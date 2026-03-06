@@ -413,15 +413,78 @@ a:hover { color: var(--color-primary-hover); }
 }
 
 .filter-section {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: var(--space-2);
 }
+.filter-section:last-of-type { border-bottom: none; }
+.filter-section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  padding: var(--space-1) 0;
+  user-select: none;
+}
+.filter-section-header:hover .filter-section-title { color: var(--color-text-muted); }
+.filter-section-arrow {
+  font-size: 10px;
+  color: var(--color-text-faint);
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+  width: 12px;
+  text-align: center;
+}
+.filter-section.collapsed .filter-section-arrow { transform: rotate(-90deg); }
 .filter-section-title {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-text-faint);
-  margin-bottom: var(--space-2);
+  flex: 1;
+}
+.filter-section-count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-text-faint);
+  font-variant-numeric: tabular-nums;
+}
+.filter-section-toggles {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+.filter-section-toggles button {
+  font-size: 10px;
+  color: var(--color-primary);
+  opacity: 0.7;
+  padding: 0 3px;
+  transition: opacity var(--transition-fast);
+}
+.filter-section-toggles button:hover { opacity: 1; }
+.filter-section-content {
+  overflow: hidden;
+  transition: max-height 0.2s ease;
+  max-height: 600px;
+}
+.filter-section.collapsed .filter-section-content {
+  max-height: 0;
+}
+.filter-section-search {
+  width: 100%;
+  padding: 4px 8px;
+  margin: 4px 0;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  font-size: 11px;
+}
+.filter-section-search::placeholder { color: var(--color-text-faint); }
+.filter-section-search:focus {
+  border-color: var(--color-primary);
+  outline: none;
 }
 
 .search-input {
@@ -1371,31 +1434,76 @@ a:hover { color: var(--color-primary-hover); }
         </div>
 
         <!-- Contractor filter -->
-        <div class="filter-section">
-          <div class="filter-section-title">Contractor</div>
-          <div id="contractorFilters"></div>
+        <div class="filter-section" id="contractorSection">
+          <div class="filter-section-header" onclick="toggleFilterSection('contractorSection')">
+            <span class="filter-section-arrow">&#9660;</span>
+            <span class="filter-section-title">Contractor</span>
+            <span class="filter-section-count" id="contractorCount"></span>
+            <span class="filter-section-toggles">
+              <button onclick="event.stopPropagation(); selectAllGroup('contractorFilters')">All</button>
+              <button onclick="event.stopPropagation(); selectNoneGroup('contractorFilters')">None</button>
+            </span>
+          </div>
+          <div class="filter-section-content">
+            <input type="text" class="filter-section-search" placeholder="Filter contractors..." oninput="filterCheckboxList('contractorFilters', this.value)">
+            <div id="contractorFilters"></div>
+          </div>
         </div>
 
         <!-- Type filter -->
-        <div class="filter-section">
-          <div class="filter-section-title">Rig Type</div>
-          <div id="typeFilters"></div>
+        <div class="filter-section" id="typeSection">
+          <div class="filter-section-header" onclick="toggleFilterSection('typeSection')">
+            <span class="filter-section-arrow">&#9660;</span>
+            <span class="filter-section-title">Rig Type</span>
+            <span class="filter-section-count" id="typeCount"></span>
+            <span class="filter-section-toggles">
+              <button onclick="event.stopPropagation(); selectAllGroup('typeFilters')">All</button>
+              <button onclick="event.stopPropagation(); selectNoneGroup('typeFilters')">None</button>
+            </span>
+          </div>
+          <div class="filter-section-content">
+            <div id="typeFilters"></div>
+          </div>
         </div>
 
         <!-- Region filter -->
-        <div class="filter-section">
-          <div class="filter-section-title">Region</div>
-          <div id="regionFilters"></div>
+        <div class="filter-section collapsed" id="regionSection">
+          <div class="filter-section-header" onclick="toggleFilterSection('regionSection')">
+            <span class="filter-section-arrow">&#9660;</span>
+            <span class="filter-section-title">Region</span>
+            <span class="filter-section-count" id="regionCount"></span>
+            <span class="filter-section-toggles">
+              <button onclick="event.stopPropagation(); selectAllGroup('regionFilters')">All</button>
+              <button onclick="event.stopPropagation(); selectNoneGroup('regionFilters')">None</button>
+            </span>
+          </div>
+          <div class="filter-section-content">
+            <input type="text" class="filter-section-search" placeholder="Filter regions..." oninput="filterCheckboxList('regionFilters', this.value)">
+            <div id="regionFilters"></div>
+          </div>
         </div>
 
         <!-- Status filter -->
-        <div class="filter-section">
-          <div class="filter-section-title">Status</div>
-          <div id="statusFilters"></div>
+        <div class="filter-section" id="statusSection">
+          <div class="filter-section-header" onclick="toggleFilterSection('statusSection')">
+            <span class="filter-section-arrow">&#9660;</span>
+            <span class="filter-section-title">Status</span>
+            <span class="filter-section-count" id="statusCount"></span>
+            <span class="filter-section-toggles">
+              <button onclick="event.stopPropagation(); selectAllGroup('statusFilters')">All</button>
+              <button onclick="event.stopPropagation(); selectNoneGroup('statusFilters')">None</button>
+            </span>
+          </div>
+          <div class="filter-section-content">
+            <div id="statusFilters"></div>
+          </div>
         </div>
 
-        <button class="filter-reset" onclick="deselectAll()">Deselect all</button>
-        <button class="filter-reset" onclick="resetFilters()">Reset all filters</button>
+        <div style="display:flex;gap:var(--space-2);padding:var(--space-2) 0;">
+          <button class="filter-reset" onclick="deselectAll()">Deselect all</button>
+          <span style="color:var(--color-text-faint)">·</span>
+          <button class="filter-reset" onclick="resetFilters()">Reset all</button>
+        </div>
       </div>
       <!-- Sidebar edge collapse tab -->
       <button class="sidebar-edge-tab" onclick="toggleSidebar()" aria-label="Collapse filters">
@@ -1755,6 +1863,51 @@ function buildFilters() {
   buildCheckboxGroup('typeFilters', types, false);
   buildCheckboxGroup('regionFilters', regions, false);
   buildCheckboxGroup('statusFilters', statuses, false);
+
+  updateSectionCounts();
+}
+
+function toggleFilterSection(sectionId) {
+  document.getElementById(sectionId).classList.toggle('collapsed');
+}
+
+function selectAllGroup(containerId) {
+  var container = document.getElementById(containerId);
+  container.querySelectorAll('input[type="checkbox"]').forEach(function(cb) { cb.checked = true; });
+  updateSectionCounts();
+  applyFilters();
+}
+
+function selectNoneGroup(containerId) {
+  var container = document.getElementById(containerId);
+  container.querySelectorAll('input[type="checkbox"]').forEach(function(cb) { cb.checked = false; });
+  updateSectionCounts();
+  applyFilters();
+}
+
+function filterCheckboxList(containerId, query) {
+  var container = document.getElementById(containerId);
+  var q = query.toLowerCase().trim();
+  container.querySelectorAll('.filter-checkbox').forEach(function(label) {
+    var val = label.querySelector('input').value.toLowerCase();
+    label.style.display = (!q || val.includes(q)) ? '' : 'none';
+  });
+}
+
+function updateSectionCounts() {
+  var sections = [
+    { filters: 'contractorFilters', count: 'contractorCount' },
+    { filters: 'typeFilters', count: 'typeCount' },
+    { filters: 'regionFilters', count: 'regionCount' },
+    { filters: 'statusFilters', count: 'statusCount' }
+  ];
+  sections.forEach(function(s) {
+    var container = document.getElementById(s.filters);
+    var all = container.querySelectorAll('input[type="checkbox"]');
+    var checked = container.querySelectorAll('input[type="checkbox"]:checked');
+    var el = document.getElementById(s.count);
+    if (el) el.textContent = checked.length + '/' + all.length;
+  });
 }
 
 function buildCheckboxGroup(containerId, items, showColor) {
@@ -1827,6 +1980,7 @@ function applyFilters() {
   updateEmptyState(filteredRigs.length);
   updateFilterChips(search, contractors, types, regions, statuses);
   updateRigCount(filteredRigs.length);
+  updateSectionCounts();
   saveToHash(search, contractors, types, regions, statuses);
   if (currentView === 'list') renderListView();
 }
