@@ -443,12 +443,20 @@ a:hover { color: var(--color-primary-hover); }
   letter-spacing: 0.06em;
   color: var(--color-text-faint);
   flex: 1;
+  transition: color var(--transition-fast);
+}
+.filter-section.has-active-filter .filter-section-title {
+  color: var(--color-primary);
 }
 .filter-section-count {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--color-text-faint);
   font-variant-numeric: tabular-nums;
+  transition: color var(--transition-fast);
+}
+.filter-section.has-active-filter .filter-section-count {
+  color: var(--color-primary);
 }
 .filter-section-toggles {
   display: flex;
@@ -1896,10 +1904,10 @@ function filterCheckboxList(containerId, query) {
 
 function updateSectionCounts() {
   var sections = [
-    { filters: 'contractorFilters', count: 'contractorCount' },
-    { filters: 'typeFilters', count: 'typeCount' },
-    { filters: 'regionFilters', count: 'regionCount' },
-    { filters: 'statusFilters', count: 'statusCount' }
+    { filters: 'contractorFilters', count: 'contractorCount', section: 'contractorSection' },
+    { filters: 'typeFilters', count: 'typeCount', section: 'typeSection' },
+    { filters: 'regionFilters', count: 'regionCount', section: 'regionSection' },
+    { filters: 'statusFilters', count: 'statusCount', section: 'statusSection' }
   ];
   sections.forEach(function(s) {
     var container = document.getElementById(s.filters);
@@ -1907,6 +1915,14 @@ function updateSectionCounts() {
     var checked = container.querySelectorAll('input[type="checkbox"]:checked');
     var el = document.getElementById(s.count);
     if (el) el.textContent = checked.length + '/' + all.length;
+    var sectionEl = document.getElementById(s.section);
+    if (sectionEl) {
+      if (checked.length < all.length) {
+        sectionEl.classList.add('has-active-filter');
+      } else {
+        sectionEl.classList.remove('has-active-filter');
+      }
+    }
   });
 }
 
