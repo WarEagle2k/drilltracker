@@ -245,10 +245,17 @@ a:hover { color: var(--color-primary-hover); }
 }
 
 .logo-text {
+  display: flex;
+  align-items: center;
   font-size: var(--text-lg);
   font-weight: 700;
   letter-spacing: -0.02em;
   color: var(--color-text);
+}
+.logo-text img {
+  height: 0.75em;
+  width: auto;
+  margin-right: 4px;
 }
 .logo-text span { color: var(--color-primary); }
 
@@ -1286,7 +1293,7 @@ a:hover { color: var(--color-primary-hover); }
       </button>
       <div class="logo">
         <img src="Drillship.png" alt="Drillship" style="height:38px;width:auto;vertical-align:middle;">
-        <div class="logo-text"><img src="CS_small.png" alt="CS Logo" style="height:1.4em;width:auto;vertical-align:baseline;margin-bottom:-0.15em;margin-right:2px;"><span>Fleet View</span></div>
+        <div class="logo-text"><img src="CS_small.png" alt="CS Logo"><span>Fleet View</span></div>
       </div>
     </div>
     <div class="header-right">
