@@ -21,6 +21,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DrillTracker — Offshore Drilling Rig Map</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='24' width='28' height='4' rx='1' fill='%23d4910a' opacity='0.3'/%3E%3Crect x='14' y='4' width='4' height='22' rx='1' fill='%23d4910a'/%3E%3Crect x='10' y='8' width='12' height='3' rx='0.5' fill='%23e8ecf4' opacity='0.9'/%3E%3Crect x='8' y='2' width='16' height='3' rx='1' fill='%23d4910a' opacity='0.7'/%3E%3Ccircle cx='16' cy='19' r='2' fill='%23d4910a'/%3E%3C/svg%3E">
 <meta name="description" content="Interactive world map of offshore drilling rigs across major contractors including Transocean, Seadrill, Noble Corporation, Valaris, and more.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1003,6 +1004,242 @@ a:hover { color: var(--color-primary-hover); }
   to { opacity: 1; transform: translateY(0); }
 }
 .kpi-value { animation: fadeIn 500ms ease-out; }
+
+/* ============================================
+   FILTER CHIPS BAR (above map/list)
+   ============================================ */
+.filter-chips-bar {
+  display: none;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-divider);
+  flex-wrap: wrap;
+  min-height: 0;
+  overflow: hidden;
+}
+.filter-chips-bar.visible {
+  display: flex;
+}
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px var(--space-2);
+  background: var(--color-primary-highlight);
+  border: 1px solid rgba(212,145,10,0.25);
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--color-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.filter-chip:hover {
+  background: rgba(212,145,10,0.25);
+}
+.filter-chip .chip-x {
+  font-size: 13px;
+  line-height: 1;
+  opacity: 0.6;
+  font-weight: 700;
+}
+.filter-chip .chip-x:hover { opacity: 1; }
+.filter-chips-bar .rig-count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+.empty-state {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  text-align: center;
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+.empty-state.visible {
+  display: flex;
+  pointer-events: auto;
+}
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-faint);
+}
+.empty-state-text {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+.empty-state-sub {
+  font-size: var(--text-sm);
+  color: var(--color-text-faint);
+}
+.empty-state-btn {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.empty-state-btn:hover {
+  background: var(--color-primary-hover);
+}
+
+/* ============================================
+   MAP TOOLTIP (hover)
+   ============================================ */
+.rig-tooltip {
+  background: var(--color-surface) !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: var(--radius-md) !important;
+  padding: var(--space-1) var(--space-2) !important;
+  font-family: var(--font-body) !important;
+  font-size: 12px !important;
+  box-shadow: var(--shadow-md) !important;
+  white-space: nowrap !important;
+}
+.rig-tooltip .tooltip-name {
+  font-weight: 600;
+}
+.rig-tooltip .tooltip-status {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+.leaflet-tooltip-top:before,
+.leaflet-tooltip-bottom:before,
+.leaflet-tooltip-left:before,
+.leaflet-tooltip-right:before {
+  border-top-color: var(--color-surface) !important;
+}
+
+/* ============================================
+   VIEW TRANSITION
+   ============================================ */
+.map-container, .list-view {
+  transition: opacity 200ms ease;
+}
+.view-fade-out {
+  opacity: 0;
+}
+
+/* ============================================
+   MOBILE BOTTOM SHEET (detail panel)
+   ============================================ */
+@media (max-width: 768px) {
+  .detail-panel {
+    width: 100% !important;
+    height: 60vh;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    transform: translateY(100%);
+  }
+  .detail-panel.open {
+    transform: translateY(0);
+  }
+  .detail-panel::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--color-border);
+    border-radius: var(--radius-full);
+    margin: var(--space-2) auto var(--space-1);
+  }
+}
+
+/* ============================================
+   SORT COLUMN HIGHLIGHT
+   ============================================ */
+.list-table th.sorted {
+  color: var(--color-primary);
+  background: var(--color-primary-highlight);
+  font-weight: 700;
+}
+
+/* ============================================
+   KPI CLICKABLE
+   ============================================ */
+.kpi-item.clickable {
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+.kpi-item.clickable:hover {
+  background: var(--color-surface-2);
+}
+
+/* ============================================
+   KEYBOARD FOCUS ROW
+   ============================================ */
+.list-table tbody tr.kb-focused {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+  background: var(--color-primary-highlight);
+}
+
+/* ============================================
+   LIGHT MODE CONTRAST FIXES
+   ============================================ */
+[data-theme="light"] .kpi-label {
+  color: #475569;
+}
+[data-theme="light"] .filter-section-title {
+  color: #475569;
+}
+[data-theme="light"] .detail-field-label {
+  color: #475569;
+}
+[data-theme="light"] .detail-section-title {
+  color: #475569;
+}
+[data-theme="light"] .footer {
+  color: #475569;
+}
+[data-theme="light"] .footer a {
+  color: #475569;
+}
+[data-theme="light"] .badge-firm { background: rgba(22,163,74,0.12); color: #16a34a; }
+[data-theme="light"] .badge-operating { background: rgba(37,99,235,0.12); color: #2563eb; }
+[data-theme="light"] .badge-loi { background: rgba(217,119,6,0.12); color: #d97706; }
+[data-theme="light"] .badge-available { background: rgba(71,85,105,0.12); color: #475569; }
+[data-theme="light"] .badge-stacked { background: rgba(220,38,38,0.12); color: #dc2626; }
+[data-theme="light"] .badge-committed { background: rgba(37,99,235,0.12); color: #2563eb; }
+[data-theme="light"] .rig-marker {
+  border-color: rgba(0,0,0,0.3);
+}
+[data-theme="light"] .rig-tooltip {
+  background: #fff !important;
+  border-color: #d0d5df !important;
+}
 </style>
 </head>
 <body>
@@ -1046,7 +1283,7 @@ a:hover { color: var(--color-primary-hover); }
 
   <!-- KPI STRIP -->
   <div class="kpi-strip">
-    <div class="kpi-item">
+    <div class="kpi-item clickable" onclick="kpiFilter('active')" title="Click to filter active rigs">
       <div class="kpi-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
       </div>
@@ -1055,7 +1292,7 @@ a:hover { color: var(--color-primary-hover); }
         <div class="kpi-value" id="kpiRigs">0</div>
       </div>
     </div>
-    <div class="kpi-item">
+    <div class="kpi-item" title="Average day rate of visible rigs">
       <div class="kpi-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       </div>
@@ -1064,7 +1301,7 @@ a:hover { color: var(--color-primary-hover); }
         <div class="kpi-value" id="kpiRate">$0</div>
       </div>
     </div>
-    <div class="kpi-item">
+    <div class="kpi-item clickable" onclick="kpiFilter('contractors')" title="Click to show all contractors">
       <div class="kpi-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       </div>
@@ -1073,7 +1310,7 @@ a:hover { color: var(--color-primary-hover); }
         <div class="kpi-value" id="kpiContractors">0</div>
       </div>
     </div>
-    <div class="kpi-item">
+    <div class="kpi-item clickable" onclick="kpiFilter('regions')" title="Click to show all regions">
       <div class="kpi-icon">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"/><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/></svg>
       </div>
@@ -1130,9 +1367,26 @@ a:hover { color: var(--color-primary-hover); }
       </div>
     </aside>
 
-    <!-- MAP -->
-    <div class="map-container" id="mapContainer">
-      <div id="map"></div>
+    <!-- CONTENT AREA -->
+    <div style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <!-- FILTER CHIPS BAR -->
+      <div class="filter-chips-bar" id="filterChipsBar">
+        <div id="filterChips"></div>
+        <span class="rig-count" id="rigCountDisplay">Showing 83 of 83 rigs</span>
+      </div>
+
+      <!-- MAP -->
+      <div class="map-container" id="mapContainer" style="position:relative;flex:1;">
+        <div id="map"></div>
+        <!-- EMPTY STATE -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-state-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+          </div>
+          <div class="empty-state-text">No rigs match your filters</div>
+          <div class="empty-state-sub">Try adjusting your search or filter criteria</div>
+          <button class="empty-state-btn" onclick="resetFilters()">Reset all filters</button>
+        </div>
 
       <!-- DETAIL PANEL -->
       <div class="detail-panel" id="detailPanel">
@@ -1169,6 +1423,7 @@ a:hover { color: var(--color-primary-hover); }
         </table>
       </div>
     </div>
+    </div><!-- /content area -->
   </div>
 
   <!-- FOOTER -->
@@ -1342,8 +1597,11 @@ document.addEventListener('DOMContentLoaded', function() {
   initTheme();
   initMap();
   buildFilters();
+  restoreFromHash();
   applyFilters();
   updateKPIs(RIG_DATA);
+  initKeyboardNav();
+  window.addEventListener('hashchange', function() { restoreFromHash(); applyFilters(); });
 });
 
 function initTheme() {
@@ -1434,6 +1692,10 @@ function createMarkers(rigs) {
 
     var marker = L.marker([rig.lat, rig.lng], { icon: icon });
     marker.rigData = rig;
+    marker.bindTooltip(
+      '<span class="tooltip-name">' + rig.name + '</span><br><span class="tooltip-status">' + rig.contractor + ' · ' + rig.status + '</span>',
+      { className: 'rig-tooltip', direction: 'top', offset: [0, -size] }
+    );
     marker.on('click', function() {
       openDetail(rig);
     });
@@ -1526,6 +1788,10 @@ function applyFilters() {
   createMarkers(filteredRigs);
   updateKPIs(filteredRigs);
   updateFilterCount(filteredRigs.length);
+  updateEmptyState(filteredRigs.length);
+  updateFilterChips(search, contractors, types, regions, statuses);
+  updateRigCount(filteredRigs.length);
+  saveToHash(search, contractors, types, regions, statuses);
   if (currentView === 'list') renderListView();
 }
 
@@ -1732,6 +1998,7 @@ function setView(view) {
    LIST VIEW
    ============================================ */
 function renderListView() {
+  kbFocusIdx = -1;
   var tbody = document.getElementById('listTableBody');
   var rows = '';
 
@@ -1813,6 +2080,261 @@ function toggleSidebar() {
     sidebar.classList.add('collapsed');
   }
   setTimeout(function() { if (map) map.invalidateSize(); }, 300);
+}
+
+/* ============================================
+   EMPTY STATE
+   ============================================ */
+function updateEmptyState(count) {
+  var el = document.getElementById('emptyState');
+  if (count === 0) {
+    el.classList.add('visible');
+  } else {
+    el.classList.remove('visible');
+  }
+}
+
+/* ============================================
+   FILTER CHIPS
+   ============================================ */
+function updateFilterChips(search, contractors, types, regions, statuses) {
+  var allContractors = [...new Set(RIG_DATA.map(function(r) { return r.contractor; }))];
+  var allTypes = [...new Set(RIG_DATA.map(function(r) { return r.type; }))];
+  var allRegions = [...new Set(RIG_DATA.map(function(r) { return r.region; }))];
+  var allStatuses = [...new Set(RIG_DATA.map(function(r) { return r.status; }))];
+
+  var chips = [];
+  var hasActiveFilter = false;
+
+  if (search) {
+    chips.push({ label: 'Search: "' + search + '"', action: function() { document.getElementById('searchInput').value = ''; applyFilters(); } });
+    hasActiveFilter = true;
+  }
+
+  // Show chips for deselected items (inverted: show what's excluded)
+  var excludedContractors = allContractors.filter(function(c) { return !contractors.includes(c); });
+  if (excludedContractors.length > 0 && excludedContractors.length <= 3) {
+    excludedContractors.forEach(function(c) {
+      chips.push({ label: '−' + shortContractor(c), action: function() { recheck('contractorFilters', c); } });
+    });
+    hasActiveFilter = true;
+  } else if (excludedContractors.length > 3) {
+    chips.push({ label: contractors.length + ' contractors', action: function() { recheckAll('contractorFilters'); } });
+    hasActiveFilter = true;
+  }
+
+  var excludedTypes = allTypes.filter(function(t) { return !types.includes(t); });
+  if (excludedTypes.length > 0) {
+    excludedTypes.forEach(function(t) {
+      chips.push({ label: '−' + t, action: function() { recheck('typeFilters', t); } });
+    });
+    hasActiveFilter = true;
+  }
+
+  var excludedStatuses = allStatuses.filter(function(s) { return !statuses.includes(s); });
+  if (excludedStatuses.length > 0 && excludedStatuses.length <= 3) {
+    excludedStatuses.forEach(function(s) {
+      chips.push({ label: '−' + s, action: function() { recheck('statusFilters', s); } });
+    });
+    hasActiveFilter = true;
+  }
+
+  var excludedRegions = allRegions.filter(function(r) { return !regions.includes(r); });
+  if (excludedRegions.length > 0 && excludedRegions.length <= 5) {
+    excludedRegions.forEach(function(r) {
+      chips.push({ label: '−' + r, action: function() { recheck('regionFilters', r); } });
+    });
+    hasActiveFilter = true;
+  } else if (excludedRegions.length > 5) {
+    chips.push({ label: regions.length + ' regions', action: function() { recheckAll('regionFilters'); } });
+    hasActiveFilter = true;
+  }
+
+  var bar = document.getElementById('filterChipsBar');
+  var container = document.getElementById('filterChips');
+
+  if (hasActiveFilter) {
+    bar.classList.add('visible');
+    var html = '';
+    chips.forEach(function(chip, i) {
+      html += '<span class="filter-chip" data-chip-idx="' + i + '">' + chip.label + ' <span class="chip-x">×</span></span>';
+    });
+    container.innerHTML = html;
+    // Attach handlers
+    container.querySelectorAll('.filter-chip').forEach(function(el, i) {
+      el.addEventListener('click', function() { chips[i].action(); });
+    });
+  } else {
+    bar.classList.remove('visible');
+    container.innerHTML = '';
+  }
+}
+
+function recheck(containerId, value) {
+  var container = document.getElementById(containerId);
+  var cb = container.querySelector('input[value="' + CSS.escape(value) + '"]');
+  if (cb) { cb.checked = true; applyFilters(); }
+}
+
+function recheckAll(containerId) {
+  var container = document.getElementById(containerId);
+  container.querySelectorAll('input[type="checkbox"]').forEach(function(cb) { cb.checked = true; });
+  applyFilters();
+}
+
+/* ============================================
+   RIG COUNT DISPLAY
+   ============================================ */
+function updateRigCount(count) {
+  var el = document.getElementById('rigCountDisplay');
+  if (el) el.textContent = 'Showing ' + count + ' of ' + RIG_DATA.length + ' rigs';
+}
+
+/* ============================================
+   KPI CLICK-TO-FILTER
+   ============================================ */
+function kpiFilter(type) {
+  if (type === 'active') {
+    // Show only Firm + Operating + Committed statuses
+    var container = document.getElementById('statusFilters');
+    var activeStatuses = ['Firm', 'Operating', 'Committed'];
+    container.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+      cb.checked = activeStatuses.includes(cb.value);
+    });
+    applyFilters();
+  } else if (type === 'contractors') {
+    // Reset contractor filter to show all, open sidebar
+    recheckAll('contractorFilters');
+    if (!sidebarOpen) toggleSidebar();
+  } else if (type === 'regions') {
+    // Reset region filter to show all, open sidebar
+    recheckAll('regionFilters');
+    if (!sidebarOpen) toggleSidebar();
+  }
+}
+
+/* ============================================
+   VIEW TRANSITION ANIMATION
+   ============================================ */
+var _origSetView = setView;
+setView = function(view) {
+  if (view === currentView) return;
+  var mapContainer = document.getElementById('mapContainer');
+  var listView = document.getElementById('listView');
+  var outgoing = view === 'map' ? listView : mapContainer;
+
+  outgoing.classList.add('view-fade-out');
+  setTimeout(function() {
+    outgoing.classList.remove('view-fade-out');
+    _origSetView(view);
+  }, 150);
+};
+
+/* ============================================
+   KEYBOARD NAVIGATION
+   ============================================ */
+var kbFocusIdx = -1;
+
+function initKeyboardNav() {
+  document.addEventListener('keydown', function(e) {
+    // Escape closes detail panel
+    if (e.key === 'Escape') {
+      closeDetail();
+      return;
+    }
+
+    // Arrow keys in list view
+    if (currentView !== 'list') return;
+    var rows = document.querySelectorAll('#listTableBody tr');
+    if (rows.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      kbFocusIdx = Math.min(kbFocusIdx + 1, rows.length - 1);
+      updateKbFocus(rows);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      kbFocusIdx = Math.max(kbFocusIdx - 1, 0);
+      updateKbFocus(rows);
+    } else if (e.key === 'Enter' && kbFocusIdx >= 0) {
+      e.preventDefault();
+      rows[kbFocusIdx].click();
+    }
+  });
+}
+
+function updateKbFocus(rows) {
+  rows.forEach(function(r) { r.classList.remove('kb-focused'); });
+  if (kbFocusIdx >= 0 && kbFocusIdx < rows.length) {
+    rows[kbFocusIdx].classList.add('kb-focused');
+    rows[kbFocusIdx].scrollIntoView({ block: 'nearest' });
+  }
+}
+
+/* ============================================
+   URL HASH STATE (Bookmark/Share)
+   ============================================ */
+var hashUpdateTimer = null;
+
+function saveToHash(search, contractors, types, regions, statuses) {
+  clearTimeout(hashUpdateTimer);
+  hashUpdateTimer = setTimeout(function() {
+    var allContractors = [...new Set(RIG_DATA.map(function(r) { return r.contractor; }))];
+    var allTypes = [...new Set(RIG_DATA.map(function(r) { return r.type; }))];
+    var allRegions = [...new Set(RIG_DATA.map(function(r) { return r.region; }))];
+    var allStatuses = [...new Set(RIG_DATA.map(function(r) { return r.status; }))];
+
+    var params = new URLSearchParams();
+    if (search) params.set('q', search);
+    if (contractors.length < allContractors.length) params.set('contractor', contractors.join('|'));
+    if (types.length < allTypes.length) params.set('type', types.join('|'));
+    if (regions.length < allRegions.length) params.set('region', regions.join('|'));
+    if (statuses.length < allStatuses.length) params.set('status', statuses.join('|'));
+
+    var hash = params.toString();
+    if (hash) {
+      history.replaceState(null, '', '#' + hash);
+    } else {
+      history.replaceState(null, '', window.location.pathname);
+    }
+  }, 300);
+}
+
+function restoreFromHash() {
+  var hash = window.location.hash.substring(1);
+  if (!hash) return;
+
+  var params = new URLSearchParams(hash);
+  var q = params.get('q');
+  if (q) document.getElementById('searchInput').value = q;
+
+  var cFilter = params.get('contractor');
+  if (cFilter) {
+    var vals = cFilter.split('|');
+    setFilterChecks('contractorFilters', vals);
+  }
+  var tFilter = params.get('type');
+  if (tFilter) {
+    var vals = tFilter.split('|');
+    setFilterChecks('typeFilters', vals);
+  }
+  var rFilter = params.get('region');
+  if (rFilter) {
+    var vals = rFilter.split('|');
+    setFilterChecks('regionFilters', vals);
+  }
+  var sFilter = params.get('status');
+  if (sFilter) {
+    var vals = sFilter.split('|');
+    setFilterChecks('statusFilters', vals);
+  }
+}
+
+function setFilterChecks(containerId, values) {
+  var container = document.getElementById(containerId);
+  container.querySelectorAll('input[type="checkbox"]').forEach(function(cb) {
+    cb.checked = values.includes(cb.value);
+  });
 }
 </script>
 </body>
