@@ -1100,6 +1100,7 @@ a:hover { color: var(--color-primary-hover); }
           <div id="statusFilters"></div>
         </div>
 
+        <button class="filter-reset" onclick="deselectAll()">Deselect all</button>
         <button class="filter-reset" onclick="resetFilters()">Reset all filters</button>
       </div>
     </aside>
@@ -1489,6 +1490,12 @@ function applyFilters() {
   updateKPIs(filteredRigs);
   updateFilterCount(filteredRigs.length);
   if (currentView === 'list') renderListView();
+}
+
+function deselectAll() {
+  var allChecks = document.querySelectorAll('.filter-body input[type="checkbox"]');
+  allChecks.forEach(function(cb) { cb.checked = false; });
+  applyFilters();
 }
 
 function resetFilters() {
