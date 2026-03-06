@@ -742,6 +742,31 @@ a:hover { color: var(--color-primary-hover); }
   border-left: 3px solid var(--color-primary);
 }
 
+.detail-source {
+  margin-top: var(--space-3);
+}
+.detail-source a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--color-primary);
+  text-decoration: none;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  transition: background 0.15s, color 0.15s;
+}
+.detail-source a:hover {
+  background: var(--color-surface-3, rgba(255,255,255,0.08));
+  color: var(--color-primary-light, #fde68a);
+}
+.detail-source a svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
 /* ============================================
    LIST VIEW
    ============================================ */
@@ -1287,6 +1312,18 @@ const TYPE_SIZES = {
   'Jackup': 6
 };
 
+const SOURCE_URLS = {
+  "Transocean":        "https://www.deepwater.com/investors/fleet-status-report",
+  "Seadrill":          "https://www.seadrill.com/wp-content/uploads/2026/02/Seadrill-Fleet-Status-Report-February-25-2026-vF.pdf",
+  "Noble Corporation": "https://www.noblecorp.com/investors/reports-and-filings/fleet-status-report/default.aspx",
+  "Valaris":           "https://www.valaris.com/news/news-details/2025/Valaris-Issues-Fleet-Status-Report-5361b576f/default.aspx",
+  "Odfjell Drilling":  "https://www.odfjelldrilling.com/investor/reports-and-presentations/",
+  "Borr Drilling":     "https://www.borrdrilling.com/fleet-status-report",
+  "Saipem":            "https://www.saipem.com/en/investors/quarterly-results",
+  "Stena Drilling":    "https://www.stena-drilling.com/fleet-contract-status-update/",
+  "COSL":              "https://www.cosl.com.cn/english/servicesproducts/drilling/drillingrigs/"
+};
+
 /* ============================================
    STATE
    ============================================ */
@@ -1606,7 +1643,15 @@ function openDetail(rig) {
 
     (rig.backlogNote ?
     '<div class="detail-section-title">Backlog Notes</div>' +
-    '<div class="backlog-note">' + rig.backlogNote + '</div>' : '');
+    '<div class="backlog-note">' + rig.backlogNote + '</div>' : '') +
+
+    (SOURCE_URLS[rig.contractor] ?
+    '<div class="detail-source">' +
+      '<a href="' + SOURCE_URLS[rig.contractor] + '" target="_blank" rel="noopener noreferrer">' +
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>' +
+        'View Fleet Status Report' +
+      '</a>' +
+    '</div>' : '');
 
   panel.classList.add('open');
 }
