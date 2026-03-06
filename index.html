@@ -364,7 +364,7 @@ a:hover { color: var(--color-primary-hover); }
   border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
   transition: width var(--transition-slide), margin var(--transition-slide);
   flex-shrink: 0;
   z-index: 500;
@@ -373,6 +373,7 @@ a:hover { color: var(--color-primary-hover); }
 .filter-sidebar.collapsed {
   width: 0;
   margin-left: -1px;
+  overflow: hidden;
 }
 
 .filter-header {
@@ -519,31 +520,32 @@ a:hover { color: var(--color-primary-hover); }
 }
 .sidebar-toggle:hover { color: var(--color-text); background: var(--color-surface-2); }
 
-/* Sidebar edge collapse tab — always visible on the right edge of the sidebar */
+/* Sidebar edge collapse tab — visible on the right edge of the sidebar */
 .sidebar-edge-tab {
   position: absolute;
-  right: -16px;
+  right: -24px;
   top: 50%;
   transform: translateY(-50%);
-  width: 16px;
-  height: 56px;
-  background: var(--color-surface);
+  width: 24px;
+  height: 72px;
+  background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   border-left: none;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text-faint);
+  color: var(--color-text-muted);
   z-index: 510;
   transition: all var(--transition-fast);
   padding: 0;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.2);
 }
 .sidebar-edge-tab:hover {
   color: var(--color-primary);
-  background: var(--color-surface-2);
-  width: 20px;
-  right: -20px;
+  background: var(--color-surface-offset);
+  width: 28px;
+  right: -28px;
 }
 .filter-sidebar.collapsed .sidebar-edge-tab {
   display: none;
