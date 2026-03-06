@@ -20,9 +20,9 @@
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CS RigView — Offshore Drilling Rig Map</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='24' width='28' height='4' rx='1' fill='%23d4910a' opacity='0.3'/%3E%3Crect x='14' y='4' width='4' height='22' rx='1' fill='%23d4910a'/%3E%3Crect x='10' y='8' width='12' height='3' rx='0.5' fill='%23e8ecf4' opacity='0.9'/%3E%3Crect x='8' y='2' width='16' height='3' rx='1' fill='%23d4910a' opacity='0.7'/%3E%3Ccircle cx='16' cy='19' r='2' fill='%23d4910a'/%3E%3C/svg%3E">
-<meta name="description" content="CS RigView by Connector Specialists — Interactive world map of offshore drilling rigs across major contractors including Transocean, Seadrill, Noble Corporation, Valaris, and more.">
+<title>CS Fleet View — Offshore Drilling Rig Map</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 26Q8 24 12 26Q16 28 20 26Q24 24 28 26' stroke='%23d4910a' stroke-width='1.5' fill='none'/%3E%3Cpath d='M6 24L8 18h16l2 6z' fill='%23e8ecf4'/%3E%3Crect x='8' y='14' width='10' height='4' rx='0.5' fill='%23e8ecf4'/%3E%3Crect x='14' y='2' width='2' height='16' fill='%23d4910a'/%3E%3Crect x='12' y='2' width='6' height='1.5' rx='0.3' fill='%23d4910a'/%3E%3Crect x='13' y='5' width='4' height='1' fill='%23d4910a' opacity='0.7'/%3E%3Crect x='13' y='8' width='4' height='1' fill='%23d4910a' opacity='0.7'/%3E%3Crect x='13' y='11' width='4' height='1' fill='%23d4910a' opacity='0.7'/%3E%3Crect x='22' y='14' width='3' height='4' rx='0.5' fill='%23d4910a'/%3E%3C/svg%3E">
+<meta name="description" content="CS Fleet View by Connector Specialists — Interactive world map of offshore drilling rigs across major contractors including Transocean, Seadrill, Noble Corporation, Valaris, and more.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1285,16 +1285,45 @@ a:hover { color: var(--color-primary-hover); }
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
       </button>
       <div class="logo">
-        <!-- DrillTracker SVG Logo -->
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-label="DrillTracker logo">
-          <rect x="2" y="24" width="28" height="4" rx="1" fill="#d4910a" opacity="0.3"/>
-          <rect x="14" y="4" width="4" height="22" rx="1" fill="#d4910a"/>
-          <rect x="10" y="8" width="12" height="3" rx="0.5" fill="#e8ecf4" opacity="0.9"/>
-          <rect x="12" y="13" width="8" height="2" rx="0.5" fill="#e8ecf4" opacity="0.6"/>
-          <rect x="8" y="2" width="16" height="3" rx="1" fill="#d4910a" opacity="0.7"/>
-          <circle cx="16" cy="19" r="2" fill="#d4910a"/>
+        <!-- Drillship SVG Logo -->
+        <svg width="36" height="32" viewBox="0 0 72 56" fill="none" aria-label="CS Fleet View logo">
+          <!-- Water waves -->
+          <path d="M2 48 Q8 44 14 48 Q20 52 26 48 Q32 44 38 48 Q44 52 50 48 Q56 44 62 48 Q68 52 70 48" stroke="#d4910a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <path d="M4 53 Q10 49 16 53 Q22 57 28 53 Q34 49 40 53 Q46 57 52 53 Q58 49 64 53 Q68 57 70 53" stroke="#d4910a" stroke-width="2" fill="none" opacity="0.5" stroke-linecap="round"/>
+          <!-- Hull -->
+          <path d="M8 44 L12 34 L60 34 L64 44 Z" fill="#e8ecf4"/>
+          <rect x="16" y="37" width="3" height="3" rx="0.5" fill="#243554" opacity="0.5"/>
+          <rect x="22" y="37" width="3" height="3" rx="0.5" fill="#243554" opacity="0.5"/>
+          <rect x="49" y="37" width="3" height="3" rx="0.5" fill="#243554" opacity="0.5"/>
+          <rect x="55" y="37" width="3" height="3" rx="0.5" fill="#243554" opacity="0.5"/>
+          <!-- Superstructure -->
+          <rect x="14" y="26" width="24" height="8" rx="1" fill="#e8ecf4"/>
+          <rect x="16" y="28" width="4" height="3" rx="0.5" fill="#243554" opacity="0.4"/>
+          <rect x="22" y="28" width="4" height="3" rx="0.5" fill="#243554" opacity="0.4"/>
+          <rect x="28" y="28" width="4" height="3" rx="0.5" fill="#243554" opacity="0.4"/>
+          <!-- Derrick/Tower -->
+          <rect x="32" y="4" width="4" height="30" fill="#d4910a"/>
+          <rect x="29" y="4" width="10" height="3" rx="0.5" fill="#d4910a"/>
+          <rect x="30" y="10" width="8" height="2" fill="#d4910a" opacity="0.7"/>
+          <rect x="30" y="16" width="8" height="2" fill="#d4910a" opacity="0.7"/>
+          <rect x="30" y="22" width="8" height="2" fill="#d4910a" opacity="0.7"/>
+          <!-- Cross bracing on derrick -->
+          <line x1="30" y1="7" x2="38" y2="15" stroke="#0a1628" stroke-width="0.8" opacity="0.3"/>
+          <line x1="38" y1="7" x2="30" y2="15" stroke="#0a1628" stroke-width="0.8" opacity="0.3"/>
+          <line x1="30" y1="15" x2="38" y2="23" stroke="#0a1628" stroke-width="0.8" opacity="0.3"/>
+          <line x1="38" y1="15" x2="30" y2="23" stroke="#0a1628" stroke-width="0.8" opacity="0.3"/>
+          <!-- Crown block -->
+          <rect x="31" y="1" width="6" height="3" rx="0.5" fill="#e8ecf4"/>
+          <!-- Crane -->
+          <line x1="44" y1="26" x2="52" y2="18" stroke="#d4910a" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="52" y1="18" x2="52" y2="22" stroke="#d4910a" stroke-width="1" stroke-linecap="round"/>
+          <!-- Funnel/Stack -->
+          <rect x="54" y="24" width="5" height="10" rx="1" fill="#d4910a"/>
+          <ellipse cx="56.5" cy="24" rx="2.5" ry="1" fill="#d4910a"/>
+          <!-- Helipad hint -->
+          <circle cx="20" cy="25" r="3" fill="none" stroke="#d4910a" stroke-width="0.8" opacity="0.5"/>
         </svg>
-        <div class="logo-text">CS <span>RigView</span></div>
+        <div class="logo-text">CS <span>Fleet View</span></div>
       </div>
     </div>
     <div class="header-right">
