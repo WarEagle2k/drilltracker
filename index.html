@@ -82,10 +82,10 @@ html {
   --color-text-faint:     #546580;
   --color-text-inverse:   #0a1628;
 
-  --color-primary:        #d4910a;
-  --color-primary-hover:  #e8a41e;
-  --color-primary-active: #b57a08;
-  --color-primary-highlight: rgba(212, 145, 10, 0.12);
+  --color-primary:        #3b82f6;
+  --color-primary-hover:  #60a5fa;
+  --color-primary-active: #2563eb;
+  --color-primary-highlight: rgba(59, 130, 246, 0.12);
 
   --color-success:        #34d399;
   --color-warning:        #fbbf24;
@@ -112,10 +112,10 @@ html {
   --color-text-faint:     #94a3b8;
   --color-text-inverse:   #ffffff;
 
-  --color-primary:        #b87a08;
-  --color-primary-hover:  #a06b06;
-  --color-primary-active: #8a5c05;
-  --color-primary-highlight: rgba(184, 122, 8, 0.1);
+  --color-primary:        #2563eb;
+  --color-primary-hover:  #1d4ed8;
+  --color-primary-active: #1e40af;
+  --color-primary-highlight: rgba(37, 99, 235, 0.1);
 
   --color-success:        #16a34a;
   --color-warning:        #d97706;
@@ -140,10 +140,10 @@ html {
     --color-text-muted:     #8899b4;
     --color-text-faint:     #546580;
     --color-text-inverse:   #0a1628;
-    --color-primary:        #d4910a;
-    --color-primary-hover:  #e8a41e;
-    --color-primary-active: #b57a08;
-    --color-primary-highlight: rgba(212, 145, 10, 0.12);
+    --color-primary:        #3b82f6;
+    --color-primary-hover:  #60a5fa;
+    --color-primary-active: #2563eb;
+    --color-primary-highlight: rgba(59, 130, 246, 0.12);
     --color-success:        #34d399;
     --color-warning:        #fbbf24;
     --color-error:          #f87171;
@@ -254,9 +254,10 @@ a:hover { color: var(--color-primary-hover); }
 .view-toggle {
   display: flex;
   background: var(--color-surface-2);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
-  overflow: hidden;
+  padding: 3px;
+  gap: 2px;
 }
 .view-toggle button {
   padding: var(--space-1) var(--space-3);
@@ -267,10 +268,12 @@ a:hover { color: var(--color-primary-hover); }
   display: flex;
   align-items: center;
   gap: var(--space-1);
+  border-radius: var(--radius-md);
 }
 .view-toggle button.active {
   background: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(59, 130, 246, 0.3);
 }
 .view-toggle button:not(.active):hover {
   color: var(--color-text);
@@ -616,7 +619,7 @@ a:hover { color: var(--color-primary-hover); }
   border-color: var(--color-primary);
 }
 .sidebar-toggle-btn.has-filters {
-  background: rgba(99, 179, 237, 0.12);
+  background: var(--color-primary-highlight);
   border-color: var(--color-primary);
   color: var(--color-primary);
 }
@@ -908,7 +911,7 @@ a:hover { color: var(--color-primary-hover); }
 }
 .detail-source a:hover {
   background: var(--color-surface-3, rgba(255,255,255,0.08));
-  color: var(--color-primary-light, #fde68a);
+  color: var(--color-primary-hover, #60a5fa);
 }
 .detail-source a svg {
   width: 14px;
