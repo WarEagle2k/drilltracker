@@ -584,6 +584,47 @@ a:hover { color: var(--color-primary-hover); }
 }
 .sidebar-toggle:hover { color: var(--color-text); background: var(--color-surface-2); }
 
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+.sidebar-toggle-btn:hover {
+  background: var(--color-surface-offset);
+  color: var(--color-text);
+  border-color: var(--color-primary);
+}
+.sidebar-toggle-btn.has-filters {
+  background: rgba(99, 179, 237, 0.12);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+.filter-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+}
+
 /* Sidebar edge collapse tab — visible on the right edge of the sidebar */
 .sidebar-edge-tab {
   position: absolute;
@@ -1345,8 +1386,9 @@ a:hover { color: var(--color-primary-hover); }
   <!-- HEADER -->
   <header class="header" role="banner">
     <div class="header-left">
-      <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle filters" style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-md);color:var(--color-text-muted);transition:all var(--transition-fast);" onmouseover="this.style.background='var(--color-surface-2)';this.style.color='var(--color-text)'" onmouseout="this.style.background='none';this.style.color='var(--color-text-muted)'">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+      <button class="sidebar-toggle-btn" onclick="toggleSidebar()" aria-label="Toggle filters">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        <span>Filters</span>
       </button>
       <div class="logo">
         <div class="logo-text"><img src="CS_small.png" alt="CS Logo"><span>ConnRig</span></div>
@@ -2357,6 +2399,24 @@ function updateFilterChips(search, contractors, types, regions, statuses) {
   } else {
     bar.classList.remove('visible');
     container.innerHTML = '';
+  }
+
+  // Update Filters button state
+  var toggleBtn = document.querySelector('.sidebar-toggle-btn');
+  if (toggleBtn) {
+    var countEl = toggleBtn.querySelector('.filter-badge');
+    if (hasActiveFilter) {
+      toggleBtn.classList.add('has-filters');
+      if (!countEl) {
+        countEl = document.createElement('span');
+        countEl.className = 'filter-badge';
+        toggleBtn.appendChild(countEl);
+      }
+      countEl.textContent = chips.length;
+    } else {
+      toggleBtn.classList.remove('has-filters');
+      if (countEl) countEl.remove();
+    }
   }
 }
 
