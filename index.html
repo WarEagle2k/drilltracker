@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!--
    ______                            __
   / ____/___  ____ ___  ____  __  __/ /____  _____
@@ -18,19 +20,31 @@
 <meta property="og:see_also" content="https://www.perplexity.ai/computer">
 <link rel="author" href="https://www.perplexity.ai/computer">
 
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DrillTracker — Offshore Drilling Rig Map</title>
 <meta name="description" content="Interactive world map of offshore drilling rigs across major contractors including Transocean, Seadrill, Noble Corporation, Valaris, and more.">
+<meta name="theme-color" content="#0a1628">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='24' width='28' height='4' rx='1' fill='%23d4910a' opacity='0.3'/%3E%3Crect x='14' y='4' width='4' height='22' rx='1' fill='%23d4910a'/%3E%3Crect x='10' y='8' width='12' height='3' rx='0.5' fill='%23e8ecf4' opacity='0.9'/%3E%3Crect x='12' y='13' width='8' height='2' rx='0.5' fill='%23e8ecf4' opacity='0.6'/%3E%3Crect x='8' y='2' width='16' height='3' rx='1' fill='%23d4910a' opacity='0.7'/%3E%3Ccircle cx='16' cy='19' r='2' fill='%23d4910a'/%3E%3C/svg%3E">
+
+<script>
+/* Apply the saved (or system-preferred) theme before first paint to avoid a flash */
+(function () {
+  var theme = null;
+  try { theme = localStorage.getItem('drilltracker-theme'); } catch (e) {}
+  if (theme !== 'dark' && theme !== 'light') {
+    theme = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  }
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous" />
 
 <style>
 /* Art direction: Maritime Operations Center → Industrial, authoritative, dark-first
@@ -328,7 +342,6 @@ a:hover { color: var(--color-primary-hover); }
   color: var(--color-primary);
   flex-shrink: 0;
 }
-.kpi-content {}
 .kpi-label {
   font-size: 11px;
   text-transform: uppercase;
@@ -497,26 +510,6 @@ a:hover { color: var(--color-primary-hover); }
   transition: opacity var(--transition-fast);
 }
 .filter-reset:hover { opacity: 1; }
-
-.sidebar-toggle {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 24px;
-  height: 48px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-left: none;
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-muted);
-  z-index: 510;
-  transition: all var(--transition-fast);
-}
-.sidebar-toggle:hover { color: var(--color-text); background: var(--color-surface-2); }
 
 /* ============================================
    MAP
@@ -887,7 +880,6 @@ a:hover { color: var(--color-primary-hover); }
     width: 280px;
     margin-left: 0;
   }
-  .sidebar-toggle { display: flex; }
   .detail-panel {
     width: 100%;
     border-left: none;
@@ -905,7 +897,6 @@ a:hover { color: var(--color-primary-hover); }
   .header { padding: var(--space-2) var(--space-3); }
   .footer { padding: var(--space-1) var(--space-3); }
   .footer-sources { display: none; }
-  .filter-sidebar:not(.collapsed) ~ .map-container .sidebar-toggle { display: none; }
 }
 
 @media (max-width: 480px) {
@@ -1121,6 +1112,35 @@ a:hover { color: var(--color-primary-hover); }
 }
 @media (max-width: 480px) { .kpi-strip .kpi-icon { display: none; } }
 
+/* ============================================
+   v3 ENHANCEMENTS (audit-driven)
+   ============================================ */
+/* search clear button */
+.search-input { padding-right: 32px; }
+.search-clear {
+  position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+  width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+  border-radius: var(--radius-full); color: var(--color-text-faint);
+  transition: all var(--transition-fast);
+}
+.search-clear:hover { color: var(--color-text); background: var(--color-surface-offset); }
+.search-clear[hidden] { display: none; }
+
+/* per-option rig counts in filter groups */
+.filter-opt-count {
+  font-family: var(--font-mono); font-size: 10px; color: var(--color-text-faint);
+  font-variant-numeric: tabular-nums; flex-shrink: 0;
+}
+
+/* mobile backdrop behind the overlaying sidebar */
+.sidebar-backdrop { display: none; }
+@media (max-width: 768px) {
+  .sidebar-backdrop {
+    display: block; position: absolute; inset: 0; z-index: 650;
+    background: rgba(0, 0, 0, 0.45); border: none; padding: 0; cursor: default;
+  }
+  .sidebar-backdrop[hidden] { display: none; }
+}
 </style>
 </head>
 <body>
@@ -1161,6 +1181,9 @@ a:hover { color: var(--color-primary-hover); }
           <span>Insights</span>
         </button>
       </div>
+      <button class="icon-btn" onclick="exportCSV()" aria-label="Export filtered rigs to CSV" title="Export CSV">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </button>
       <button class="icon-btn theme-btn" data-theme-toggle aria-label="Switch to light theme">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
       </button>
@@ -1174,7 +1197,7 @@ a:hover { color: var(--color-primary-hover); }
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
       </div>
       <div class="kpi-content">
-        <div class="kpi-label">Active Rigs</div>
+        <div class="kpi-label">Rigs Shown</div>
         <div class="kpi-value" id="kpiRigs">0</div>
       </div>
     </div>
@@ -1238,7 +1261,10 @@ a:hover { color: var(--color-primary-hover); }
         <div class="filter-section">
           <div class="search-wrapper">
             <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search rig, contractor, customer…" aria-label="Search rigs by name, contractor, customer, or region">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search rig, contractor, customer…" aria-label="Search rigs by name, contractor, customer, region, type, or status">
+            <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Clear search" hidden>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
         </div>
 
@@ -1273,6 +1299,9 @@ a:hover { color: var(--color-primary-hover); }
       </div>
     </aside>
 
+    <!-- Backdrop shown behind the sidebar on small screens; tap to dismiss -->
+    <button type="button" class="sidebar-backdrop" id="sidebarBackdrop" onclick="toggleSidebar()" aria-label="Close filters" tabindex="-1" hidden></button>
+
     <!-- MAP -->
     <div class="map-container" id="mapContainer">
       <div id="map"></div>
@@ -1294,7 +1323,7 @@ a:hover { color: var(--color-primary-hover); }
       </div>
 
       <!-- DETAIL PANEL -->
-      <div class="detail-panel" id="detailPanel" role="dialog" aria-modal="true" aria-labelledby="detailName">
+      <div class="detail-panel" id="detailPanel" role="dialog" aria-labelledby="detailName">
         <div class="detail-header">
           <div>
             <h2 class="detail-rig-name" id="detailName">—</h2>
@@ -1347,8 +1376,8 @@ a:hover { color: var(--color-primary-hover); }
   </footer>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
 <script>
 /* ============================================
    RIG DATA
@@ -1377,7 +1406,7 @@ const RIG_DATA = [
   {"id":"rig-021","name":"Transocean Endurance","contractor":"Transocean","type":"Semisubmersible","generation":"6th Gen HE","waterDepth_ft":7500,"hookload_tons":750,"buildYear":2015,"region":"Australia","lat":-19.8,"lng":116.5,"customer":"Woodside","status":"Firm","contractStart":"Feb 2026","contractEnd":"Oct 2026","dayRate":390000,"backlogNote":"Woodside offshore Australia at $390k/day to Aug 2026 then $419k/day to Oct 2026"},
   {"id":"rig-022","name":"Transocean Equinox","contractor":"Transocean","type":"Semisubmersible","generation":"6th Gen HE","waterDepth_ft":7500,"hookload_tons":750,"buildYear":2015,"region":"Australia","lat":-20.3,"lng":115.8,"customer":"Not Disclosed","status":"Firm","contractStart":"Apr 2025","contractEnd":"Aug 2026","dayRate":485000,"backlogNote":"Undisclosed Australia operator at $485k/day to Aug 2026, $540k/day fixture Sep-Nov 2026; new two-well Santos Australia contract (~$36M, ~90 days, plus options) awarded for Q2 2027"},
   {"id":"rig-023","name":"West Auriga","contractor":"Seadrill","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2013,"region":"Brazil","lat":-22.2,"lng":-39.4,"customer":"Petrobras","status":"Firm","contractStart":"Dec 2024","contractEnd":"Nov 2027","dayRate":null,"backlogNote":"Petrobras Buzios/Santos Basin firm contract running to ~end 2027; priced options extending beyond 2028 per the May 2026 fleet status. Day rate undisclosed."},
-  {"id":"rig-024","name":"West Neptune","contractor":"Seadrill","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"US Gulf of Mexico","lat":27.5,"lng":-90.5,"customer":"LLOG","status":"Firm","contractStart":"Sep 2026","contractEnd":"Oct 2027","dayRate":400000,"backlogNote":"April 22, 2026 LLOG (Harbour Energy subsidiary) 365-day extension commencing Sep 2026, firm ~through Oct 2027; part of ~$260M combined Neptune+Vela award. No dayrate and no priced options disclosed in the award."},
+  {"id":"rig-024","name":"West Neptune","contractor":"Seadrill","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"US Gulf of Mexico","lat":27.5,"lng":-90.5,"customer":"LLOG","status":"Firm","contractStart":"Sep 2026","contractEnd":"Oct 2027","dayRate":null,"backlogNote":"April 22, 2026 LLOG (Harbour Energy subsidiary) 365-day extension commencing Sep 2026, firm ~through Oct 2027; part of ~$260M combined Neptune+Vela award. No dayrate and no priced options disclosed in the award."},
   {"id":"rig-025","name":"West Vela","contractor":"Seadrill","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2013,"region":"US Gulf of Mexico","lat":28.3,"lng":-89.6,"customer":"LLOG","status":"Firm","contractStart":"Aug 2026","contractEnd":"Jun 2027","dayRate":null,"backlogNote":"April 22, 2026 LLOG (Harbour Energy subsidiary) 270-day program commencing Aug 2026, firm to ~Jun 2027; part of ~$260M combined Neptune+Vela award. Follows earlier short Talos and Walter Oil & Gas programs in late 2025/early 2026. No dayrate disclosed."},
   {"id":"rig-026","name":"West Jupiter","contractor":"Seadrill","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"Brazil","lat":-23.5,"lng":-41.0,"customer":"Petrobras","status":"Firm","contractStart":"Mar 2026","contractEnd":"Mar 2029","dayRate":null,"backlogNote":"Petrobras Brazil multi-year program; commenced ~March 2026 per the May 2026 fleet status. Day rate undisclosed."},
   {"id":"rig-027","name":"West Saturn","contractor":"Seadrill","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"Brazil","lat":-22.9,"lng":-40.8,"customer":"Equinor","status":"Firm","contractStart":"Oct 2022","contractEnd":"Oct 2027","dayRate":null,"backlogNote":"Equinor Brazil; firm term to ~Oct 2027 with priced options through October 2030 per the May 2026 fleet status. Day rate undisclosed."},
@@ -1389,14 +1418,14 @@ const RIG_DATA = [
   {"id":"rig-033","name":"Sonangol Libongos","contractor":"Seadrill (Sonadrill JV)","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2019,"region":"West Africa","lat":-7.5,"lng":12.0,"customer":"Undisclosed","status":"Firm","contractStart":"Dec 2020","contractEnd":"Feb 2027","dayRate":null,"backlogNote":"Sonangol-owned drillship offshore Angola, managed by Seadrill via the Sonadrill JV (daily management fee, not dayrate); includes priced options through January 2030."},
   {"id":"rig-034","name":"Sonangol Quenguela","contractor":"Seadrill (Sonadrill JV)","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2019,"region":"West Africa","lat":-7.8,"lng":11.5,"customer":"TotalEnergies","status":"Firm","contractStart":"May 2024","contractEnd":"Jul 2028","dayRate":null,"backlogNote":"TotalEnergies Angola ultra-deepwater drillship (Sonadrill JV, daily management fee not dayrate); seven-well (~480-day) priced option exercised March 2026 extended the firm contract end to Jul 2028."},
   {"id":"rig-035","name":"West Gemini","contractor":"Seadrill (Sonadrill JV)","type":"Drillship","generation":"6th Gen","waterDepth_ft":10000,"hookload_tons":1000,"buildYear":2010,"region":"West Africa","lat":-6.8,"lng":11.8,"customer":"Sonangol","status":"Firm","contractStart":"Feb 2026","contractEnd":"Nov 2026","dayRate":null,"backlogNote":"Sonangol Angola deepwater campaign (Sonadrill JV, daily management fee not dayrate); firm Feb 2026 to Nov 2026."},
-  {"id":"rig-036","name":"Noble Globetrotter I","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2013,"region":"US Gulf of Mexico","lat":27.3,"lng":-91.0,"customer":"OMV Petrom","status":"Firm","contractStart":"Dec 2025","contractEnd":"Apr 2026","dayRate":425000,"backlogNote":"Globetrotter-class drillship (HuisDrill 10000 design), two-well Han Asparuh exploration campaign for OMV Petrom/NewMed Energy offshore Bulgaria; rig-contract value ~$80M, ~four months from late 2025. Day rate not disclosed."},
+  {"id":"rig-036","name":"Noble Globetrotter I","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2013,"region":"US Gulf of Mexico","lat":27.3,"lng":-91.0,"customer":"OMV Petrom","status":"Firm","contractStart":"Dec 2025","contractEnd":"Apr 2026","dayRate":null,"backlogNote":"Globetrotter-class drillship (HuisDrill 10000 design), two-well Han Asparuh exploration campaign for OMV Petrom/NewMed Energy offshore Bulgaria; rig-contract value ~$80M, ~four months from late 2025. Day rate not disclosed."},
   {"id":"rig-037","name":"Noble Sam Croft","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"Guyana","lat":7.0,"lng":-57.5,"customer":"ExxonMobil","status":"Firm","contractStart":"2022","contractEnd":"Feb 2029","dayRate":425000,"backlogNote":"ExxonMobil Guyana Stabroek block; CEA framework extended to Feb 2029"},
   {"id":"rig-038","name":"Noble Bob Douglas","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"Guyana","lat":6.8,"lng":-57.8,"customer":"ExxonMobil","status":"Firm","contractStart":"2020","contractEnd":"Feb 2029","dayRate":425000,"backlogNote":"ExxonMobil Guyana development drilling; CEA extended"},
   {"id":"rig-039","name":"Noble Tom Madden","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"Guyana","lat":7.2,"lng":-57.2,"customer":"ExxonMobil","status":"Firm","contractStart":"2020","contractEnd":"Feb 2029","dayRate":425000,"backlogNote":"ExxonMobil Guyana development drilling; CEA extended"},
   {"id":"rig-040","name":"Noble Don Taylor","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"Guyana","lat":6.5,"lng":-57.0,"customer":"ExxonMobil","status":"Firm","contractStart":"2023","contractEnd":"Feb 2029","dayRate":425000,"backlogNote":"ExxonMobil Guyana; CEA framework"},
   {"id":"rig-041","name":"Noble BlackHornet","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"US Gulf of Mexico","lat":28.0,"lng":-88.0,"customer":"bp","status":"Firm","contractStart":"2023","contractEnd":"Feb 2029","dayRate":null,"backlogNote":"bp GoM; Oct-2025 two-year extension worth ~$310M (excl. MPD) carries the rig into Feb 2029, plus a one-year priced option. Day rate not disclosed."},
   {"id":"rig-042","name":"Noble BlackLion","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2014,"region":"US Gulf of Mexico","lat":27.6,"lng":-88.5,"customer":"bp","status":"Firm","contractStart":"2023","contractEnd":"Sep 2028","dayRate":null,"backlogNote":"bp GoM; Oct-2025 two-year extension worth ~$310M (excl. MPD) carries the rig into Sep 2028, plus a one-year priced option. Day rate not disclosed."},
-  {"id":"rig-043","name":"Noble BlackRhino","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2013,"region":"US Gulf of Mexico","lat":27.2,"lng":-89.3,"customer":"Beacon Offshore Energy","status":"Firm","contractStart":"Mar 2026","contractEnd":"May 2026","dayRate":400000,"backlogNote":"Beacon GoM one workover well (~50 days) from Mar 2026; the ~100-day option well was exercised and commenced April 2026 (per Q1 2026 results). Day rate not disclosed."},
+  {"id":"rig-043","name":"Noble BlackRhino","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2013,"region":"US Gulf of Mexico","lat":27.2,"lng":-89.3,"customer":"Beacon Offshore Energy","status":"Firm","contractStart":"Mar 2026","contractEnd":"May 2026","dayRate":null,"backlogNote":"Beacon GoM one workover well (~50 days) from Mar 2026; the ~100-day option well was exercised and commenced April 2026 (per Q1 2026 results). Day rate not disclosed."},
   {"id":"rig-044","name":"Noble Gerry de Souza","contractor":"Noble Corporation","type":"Drillship","generation":"7th Gen","waterDepth_ft":12000,"hookload_tons":1250,"buildYear":2015,"region":"West Africa","lat":4.5,"lng":5.5,"customer":"ExxonMobil","status":"Firm","contractStart":"Mid-2026","contractEnd":"Mid-2028","dayRate":null,"backlogNote":"Esso/ExxonMobil Nigeria (via PIDWAL JV); 2-year contract valued ~$292M commencing mid-2026 after MPD upgrade, plus up to three years of options. Day rate not disclosed."},
   {"id":"rig-045","name":"Noble Developer","contractor":"Noble Corporation","type":"Drillship","generation":"6th Gen","waterDepth_ft":10000,"hookload_tons":1000,"buildYear":2013,"region":"Southeast Asia","lat":4.5,"lng":108.0,"customer":"PETRONAS","status":"Firm","contractStart":"Jan 2026","contractEnd":"Mar 2026","dayRate":375000,"backlogNote":"PETRONAS option well exercised ~70 days; followed by bp Trinidad 3-well contract at $375k/day from Q1 2027"},
   {"id":"rig-046","name":"Noble Endeavor","contractor":"Noble Corporation","type":"Semisubmersible","generation":"6th Gen","waterDepth_ft":10000,"hookload_tons":1000,"buildYear":2013,"region":"South America","lat":10.5,"lng":-61.0,"customer":"Undisclosed","status":"Firm","contractStart":"Late 2026","contractEnd":"2028","dayRate":300000,"backlogNote":"11-well contract with an undisclosed operator in South America at $300,000/day plus mob/demob, with performance-incentive upside; commencing late 2026 per Noble's Jan 26, 2026 awards release."},
@@ -1532,6 +1561,9 @@ document.addEventListener('DOMContentLoaded', function () {
   buildFilters();
   applyFilters();
   wireGlobalKeys();
+  updateSortHeaders();
+  // On small screens the sidebar overlays the map, so start with it closed
+  if (window.matchMedia('(max-width: 768px)').matches) toggleSidebar();
   document.getElementById('searchInput')
     .addEventListener('input', debounce(applyFilters, 150));
   document.getElementById('listTableBody')
@@ -1556,32 +1588,66 @@ function wireGlobalKeys() {
       const panel = document.getElementById('detailPanel');
       if (panel.classList.contains('open')) closeDetail();
     }
+    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+      const tag = document.activeElement && document.activeElement.tagName;
+      if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+        e.preventDefault();
+        if (!sidebarOpen) toggleSidebar();
+        document.getElementById('searchInput').focus();
+      }
+    }
   });
+  document.getElementById('searchInput').addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && this.value) {
+      e.stopPropagation();
+      clearSearch();
+    }
+  });
+}
+
+function clearSearch() {
+  const input = document.getElementById('searchInput');
+  input.value = '';
+  applyFilters();
+  input.focus();
+}
+
+const THEME_KEY = 'drilltracker-theme';
+const THEME_ICONS = {
+  dark: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>',
+  light: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>'
+};
+
+function currentTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
 }
 
 function initTheme() {
   const toggle = document.querySelector('[data-theme-toggle]');
   const root = document.documentElement;
-  let theme = 'dark';
-  root.setAttribute('data-theme', theme);
   if (!toggle) return;
-  toggle.addEventListener('click', function () {
-    theme = theme === 'dark' ? 'light' : 'dark';
-    root.setAttribute('data-theme', theme);
+
+  function syncTheme(theme) {
     toggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
-    toggle.innerHTML = theme === 'dark'
-      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" focusable="false"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    toggle.innerHTML = THEME_ICONS[theme];
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0a1628' : '#eef0f5');
+  }
+
+  syncTheme(currentTheme());
+  toggle.addEventListener('click', function () {
+    const theme = currentTheme() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', theme);
+    try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+    syncTheme(theme);
     updateMapTiles(theme);
     buildLegend();
     if (currentView === 'insights') renderInsights();
   });
 }
 
-function updateMapTiles(theme) {
-  if (!map || !tileLayer) return;
-  map.removeLayer(tileLayer);
-  tileLayer = L.tileLayer(
+function makeTileLayer(theme) {
+  return L.tileLayer(
     theme === 'dark'
       ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
       : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
@@ -1590,6 +1656,12 @@ function updateMapTiles(theme) {
       subdomains: 'abcd', maxZoom: 19
     }
   );
+}
+
+function updateMapTiles(theme) {
+  if (!map || !tileLayer) return;
+  map.removeLayer(tileLayer);
+  tileLayer = makeTileLayer(theme);
   tileLayer.addTo(map);
 }
 
@@ -1598,10 +1670,7 @@ function initMap() {
     center: [15, 0], zoom: 3, minZoom: 2, maxZoom: 14,
     zoomControl: true, attributionControl: true
   });
-  tileLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/" target="_blank" rel="noopener">CARTO</a>',
-    subdomains: 'abcd', maxZoom: 19
-  });
+  tileLayer = makeTileLayer(currentTheme());
   tileLayer.addTo(map);
 
   markerClusterGroup = L.markerClusterGroup({
@@ -1657,17 +1726,22 @@ function createMarkers(rigs) {
    FILTERS
    ============================================ */
 function buildFilters() {
+  const tally = function (key) {
+    const m = {};
+    RIG_DATA.forEach(r => { m[r[key]] = (m[r[key]] || 0) + 1; });
+    return m;
+  };
   const contractors = [...new Set(RIG_DATA.map(r => r.contractor))].sort();
   const types = [...new Set(RIG_DATA.map(r => r.type))].sort();
   const regions = [...new Set(RIG_DATA.map(r => r.region))].sort();
   const statuses = [...new Set(RIG_DATA.map(r => r.status))].sort();
-  buildCheckboxGroup('contractorFilters', contractors, true);
-  buildCheckboxGroup('typeFilters', types, false);
-  buildCheckboxGroup('regionFilters', regions, false);
-  buildCheckboxGroup('statusFilters', statuses, false);
+  buildCheckboxGroup('contractorFilters', contractors, true, tally('contractor'));
+  buildCheckboxGroup('typeFilters', types, false, tally('type'));
+  buildCheckboxGroup('regionFilters', regions, false, tally('region'));
+  buildCheckboxGroup('statusFilters', statuses, false, tally('status'));
 }
 
-function buildCheckboxGroup(containerId, items, showColor) {
+function buildCheckboxGroup(containerId, items, showColor, counts) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
   items.forEach(function (item) {
@@ -1696,6 +1770,14 @@ function buildCheckboxGroup(containerId, items, showColor) {
     textSpan.title = item;
     label.appendChild(textSpan);
 
+    if (counts && counts[item] != null) {
+      const cnt = document.createElement('span');
+      cnt.className = 'filter-opt-count';
+      cnt.textContent = counts[item];
+      cnt.setAttribute('aria-label', counts[item] + ' rigs');
+      label.appendChild(cnt);
+    }
+
     const only = document.createElement('button');
     only.type = 'button';
     only.className = 'filter-only';
@@ -1720,6 +1802,8 @@ function getCheckedValues(containerId) {
 
 function applyFilters() {
   const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const clearBtn = document.getElementById('searchClear');
+  if (clearBtn) clearBtn.hidden = !search;
   const contractors = getCheckedValues('contractorFilters');
   const types = getCheckedValues('typeFilters');
   const regions = getCheckedValues('regionFilters');
@@ -1727,7 +1811,8 @@ function applyFilters() {
 
   filteredRigs = RIG_DATA.filter(function (rig) {
     if (search) {
-      const hay = (rig.name + ' ' + rig.contractor + ' ' + rig.customer + ' ' + rig.region).toLowerCase();
+      const hay = (rig.name + ' ' + rig.contractor + ' ' + rig.customer + ' ' + rig.region + ' ' +
+                   rig.type + ' ' + rig.status + ' ' + rig.generation).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     if (!contractors.includes(rig.contractor)) return false;
@@ -2071,21 +2156,51 @@ function sortTable(field) {
   if (currentSort.field === field) currentSort.asc = !currentSort.asc;
   else { currentSort.field = field; currentSort.asc = true; }
   applySort();
+  updateSortHeaders();
+  renderListView();
+}
 
+function updateSortHeaders() {
   document.querySelectorAll('.list-table th').forEach(function (th) {
     th.classList.remove('sorted');
     th.setAttribute('aria-sort', 'none');
     const arrow = th.querySelector('.sort-arrow');
     if (arrow) arrow.textContent = '↕';
   });
-  const active = document.querySelector('.list-table th[data-field="' + field + '"]');
+  const active = document.querySelector('.list-table th[data-field="' + currentSort.field + '"]');
   if (active) {
     active.classList.add('sorted');
     active.setAttribute('aria-sort', currentSort.asc ? 'ascending' : 'descending');
     const arrow = active.querySelector('.sort-arrow');
     if (arrow) arrow.textContent = currentSort.asc ? '↑' : '↓';
   }
-  renderListView();
+}
+
+/* ============================================
+   CSV EXPORT
+   ============================================ */
+function exportCSV() {
+  const cols = ['name', 'contractor', 'type', 'generation', 'waterDepth_ft', 'hookload_tons', 'buildYear',
+                'region', 'lat', 'lng', 'customer', 'status', 'contractStart', 'contractEnd', 'dayRate'];
+  const head = ['Rig Name', 'Contractor', 'Type', 'Generation', 'Water Depth (ft)', 'Hookload (t)', 'Build Year',
+                'Region', 'Latitude', 'Longitude', 'Customer', 'Status', 'Contract Start', 'Contract End', 'Day Rate (USD)'];
+  const esc = function (v) {
+    v = v == null ? '' : String(v);
+    return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  };
+  const lines = [head.join(',')].concat(
+    filteredRigs.map(r => cols.map(c => esc(r[c])).join(','))
+  );
+  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'drilltracker-rigs.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  announce('Exported ' + filteredRigs.length + ' rigs to CSV');
 }
 
 function focusRig(rigId) {
@@ -2214,10 +2329,12 @@ function renderInsights() {
 function toggleSidebar() {
   const sidebar = document.getElementById('filterSidebar');
   const btn = document.querySelector('.sidebar-toggle-btn');
+  const backdrop = document.getElementById('sidebarBackdrop');
   sidebarOpen = !sidebarOpen;
   sidebar.classList.toggle('collapsed', !sidebarOpen);
   sidebar.toggleAttribute('inert', !sidebarOpen);
   if (btn) btn.setAttribute('aria-expanded', sidebarOpen ? 'true' : 'false');
+  if (backdrop) backdrop.hidden = !sidebarOpen;
   setTimeout(function () { if (map) map.invalidateSize(); }, 300);
 }
 </script>
