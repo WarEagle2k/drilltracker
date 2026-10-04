@@ -48,6 +48,20 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 
 Filters start empty, and an empty group doesn't filter. Ticking options narrows the rigs shown. Options within a group combine with OR (Brazil or Guyana); groups combine with AND (and Drillship). The number beside each option is how many rigs it has within your other choices. Options that would show nothing are greyed out, so only the search can produce an empty result. Active filters appear as removable chips above the list, and as a summary over the map.
 
+## Insights
+
+Every chart follows the filters and has a table view of the same numbers.
+
+- **Booked a year out**: the share of rigs with awarded work (firm, LOI or conditional) twelve months after the data date.
+- **How much of the fleet is booked**: rigs under contract each month for three years, layered by the firmest contract covering that month. Contracts with no published end are counted for six months.
+- **When rigs come free**: rigs by the quarter their booked work ends. The next nine months are highlighted.
+- **Day rates by start date**: every disclosed rate period, by rig type.
+- **Contractor runway**: the share of each contractor's rigs with awarded work, quarter by quarter.
+- **Who the work is for**: rig-years of awarded work after the data date, by customer.
+- **Contract timeline**: one row per rig, one bar per contract.
+
+Chart colours follow the job they do. Contract firmness is an ordered scale, so it uses one blue ramp. Rig type uses three categorical colours plus a marker shape each. The heatmap uses five steps of one ramp. All were checked for colour-vision deficiency and contrast against both themes.
+
 ## Sharing a view
 
 The URL hash keeps the view, search, filters, sort and open rig, so a link reproduces what you see. For example:
@@ -65,7 +79,8 @@ A filter lists the values shown, comma-separated; a filter that isn't in the lin
 |---|---|
 | `index.html` | Page markup only. No inline scripts or handlers, so it carries a Content-Security-Policy. |
 | `rigs.js` | The data: `DATA_AS_OF` and `RIG_DATA`. |
-| `app.js` | App logic: derived fields, map, filters, list, insights, URL state, CSV export. |
+| `app.js` | App logic: derived fields, map, filters, list, URL state, CSV export. |
+| `insights.js` | The Insights view: calculations and charts. |
 | `styles.css` | Styles. Theme colours, including status and firmness colours, are CSS variables. |
 | `theme-init.js` | Applies the saved theme before first paint. |
 | `basemap.js` | World outline from Natural Earth (public domain), built by `scripts/build-basemap.js`. |
@@ -105,6 +120,8 @@ Use `null` for anything missing. The validator rejects placeholder strings such 
    ```
    node scripts/validate.js
    node scripts/test-dates.js
+   node scripts/test-filters.js
+   node scripts/test-insights.js
    ```
    `validate.js` fails on errors; `--strict` also fails on warnings. `test-dates.js` tests the date and contract logic with a fixed data date, so it does not change with a refresh.
 3. Open the page and spot-check a few rigs.
