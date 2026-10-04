@@ -3,23 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!--
-   ______                            __
-  / ____/___  ____ ___  ____  __  __/ /____  _____
- / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
-/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
-\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
-                    /_/
-        Created with Perplexity Computer
-        https://www.perplexity.ai/computer
--->
-
-<!-- Perplexity Computer Attribution — SEO Meta Tags -->
-<meta name="generator" content="Perplexity Computer">
-<meta name="author" content="Perplexity Computer">
-<meta property="og:see_also" content="https://www.perplexity.ai/computer">
-<link rel="author" href="https://www.perplexity.ai/computer">
-
 <title>DrillTracker — Offshore Drilling Rig Map</title>
 <meta name="description" content="Interactive world map of offshore drilling rigs across major contractors including Transocean, Seadrill, Noble Corporation, Valaris, and more.">
 <meta name="theme-color" content="#0a1628">
@@ -154,33 +137,6 @@ html {
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
   --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
   --shadow-xl: 0 20px 50px rgba(0,0,0,0.16);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    --color-bg:             #0a1628;
-    --color-surface:        #111d33;
-    --color-surface-2:      #182440;
-    --color-surface-offset: #1e2d4d;
-    --color-divider:        #243554;
-    --color-border:         #2d4066;
-    --color-text:           #e8ecf4;
-    --color-text-muted:     #8899b4;
-    --color-text-faint:     #546580;
-    --color-text-inverse:   #0a1628;
-    --color-primary:        #d4910a;
-    --color-primary-hover:  #e8a41e;
-    --color-primary-active: #b57a08;
-    --color-primary-highlight: rgba(212, 145, 10, 0.12);
-    --color-success:        #34d399;
-    --color-warning:        #fbbf24;
-    --color-error:          #f87171;
-    --color-info:           #60a5fa;
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-    --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
-    --shadow-xl: 0 20px 50px rgba(0,0,0,0.6);
-  }
 }
 
 html, body { height: 100%; overflow: hidden; }
@@ -502,15 +458,6 @@ a:hover { color: var(--color-primary-hover); }
   flex-shrink: 0;
 }
 
-.filter-reset {
-  font-size: var(--text-xs);
-  color: var(--color-primary);
-  padding: var(--space-1) 0;
-  opacity: 0.8;
-  transition: opacity var(--transition-fast);
-}
-.filter-reset:hover { opacity: 1; }
-
 /* ============================================
    MAP
    ============================================ */
@@ -720,13 +667,6 @@ a:hover { color: var(--color-primary-hover); }
   color: var(--color-primary);
   font-variant-numeric: tabular-nums lining-nums;
   margin-bottom: var(--space-2);
-}
-
-.detail-customer {
-  font-size: var(--text-sm);
-  color: var(--color-text);
-  font-weight: 500;
-  margin-bottom: var(--space-4);
 }
 
 .backlog-note {
@@ -979,7 +919,6 @@ a:hover { color: var(--color-primary-hover); }
    ============================================ */
 :root, [data-theme="dark"] { --color-text-faint: #7d8ca8; }
 [data-theme="light"] { --color-text-faint: #647184; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme]) { --color-text-faint: #7d8ca8; } }
 
 /* shared icon button (replaces inline-styled hamburger) */
 .icon-btn {
@@ -1035,7 +974,6 @@ a:hover { color: var(--color-primary-hover); }
 /* list polish */
 .list-table tbody tr:nth-child(even) { background: rgba(255,255,255,0.02); }
 [data-theme="light"] .list-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
-.list-row:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
 .cell-name { font-weight: 600; }
 .list-row.near-term .cell-name { box-shadow: inset 3px 0 0 var(--color-warning); }
 .list-empty { text-align: center; color: var(--color-text-muted); padding: var(--space-10) var(--space-4) !important; white-space: normal; }
@@ -1421,8 +1359,7 @@ a:hover { color: var(--color-primary-hover); }
   <!-- FOOTER -->
   <footer class="footer">
     <div>
-      <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
-      &nbsp;·&nbsp; Data as of October 4, 2026 · Jul–Aug 2026 fleet status reports + Aug–Oct 2026 press &amp; AIS updates
+      Data as of October 4, 2026 · Jul–Aug 2026 fleet status reports + Aug–Oct 2026 press &amp; AIS updates
       <span id="footerScope"></span>
     </div>
     <div class="footer-sources">
@@ -1511,7 +1448,7 @@ const RIG_DATA = [
   {"id":"rig-071","name":"COSL Promoter","contractor":"COSL","type":"Semisubmersible","generation":"6th Gen","waterDepth_ft":7500,"hookload_tons":750,"buildYear":2012,"region":"Norway","lat":61.5,"lng":3.5,"customer":"Equinor","status":"Operating","contractStart":"Q1 2025","contractEnd":"2026","dayRate":null,"backlogNote":"Works for Equinor on the NCS (2023 award: 1-year firm from Q1 2025 plus up to 4 years of options) and remains active past the firm year, apparently on exercised options. 2026 Havtil consents: permanent P&A of Tordis well 34/7-K-4 HT2 (Jun) and production drilling at Fram Ost (Aug 25, 2026)."},
   {"id":"rig-072","name":"Deepsea Mira","contractor":"Northern Ocean (Odfjell managed)","type":"Semisubmersible","generation":"6th Gen HE","waterDepth_ft":10000,"hookload_tons":1000,"buildYear":2019,"region":"Namibia","lat":-22.9,"lng":14.1,"customer":"Shell","status":"Committed","contractStart":"Apr 2027","contractEnd":"Q3 2027","dayRate":null,"backlogNote":"Shell Namibia (PEL 39) contract ended Jul 2, 2026, followed by ~30 days in Walvis Bay upgrading the drilling control system. Early Oct 2026: Northern Ocean signed a Shell contract for Trinidad and Tobago / the wider Caribbean - ~150 days firm from Apr 2027 (~$70M incl. mob/demob) plus a 1-year option (up to ~$226M total). Day rate undisclosed."},
   {"id":"rig-073","name":"Borr Odin","contractor":"Borr Drilling","type":"Jackup","generation":"Modern Premium","waterDepth_ft":400,"hookload_tons":450,"buildYear":2019,"region":"US Gulf of Mexico","lat":28.4,"lng":-95.3,"customer":"Undisclosed","status":"Firm","contractStart":"Sep 2026","contractEnd":"Dec 2026","dayRate":null,"backlogNote":"Mobilized offshore Texas mid-Aug 2026 and began a two-well firm contract for an undisclosed operator, on dayrate from Sep 11, 2026 (Borr release Sep 15, 2026), expected to end Dec 2026. The Cantium contract now runs Feb-Jul 2027 with options (Aug 11, 2026 FSR). Day rate not disclosed."},
-  {"id":"rig-074","name":"Borr Ran","contractor":"Borr Drilling","type":"Jackup","generation":"Modern Premium","waterDepth_ft":400,"hookload_tons":450,"buildYear":2019,"region":"Mexico","lat":19.9,"lng":-92.8,"customer":"Eni","status":"Operating","contractStart":"May 2025","contractEnd":"Sep 2026","dayRate":null,"backlogNote":"Eni Mexico campaign extended to Sep 2026 (listed under New Contracts/Extensions: 'Extension: April 2026 to September 2026, Eni (Mexico)'); day rate not disclosed."},
+  {"id":"rig-074","name":"Borr Ran","contractor":"Borr Drilling","type":"Jackup","generation":"Modern Premium","waterDepth_ft":400,"hookload_tons":450,"buildYear":2019,"region":"Mexico","lat":19.9,"lng":-92.8,"customer":"Eni","status":"Operating","contractStart":"May 2025","contractEnd":"Sep 2026","dayRate":null,"backlogNote":"Eni Mexico campaign extended to Sep 2026 (listed under New Contracts/Extensions: 'Extension: April 2026 to September 2026, Eni (Mexico)'); day rate not disclosed. The Aug 11, 2026 fleet status report still lists the rig operating for Eni to Sep 2026; no extension or follow-on found as of Oct 4, 2026, so its current status is unconfirmed."},
   {"id":"rig-075","name":"Borr Saga","contractor":"Borr Drilling","type":"Jackup","generation":"Modern Premium","waterDepth_ft":400,"hookload_tons":450,"buildYear":2019,"region":"Southeast Asia","lat":5.3,"lng":114.3,"customer":"Brunei Shell Petroleum","status":"Operating","contractStart":"Nov 2022","contractEnd":"Apr 2027","dayRate":null,"backlogNote":"Long-running Brunei Shell Petroleum contract offshore Brunei, with options to extend (FSR status: 'Operating with option to extend'); day rate not disclosed."},
   {"id":"rig-076","name":"Borr Idun","contractor":"Borr Drilling","type":"Jackup","generation":"Modern Premium","waterDepth_ft":400,"hookload_tons":450,"buildYear":2020,"region":"Southeast Asia","lat":10.3,"lng":107.9,"customer":"Hoang Long JOC / PVEP","status":"Firm","contractStart":"Jul 2026","contractEnd":"Feb 2027","dayRate":null,"backlogNote":"Back at work in Vietnam from Jul 2026: ~60 days for an undisclosed operator, then one well for Hoang Long JOC (Sep-Oct 2026), per the Aug 11, 2026 FSR. In direct continuation, a three-well ~130-day TL-WHP campaign (Blocks 01/97 & 02/97) for PVEP via PV Drilling from mid-Oct 2026 to ~Feb 2027 (Borr release Sep 15, 2026). Day rate not disclosed."},
   {"id":"rig-077","name":"Borr Natt","contractor":"Borr Drilling","type":"Jackup","generation":"Modern Premium","waterDepth_ft":400,"hookload_tons":450,"buildYear":2020,"region":"West Africa","lat":4.2,"lng":5.8,"customer":"SNEPCO","status":"Operating","contractStart":"Apr 2026","contractEnd":"Aug 2027","dayRate":null,"backlogNote":"Working for SNEPCO (Shell Nigeria) on the HI gas field since late Apr 2026; on Sep 30, 2026 SNEPCO exercised a one-well option keeping the rig contracted into early Aug 2027 (Borr release). Day rate not disclosed."},

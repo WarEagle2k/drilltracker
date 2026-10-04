@@ -22,6 +22,17 @@ Applied on branch `fable-audit-quick-fixes`, uncommitted, and checked in a local
 | P8 — scope statement | Footer now says "A curated set of 82 rigs across 13 contractors, not complete fleets", generated from the data. |
 | C3 — four data rows | **Not changed.** Three of the four (Santorini, Deep Value Driller, Stena IceMAX) have no end date because the term is undisclosed, so the data is accurate. Borr Ran needs a source check: its extension ran to Sep 2026 and nothing in the data says what happened next. |
 
+## Progress — cleanup and validation (October 4, 2026)
+
+| Item | Status |
+|---|---|
+| P9 — Perplexity attribution | Removed: the ASCII banner, the `generator`, `author` and `og:see_also` tags, the `rel="author"` link and the footer credit. |
+| C10 — dead CSS | Removed the two `:root:not([data-theme])` blocks. |
+| C11 — unused rules | Removed `.filter-reset`, `.detail-customer` and `.list-row:focus-visible`. |
+| C3 — validation | Added `scripts/validate.js`. Run `node scripts/validate.js` before committing a data refresh. It currently reports 0 errors and 4 warnings (the four rows named in C3). |
+| C20 — tests | Added `scripts/test-dates.js` (48 checks on date parsing and contract maths, run against the real functions in `index.html`). |
+| C3 — Borr Ran | Source checked. Borr's Aug 11, 2026 fleet status report still lists the rig operating for Eni to Sep 2026, and no later update was found. Dates and status are unchanged; the note now says the current status is unconfirmed. Recheck at Borr's next fleet status report. |
+
 ### Two new findings from running the app
 
 | # | Sev | Finding |
