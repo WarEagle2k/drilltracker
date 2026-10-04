@@ -47,7 +47,65 @@ Applied on branch `fable-audit-quick-fixes`, uncommitted, and checked in a local
 | # | Sev | Finding |
 |---|---|---|
 | N1 | **High** | **The basemap is watermarked "API KEY REQUIRED".** CARTO's tile servers now return watermarked tiles for keyless requests, on both themes, locally and on the live site. The map needs a CARTO API key or a different tile provider. Not changed: this is a provider choice. |
-| N2 | **High** | **The public site is seven months out of date.** GitHub Pages publishes from the branch `claude/html-git-access-1a0xH`, last built March 7, 2026. It serves an older app titled "ConnRig" with data "last updated February 2026". Nothing merged to `main` since then is live. Fix: point Pages at `main` in the repository settings. Not changed: this is a repository setting. |
+| N2 | **High** | **The public site is seven months out of date.** GitHub Pages publishes from the branch `claude/html-git-access-1a0xH`, last built March 7, 2026. It serves an older app titled "ConnRig" with data "last updated February 2026". Nothing merged to `main` since then is live. Fix: point Pages at `main` in the repository settings. Not changed: this is a repository setting. **Resolved:** Pages now publishes from `main` (checked October 4, 2026). |
+
+## Progress — remaining items (October 4, 2026)
+
+Applied on branch `fable-audit-complete`. Checked with `node scripts/validate.js` (0 errors, 1 warning), `node scripts/test-dates.js` (76 checks), and in a browser: desktop and phone widths, both themes, keyboard use, a shared URL, the CSP, opening from `file://`, and a page where Leaflet fails to load.
+
+### Philosophy review
+
+| Item | Status |
+|---|---|
+| P1 — KPIs | Done. "Avg Day Rate" is now "Avg Floater Rate": jackups are left out, and the note reads "28 of 68 disclosed". When fewer than five rates are disclosed, that note turns amber and bold. Insights adds the average rate for each rig type. "Contracted" is now "Contracted Share", noted "68 working · 9 not started". Backlog counts follow-on contracts and rate steps (see P2), and after the source check below it stands at $7.4B (from $6.7B). All three KPIs have a "?" definition. |
+| P2 — contract sequences | Done. Each rig has a `contracts` array (customer, start, end, rate, firmness, note). Status, the "booked to" date, backlog, the near-term count and the timeline all come from it. Stepped rates are consecutive contracts. Transocean Barents is booked to Jul 2030 through its Norway contract; West Polaris has its $409,200 and $454,700 rates; Noble Developer has its $375k jobs. The Beacon follow-ons on Deepwater Atlas are undated, so they stay in the note. |
+| P3 — structured fields | Done. Each rig has `source` and `asOf`, shown in the panel. The panel also warns when the source predates the data date by more than 120 days or has no recorded date. After the source check below, every rig has a dated source and four are flagged as older than 120 days (Stena DrillMAX, Stena Don, Stena Evolution and Tidal Action), because nothing newer has been published for them. Customers are normalized (Adura, ExxonMobil). `null` replaces "None", "-" and "Undisclosed", and the validator rejects those strings. Status (activity: Working, Committed, Available, Unconfirmed) is now separate from firmness (Firm, LOI, Conditional, Option), and the four unused statuses are gone. Location is split into six market `region`s and a `country`; both are filters. Contractor notes are now `owner` fields: Northern Ocean (Odfjell), Hanwha Drilling (Constellation), Sonangol and Seadrill (Sonadrill), Eldorado Drilling (Ventura Offshore). Generation is split into `generation` (floaters), `jackupClass` and `environment`. |
+| P4 — map precision | Done. Each rig has `position` (`ais`, `field` or `area`). A centre dot marks the four reported positions; the legend and the panel explain it. |
+| P5 — clock | Done. `DATA_AS_OF` in `rigs.js` is the only data date. Every calculation uses it instead of the viewer's clock. The footer, the KPI help and the CSV are generated from it, and a banner appears once it is more than 45 days old. |
+| P6 — single file | Done. The data is in `rigs.js`, one field per line. The app is in `app.js` and the styles in `styles.css`, with the v2–v4 layers folded into the original rules. There is still no build step, and the page opens from `file://`. |
+| P7 — README and method | Done. `README.md` covers scope, sources, the status, booked-to and KPI definitions, the data format, the refresh steps, a disclaimer and the licence position (none granted). The footer carries a short disclaimer and links to the README. |
+| P10 — shareable views | Done. The hash holds the view, search, filters, sort and open rig, for example `#view=list&region=South+America&type=Drillship&sort=-dayRate`. |
+
+### Code review
+
+| Item | Status |
+|---|---|
+| C4 — Leaflet fails | Done. The map area says the map is unavailable; the list, insights and detail panel still work. |
+| C6 — "only" shortcut | Done. It is a button next to the label, not inside it, and it is always visible on touch screens. |
+| C7 — focus on close | Done. The panel records the rig, and closing it returns focus to that rig's marker (or the map, if the marker is in a cluster). |
+| C8 — KPI animations | Done. Each element cancels its running animation before starting another. |
+| C9 — orphaned panel | Done. The panel closes when its rig is filtered out or the view changes. |
+| C12 — status colours | Done. Status and firmness colours are CSS variables defined per theme; the JavaScript copy is gone. |
+| C13 — hard-coded values | Done. The rig count, as-of date, source date range, contractor list and scope line are generated from the data. The meta description no longer lists contractors. |
+| C14 — `_icon` | Done. Uses `marker.getElement()`. |
+| C15 — `keypress` | Done. One `keydown` listener on the map handles Enter and Space on markers. |
+| C16 — needless re-renders | Done. Nothing rebuilds on resize or theme change; colours that depend on the theme are CSS variables. |
+| C17 — double truncation | Done. Only the CSS ellipsis is left. |
+| C18 — inline handlers | Done. No inline scripts or `onclick` attributes remain, and the page now sends a Content-Security-Policy. Styles still allow `'unsafe-inline'`, because chart widths and marker colours are set inline. |
+| C19 — CSV | Done. The export adds the rig ID, owner, class, country, position, booked-to date, all contracts, source, source date and data date. The filename carries the data date. |
+| C20 — tests | Extended. `scripts/test-dates.js` also covers status, booked-to, near-term and backlog, with the data date pinned so a refresh does not break it. |
+
+### Accessibility notes
+
+All done: the wordmark is the page's `<h1>` (on phones it is hidden visually, not removed). Filter counts use visually hidden text instead of `aria-label` on a span. The detail panel is a labelled `<section>` (a region), not a dialog. `text-size-adjust` is `100%`.
+
+### Source check (October 4, 2026)
+
+Every rig whose source was undated or more than 120 days old (42 rigs) was checked against the latest public reports: Transocean FSR Aug 5, 2026; Noble FSR Jul 27, 2026; Seadrill FSR Aug 10, 2026; Valaris FSR Aug 5, 2026; Borr FSR Aug 11, 2026; Odfjell Q2 report Aug 18, 2026; plus company releases and trade press through Oct 4. Changes applied to `rigs.js`:
+
+- **Transocean:** the data matched the May 2026 FSR. The Aug FSR raised most rates by $1k–$16k (cost escalation) and changed the schedules for Deepwater Atlas (Beacon work now to Jul 2027), Transocean Norge (Harbour program at $513k/day, Jan–Nov 2028), Spitsbergen (to Nov 2027) and Barents (step to $498k/day in Sep 2026, OMV to Feb 2027, Vår Energi at $467k/day). Petrobras 10000's steps fall each October, not November as estimated.
+- **Noble:** the four Guyana rigs work at an undisclosed market-based rate under the ExxonMobil agreement, reset each Jan 1 and Jul 1. The $425k figure had no source and is removed, and their start dates are corrected (2018–2019). Noble GreatWhite is now Noble Claus Bachmann, with a bp UK job (Mar–Sep 2027, $320k/day) before Aker BP (now Sep 2027–Sep 2030). Noble Developer's Shell contract is no longer listed; it goes to ExxonMobil Guyana (Oct–Nov 2026) and then bp Trinidad (Dec 2026–Aug 2027). Noble Endeavor starts Jan 2027 and ends Jun 2028. BlackHornet and BlackLion now show their current terms, extensions and priced options.
+- **Seadrill:** West Polaris rates are now $413,400, $459,400 and (newly disclosed) $441,500/day for the extension. West Neptune's 365-day term starts Oct 2026, after a bridging term. West Elara runs to Dec 2027. Sonangol Quenguela runs to Jul 2028. Sonangol Libongos has priced options to Jan 2030. West Auriga's "priced options" had no source and are removed. The Sonadrill ownership was confirmed: the two Sonangol rigs are Sonangol-owned and West Gemini is Seadrill-owned, all bareboat-chartered into Sonadrill.
+- **Valaris:** confirmed, plus the DS-7 five-well unpriced option.
+- **Odfjell, Stena and others:** Deepsea Stavanger's current contract started in early 2025. Deepsea Aberdeen's previous extension was added, so it continues directly into the new contract (its start is not yet confirmed). Stena Don's customer is undisclosed (Adura is likely but unnamed). Stena DrillMAX's Suriname work is firm only to end-2025, with unconfirmed options in 2026. Deep Value Driller was sold to Eldorado by Deep Value Driller AS (not by Saipem), and its PETRONAS well is reported as Redha-1. Tidal Action's ownership (Hanwha Drilling) and operator (Constellation) were confirmed.
+
+Still estimates: the Deepwater Conqueror Equatorial Guinea months, the DS-7 option dates, and the Tidal Action end date; each is marked in its contract note. The "booked to" gap allowance was raised from 92 to 140 days, because the Aug FSR shows 135 days of mobilization between Barents' two contracts.
+
+Not tracked but noted: Transocean won a $300M ONGC contract for Dhirubhai Deepwater KG2 (Aug 20, 2026), and the Transocean–Valaris merger cleared US antitrust review on Sep 30, 2026, with closing expected in Q4 2026.
+
+### Data rows (C3)
+
+The validator now reports one warning: Stena IceMAX works for an undisclosed client with no published end date, which is accurate. Santorini and Deep Value Driller now derive as Committed with an undisclosed term. Borr Ran is marked Unconfirmed until Borr's next fleet status report.
 
 ---
 

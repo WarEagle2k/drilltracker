@@ -1,38 +1,32 @@
-/* Loads the app's inline script from index.html into a sandbox, so Node can
-   check the real data and run the real functions (no copies to drift).
-   Pass { now: <ms> } to pin the clock the app sees. */
+/* Loads rigs.js and app.js into a sandbox, as the page does, so Node can check
+   the real data and run the real functions (no copies to drift).
+   Pass { asOf: 'YYYY-MM-DD' } to replace DATA_AS_OF, so tests do not depend on the data date. */
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
 
-const EXPORTS = ['RIG_DATA', 'CONTRACTOR_COLORS', 'STATUS_COLORS', 'TYPE_SIZES', 'CONTRACTED', 'MARKETABLE_IDLE',
-                 'NEAR_TERM_MONTHS', 'DATA_AS_OF_LABEL', 'parseFlexDate', 'contractInfo', 'fmtMonths', 'monthsUntil', 'isNearTerm'];
+const ROOT = path.join(__dirname, '..');
+const EXPORTS = ['RIG_DATA', 'DATA_AS_OF', 'DATA_AS_OF_LABEL', 'AS_OF', 'CONTRACTOR_COLORS', 'STATUSES', 'FIRMNESS',
+                 'REGIONS', 'POSITIONS', 'TYPE_SIZES', 'NEAR_TERM_MONTHS', 'parseFlexDate', 'parseIsoDate',
+                 'contractInfo', 'fmtMonths', 'deriveRig', 'isNearTerm', 'classLabel'];
 
 function loadApp(opts) {
-  const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
-  const inline = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-  const appScript = inline.find(code => code.includes('const RIG_DATA'));
-  if (!appScript) throw new Error('Could not find the app script (const RIG_DATA) in index.html');
-
   const noop = function () {};
   const context = vm.createContext({
     window: { matchMedia: () => ({ matches: false }), addEventListener: noop },
     document: { addEventListener: noop, getElementById: () => null, querySelector: () => null },
+    location: { hash: '', pathname: '/', search: '' },
     performance: { now: () => 0 },
     console: console
   });
-  if (opts && opts.now != null) {
-    vm.runInContext(
-      'const RealDate = Date; const FIXED_NOW = ' + Number(opts.now) + ';' +
-      'Date = class extends RealDate {' +
-      '  constructor(...a) { if (a.length === 0) super(FIXED_NOW); else super(...a); }' +
-      '  static now() { return FIXED_NOW; }' +
-      '};', context);
-  }
-  vm.runInContext(appScript, context, { filename: 'index.html (inline script)' });
-  const app = vm.runInContext('({' + EXPORTS.join(',') + '})', context);
-  app.html = html;
-  return app;
+  ['rigs.js', 'app.js'].forEach(function (file) {
+    let code = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    if (file === 'rigs.js' && opts && opts.asOf) {
+      code = code.replace(/const DATA_AS_OF = '[^']*';/, "const DATA_AS_OF = '" + opts.asOf + "';");
+    }
+    vm.runInContext(code, context, { filename: file });
+  });
+  return vm.runInContext('({' + EXPORTS.join(',') + '})', context);
 }
 
 module.exports = { loadApp };
