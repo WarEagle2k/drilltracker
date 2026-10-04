@@ -300,7 +300,10 @@ document.addEventListener('DOMContentLoaded', function () {
   let rt;
   window.addEventListener('resize', function () {
     clearTimeout(rt);
-    rt = setTimeout(function () { if (map && currentView === 'map') map.invalidateSize(); }, 200);
+    rt = setTimeout(function () {
+      if (map && currentView === 'map') map.invalidateSize();
+      if (currentView === 'insights') renderInsights(); // the SVG charts are drawn to the card width
+    }, 200);
   });
 });
 
@@ -1306,156 +1309,6 @@ function focusRig(rigId) {
     if (marker && !marker.getElement() && markerLayer.zoomToShowLayer) markerLayer.zoomToShowLayer(marker, function () { openDetail(rig); });
     else openDetail(rig);
   }, prefersReduced ? 0 : 350);
-}
-
-/* ============================================
-   INSIGHTS VIEW (charts + contract timeline)
-   ============================================ */
-function countBy(rigs, getter) {
-  const m = {};
-  rigs.forEach(r => { const k = getter(r); m[k] = (m[k] || 0) + 1; });
-  return Object.keys(m).map(k => ({ label: k, value: m[k] })).sort((a, b) => b.value - a.value);
-}
-
-function barChart(title, entries, opts) {
-  opts = opts || {};
-  const max = Math.max(1, ...entries.map(e => e.value));
-  const rows = entries.map(function (e) {
-    const w = (e.value / max) * 100;
-    const col = opts.color ? opts.color(e.label) : 'var(--color-primary)';
-    return '<div class="bar-row' + (opts.fmt ? ' bar-row--wide' : '') + '">' +
-      '<div class="bar-label" title="' + escapeHtml(e.label) + '">' + escapeHtml(e.label) + '</div>' +
-      '<div class="bar-track"><div class="bar-fill" style="width:' + w + '%;background:' + col + '"></div></div>' +
-      '<div class="bar-value">' + (opts.fmt ? opts.fmt(e) : e.value) + '</div></div>';
-  }).join('');
-  return '<section class="chart-card"><h3 class="chart-title">' + escapeHtml(title) +
-    (opts.sub ? ' <span class="chart-sub">' + escapeHtml(opts.sub) + '</span>' : '') + '</h3>' +
-    (rows || '<p class="chart-empty">Nothing to show.</p>') + '</section>';
-}
-
-function rateByTypeChart(rigs) {
-  const entries = Object.keys(TYPE_SIZES).map(function (type) {
-    const rated = rigs.filter(r => r.type === type && r.derived.dayRate != null);
-    return { label: type, value: rated.length ? rated.reduce((s, r) => s + r.derived.dayRate, 0) / rated.length : 0, n: rated.length };
-  }).filter(e => e.n);
-  return barChart('Average Day Rate by Type', entries, {
-    sub: 'current or next contract, disclosed rates only',
-    fmt: e => fmtRateShort(e.value) + ' <span class="bar-n">n=' + e.n + '</span>'
-  });
-}
-
-function customerChart(rigs) {
-  const entries = countBy(rigs.filter(r => r.derived.customer), r => r.derived.customer);
-  return barChart('Rigs by Customer', entries.slice(0, 10), {
-    sub: 'current or next contract' + (entries.length > 10 ? ' · top 10 of ' + entries.length : '')
-  });
-}
-
-function histogramChart(title, rigs) {
-  const rated = rigs.filter(r => r.derived.dayRate != null);
-  const bins = [];
-  for (let lo = 100000; lo < 650000; lo += 50000) bins.push({ lo: lo, hi: lo + 50000, count: 0 });
-  rated.forEach(function (r) {
-    const i = Math.floor((r.derived.dayRate - bins[0].lo) / 50000);
-    bins[Math.max(0, Math.min(bins.length - 1, i))].count++;
-  });
-  const max = Math.max(1, ...bins.map(b => b.count));
-  const cols = bins.map(function (b) {
-    const h = (b.count / max) * 100;
-    const last = b === bins[bins.length - 1];
-    const range = last ? '$' + (b.lo / 1000) + 'k+' : '$' + (b.lo / 1000) + 'k–$' + (b.hi / 1000) + 'k';
-    return '<div class="hist-col" title="' + range + ': ' + plural(b.count, 'rig') + '">' +
-      '<div class="hist-bar-wrap"><div class="hist-bar" style="height:' + h + '%"></div></div>' +
-      '<div class="hist-x">' + (b.lo / 1000) + 'k</div></div>';
-  }).join('');
-  return '<section class="chart-card chart-card-wide"><h3 class="chart-title">' + escapeHtml(title) +
-    ' <span class="chart-sub">' + rated.length + ' rigs with a disclosed current or next rate</span></h3>' +
-    '<div class="hist">' + cols + '</div></section>';
-}
-
-/* One row per rig, one bar per contract, coloured by firmness. The axis starts
-   at the beginning of last year so long-running contracts do not squash the view. */
-function ganttChart(rigs) {
-  const rows = rigs.map(r => ({ r: r, segs: r.derived.contracts.filter(x => x.s) }))
-    .filter(x => x.segs.length)
-    .sort((a, b) => (SORT_KEYS.bookedTo(a.r) || Infinity) - (SORT_KEYS.bookedTo(b.r) || Infinity) || a.r.name.localeCompare(b.r.name));
-  if (!rows.length) return '<section class="chart-card chart-card-wide"><h3 class="chart-title">Contract Timeline</h3><p class="chart-empty">No datable contracts in the current selection.</p></section>';
-
-  const minT = new Date(AS_OF.getFullYear() - 1, 0, 1).getTime();
-  const ends = rows.flatMap(x => x.segs.filter(s => s.k.firmness !== 'option').map(s => s.e ? s.e.getTime() : 0));
-  const maxT = Math.max(addMonths(AS_OF, 12).getTime(), ...ends);
-  const span = maxT - minT;
-  const pos = t => Math.max(0, Math.min(100, ((t - minT) / span) * 100));
-  const nowPct = pos(AS_OF);
-
-  const ticks = [];
-  for (let y = new Date(minT).getFullYear(); y <= new Date(maxT).getFullYear(); y++) {
-    const t = new Date(y, 0, 1).getTime();
-    if (t >= minT && t <= maxT) ticks.push('<div class="gantt-tick" style="left:' + pos(t) + '%"><span>' + y + '</span></div>');
-  }
-
-  const rowHtml = rows.map(function (x) {
-    const d = x.r.derived;
-    const bars = x.segs.map(function (s) {
-      const left = pos(s.s), right = s.e ? pos(s.e) : 100;
-      if (right <= 0) return '';
-      return '<div class="gantt-bar gantt-bar--' + escapeHtml(s.k.firmness) + (s.e ? '' : ' gantt-bar--open') +
-        '" style="left:' + left + '%;width:' + Math.max(0.6, right - left) + '%"></div>';
-    }).join('');
-    const label = x.r.name + ' — ' + d.status + ', booked to ' + d.bookedToLabel + '. ' +
-      x.segs.map(s => (s.k.customer || 'Undisclosed') + ' ' + s.k.start + ' to ' + (s.k.end || 'undisclosed') + ' (' + FIRMNESS[s.k.firmness] + ')').join('; ');
-    return '<div class="gantt-row" role="button" tabindex="0" title="' + escapeHtml(label) + '" aria-label="' + escapeHtml(label + '. Show on map.') +
-      '" data-rig-id="' + escapeHtml(x.r.id) + '">' +
-      '<div class="gantt-name">' + escapeHtml(x.r.name) + '</div>' +
-      '<div class="gantt-track">' + bars + '</div></div>';
-  }).join('');
-
-  const key = Object.keys(FIRMNESS).map(f => '<span class="gantt-key"><span class="gantt-swatch gantt-bar--' + f + '"></span>' + FIRMNESS[f] + '</span>').join('') +
-    '<span class="gantt-key"><span class="gantt-swatch gantt-bar--firm gantt-bar--open"></span>End undisclosed</span>';
-
-  return '<section class="chart-card chart-card-wide"><h3 class="chart-title">Contract Timeline ' +
-    '<span class="chart-sub">' + plural(rows.length, 'rig') + ' · sorted by booked-to date · red line = ' + DATA_AS_OF_LABEL + '</span></h3>' +
-    '<div class="gantt-legend">' + key + '</div>' +
-    '<div class="gantt" id="ganttChart">' +
-      '<div class="gantt-grid">' + ticks.join('') + '<div class="gantt-now" style="left:' + nowPct + '%"></div></div>' +
-      rowHtml +
-    '</div></section>';
-}
-
-function renderInsights() {
-  const host = document.getElementById('insightsScroll');
-  const rigs = filteredRigs;
-  if (!rigs.length) {
-    host.innerHTML = '<div class="insights-empty">No rigs match your filters. <button type="button" class="link-btn" data-action="reset-filters">Reset filters</button></div>';
-    return;
-  }
-  const nearCount = rigs.filter(isNearTerm).length;
-  const summary = '<div class="insights-summary">Showing <strong>' + rigs.length + '</strong> ' + (rigs.length === 1 ? 'rig' : 'rigs') + ' · ' +
-    '<strong>' + nearCount + '</strong> open now or booked for less than ' + NEAR_TERM_MONTHS + ' months · data as of ' + DATA_AS_OF_LABEL + '</div>';
-
-  host.innerHTML = summary +
-    '<div class="chart-grid">' +
-      barChart('Rigs by Contractor', countBy(rigs, r => r.contractor), { color: getContractorColor }) +
-      barChart('Rigs by Status', countBy(rigs, r => r.derived.status), { color: statusColor, sub: 'as of ' + DATA_AS_OF_LABEL }) +
-      barChart('Rigs by Region', countBy(rigs, r => r.region)) +
-      barChart('Rigs by Type', countBy(rigs, r => r.type)) +
-      customerChart(rigs) +
-      rateByTypeChart(rigs) +
-    '</div>' +
-    histogramChart('Day-Rate Distribution', rigs) +
-    ganttChart(rigs);
-
-  const gantt = document.getElementById('ganttChart');
-  if (gantt) {
-    gantt.addEventListener('click', function (e) {
-      const row = e.target.closest('.gantt-row');
-      if (row) focusRig(row.dataset.rigId);
-    });
-    gantt.addEventListener('keydown', function (e) {
-      const row = e.target.closest('.gantt-row');
-      if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); focusRig(row.dataset.rigId); }
-    });
-  }
 }
 
 /* ============================================
