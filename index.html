@@ -83,9 +83,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       </div>
       <div class="kpi-content">
-        <div class="kpi-label">Contracted Share <span class="kpi-note" id="kpiUtilNote"></span>
+        <div class="kpi-label">Contracted Share
           <button type="button" class="kpi-help" aria-label="About the Contracted Share metric" aria-expanded="false" aria-controls="kpiUtilHelp" aria-describedby="kpiUtilHelp">?</button></div>
         <div class="kpi-value" id="kpiUtil">—</div>
+        <div class="kpi-note" id="kpiUtilNote"></div>
         <div class="kpi-help-text" id="kpiUtilHelp" hidden>Share of the rigs shown that are working or have a contract that has not started yet. This is a curated set with no stacked rigs, so it is not a market utilization figure.</div>
       </div>
     </div>
@@ -94,9 +95,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
       </div>
       <div class="kpi-content">
-        <div class="kpi-label">Avg Floater Rate <span class="kpi-note" id="kpiRateNote"></span>
+        <div class="kpi-label">Avg Floater Rate
           <button type="button" class="kpi-help" aria-label="About the Average Floater Rate metric" aria-expanded="false" aria-controls="kpiRateHelp" aria-describedby="kpiRateHelp">?</button></div>
         <div class="kpi-value" id="kpiRate">—</div>
+        <div class="kpi-note" id="kpiRateNote"></div>
         <div class="kpi-help-text" id="kpiRateHelp" hidden>Mean day rate of the drillships and semisubmersibles shown that have a disclosed rate, using the current contract (or the next one, for rigs not yet working). Jackups are left out because they earn a fraction of a floater's rate; Insights shows the average for each type.</div>
       </div>
     </div>
@@ -105,9 +107,10 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
       </div>
       <div class="kpi-content">
-        <div class="kpi-label">Disclosed Backlog <span class="kpi-note" id="kpiBacklogNote"></span>
+        <div class="kpi-label">Disclosed Backlog
           <button type="button" class="kpi-help" aria-label="About the Disclosed Backlog metric" aria-expanded="false" aria-controls="kpiBacklogHelp" aria-describedby="kpiBacklogHelp">?</button></div>
         <div class="kpi-value" id="kpiBacklog">—</div>
+        <div class="kpi-note" id="kpiBacklogNote"></div>
         <div class="kpi-help-text" id="kpiBacklogHelp" hidden>Firm contracts with a disclosed rate only: remaining days × day rate.</div>
       </div>
     </div>
@@ -143,13 +146,17 @@
         <div class="filter-section">
           <div class="search-wrapper">
             <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search rig, contractor, customer…" aria-label="Search rigs by name, contractor, owner, customer, location, type, status, or notes">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search rigs, customers…" aria-label="Search rigs by name, contractor, owner, customer, location, type, status, or notes">
             <button type="button" class="search-clear" id="searchClear" data-action="clear-search" aria-label="Clear search" hidden>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
           </div>
         </div>
 
+        <div class="filter-section" role="group" aria-labelledby="fsStatus">
+          <h3 class="filter-section-title" id="fsStatus">Status</h3>
+          <div id="statusFilters"></div>
+        </div>
         <div class="filter-section" role="group" aria-labelledby="fsContractor">
           <h3 class="filter-section-title" id="fsContractor">Contractor</h3>
           <div id="contractorFilters"></div>
@@ -162,14 +169,10 @@
           <h3 class="filter-section-title" id="fsRegion">Region</h3>
           <div id="regionFilters"></div>
         </div>
-        <div class="filter-section" role="group" aria-labelledby="fsCountry">
-          <h3 class="filter-section-title" id="fsCountry">Country</h3>
-          <div id="countryFilters"></div>
-        </div>
-        <div class="filter-section" role="group" aria-labelledby="fsStatus">
-          <h3 class="filter-section-title" id="fsStatus">Status</h3>
-          <div id="statusFilters"></div>
-        </div>
+        <details class="filter-section filter-collapsible" id="countrySection">
+          <summary class="filter-section-title">Country <span class="filter-summary-note" id="countrySummary"></span></summary>
+          <div id="countryFilters" role="group" aria-label="Country"></div>
+        </details>
 
         <div class="filter-actions">
           <button type="button" class="btn-reset" data-action="reset-filters">Reset all filters</button>
@@ -191,6 +194,7 @@
           <span class="legend-chevron" aria-hidden="true">▾</span>
         </button>
         <div class="legend-body"></div>
+        <div class="legend-note"><span class="legend-dot legend-dot--reported" aria-hidden="true"></span>Centre dot: reported position. Others are approximate, placed in the operating area.</div>
       </div>
 
       <div class="empty-state" id="emptyState" hidden>
@@ -244,11 +248,10 @@
 
   <footer class="footer">
     <div>
-      <span id="footerAsOf"></span> · <span id="footerScope"></span> ·
+      <span id="footerAsOf"></span><span class="footer-scope"> · <span id="footerScope"></span></span> ·
       Compiled from public disclosures; not investment advice ·
       <a href="https://github.com/WarEagle2k/drilltracker#readme" target="_blank" rel="noopener">About &amp; method</a>
     </div>
-    <div class="footer-sources" id="footerSources"></div>
   </footer>
 </div>
 

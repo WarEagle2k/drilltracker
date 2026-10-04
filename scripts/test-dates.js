@@ -113,7 +113,7 @@ check('future only: Committed', d.status, 'Committed');
 check('undisclosed customer label', d.customer, 'Undisclosed');
 
 d = rig([k(null, 'Aug 2026', null, null)]);
-check('no end date: term undisclosed', d.bookedToLabel, 'Term undisclosed');
+check('no end date: undisclosed', d.bookedToLabel, 'Undisclosed');
 check('no end date: not near-term', d.nearTerm, false);
 
 d = rig([k('Eni', 'May 2025', 'Sep 2026', null)], 'Unconfirmed');
