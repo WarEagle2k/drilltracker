@@ -576,11 +576,14 @@ a:hover { color: var(--color-primary-hover); }
   flex-direction: column;
   overflow: hidden;
   transform: translateX(100%);
-  transition: transform var(--transition-slide);
+  visibility: hidden;
+  transition: transform var(--transition-slide), visibility 0s linear 280ms;
   box-shadow: var(--shadow-xl);
 }
 .detail-panel.open {
   transform: translateX(0);
+  visibility: visible;
+  transition: transform var(--transition-slide), visibility 0s;
 }
 
 .detail-header {
@@ -987,7 +990,7 @@ a:hover { color: var(--color-primary-hover); }
 
 /* KPI label tracks the token scale; note pill */
 .kpi-label { font-size: var(--text-xs); }
-.kpi-note { font-weight: 500; color: var(--color-text-faint); font-size: 10px; text-transform: none; letter-spacing: 0; }
+.kpi-note { white-space: nowrap; font-weight: 500; color: var(--color-text-faint); font-size: 10px; text-transform: none; letter-spacing: 0; }
 
 /* distinct status badges */
 .badge-committed { background: rgba(129,140,248,0.16); color: #818cf8; }
@@ -1018,7 +1021,7 @@ a:hover { color: var(--color-primary-hover); }
 [data-theme="light"] .list-table tbody tr:nth-child(even) { background: rgba(0,0,0,0.02); }
 .list-row:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
 .cell-name { font-weight: 600; }
-.list-row.near-term .cell-name { box-shadow: inset 3px 0 0 var(--color-warning); padding-left: calc(var(--space-3) - 3px); }
+.list-row.near-term .cell-name { box-shadow: inset 3px 0 0 var(--color-warning); }
 .list-empty { text-align: center; color: var(--color-text-muted); padding: var(--space-10) var(--space-4) !important; white-space: normal; }
 .link-btn { color: var(--color-primary); text-decoration: underline; }
 .th-btn { display: inline-flex; align-items: center; gap: 4px; font: inherit; color: inherit; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
@@ -1081,13 +1084,14 @@ a:hover { color: var(--color-primary-hover); }
 .hist-x { font-family: var(--font-mono); font-size: 9px; color: var(--color-text-faint); margin-top: 4px; }
 
 /* gantt */
-.gantt { position: relative; }
-.gantt-grid { position: absolute; inset: 24px 0 0 130px; pointer-events: none; }
+.gantt { position: relative; padding-top: 22px; }
+.gantt-grid { position: absolute; inset: 22px 0 0 130px; pointer-events: none; }
 .gantt-tick { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--color-divider); }
 .gantt-tick span { position: absolute; top: -18px; left: 3px; font-size: 9px; color: var(--color-text-faint); font-family: var(--font-mono); }
 .gantt-now { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--color-error); }
 .gantt-row { display: grid; grid-template-columns: 130px 1fr; align-items: center; height: 20px; cursor: pointer; }
-.gantt-row:hover { background: var(--color-primary-highlight); }
+.gantt-row:hover, .gantt-row:focus-visible { background: var(--color-primary-highlight); }
+.gantt-row:focus-visible { outline: 2px solid var(--color-primary); outline-offset: -2px; }
 .gantt-name { font-size: 10px; color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding-right: var(--space-2); }
 .gantt-track { position: relative; height: 100%; }
 .gantt-bar { position: absolute; top: 5px; height: 10px; border-radius: 3px; min-width: 3px; opacity: 0.85; }
@@ -1140,6 +1144,35 @@ a:hover { color: var(--color-primary-hover); }
     background: rgba(0, 0, 0, 0.45); border: none; padding: 0; cursor: default;
   }
   .sidebar-backdrop[hidden] { display: none; }
+}
+
+/* ============================================
+   v4 FIXES (Oct 2026 audit)
+   ============================================ */
+/* cluster counts: MarkerCluster.Default.css centres text via the inner span */
+.marker-cluster span { line-height: 30px; }
+
+/* map background matches the theme while tiles load (Leaflet default is light grey) */
+.leaflet-container { background: var(--color-bg); }
+
+/* status badges need darker text on the light theme for contrast */
+[data-theme="light"] .badge-firm        { background: rgba(5,150,105,0.12);  color: #047857; }
+[data-theme="light"] .badge-operating   { background: rgba(37,99,235,0.12);  color: #1d4ed8; }
+[data-theme="light"] .badge-committed   { background: rgba(79,70,229,0.12);  color: #4338ca; }
+[data-theme="light"] .badge-loi         { background: rgba(217,119,6,0.14);  color: #b45309; }
+[data-theme="light"] .badge-available   { background: rgba(71,85,105,0.12);  color: #475569; }
+[data-theme="light"] .badge-warmstacked { background: rgba(234,88,12,0.12);  color: #c2410c; }
+[data-theme="light"] .badge-heldforsale { background: rgba(147,51,234,0.12); color: #7e22ce; }
+[data-theme="light"] .badge-stacked     { background: rgba(220,38,38,0.12);  color: #b91c1c; }
+
+/* list: rig name is a real button (rows keep table semantics) */
+.row-link { font: inherit; font-weight: 600; color: inherit; text-align: left; padding: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.row-link:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+/* narrow phones: the wordmark collided with the view toggle */
+@media (max-width: 480px) {
+  .logo-text { display: none; }
+  .header-right { gap: var(--space-1); }
 }
 </style>
 </head>
@@ -1308,7 +1341,7 @@ a:hover { color: var(--color-primary-hover); }
 
       <!-- MAP LEGEND -->
       <div class="map-legend" id="mapLegend">
-        <button type="button" class="legend-toggle" onclick="toggleLegend()" aria-label="Toggle legend">
+        <button type="button" class="legend-toggle" onclick="toggleLegend()" aria-label="Toggle contractor legend" aria-expanded="true">
           <span class="legend-heading">Contractors</span>
           <span class="legend-chevron" aria-hidden="true">▾</span>
         </button>
@@ -1562,15 +1595,14 @@ document.addEventListener('DOMContentLoaded', function () {
   wireGlobalKeys();
   updateSortHeaders();
   // On small screens the sidebar overlays the map, so start with it closed
-  if (window.matchMedia('(max-width: 768px)').matches) toggleSidebar();
+  if (window.matchMedia('(max-width: 768px)').matches) {
+    toggleSidebar();
+    toggleLegend(); // the legend would cover much of a phone-sized map
+  }
   document.getElementById('searchInput')
     .addEventListener('input', debounce(applyFilters, 150));
   document.getElementById('listTableBody')
     .addEventListener('click', onListActivate);
-  document.getElementById('listTableBody')
-    .addEventListener('keydown', function (e) {
-      if (e.key === 'Enter' || e.key === ' ') onListActivate(e);
-    });
   let rt;
   window.addEventListener('resize', function () {
     clearTimeout(rt);
@@ -1586,10 +1618,13 @@ function wireGlobalKeys() {
     if (e.key === 'Escape') {
       const panel = document.getElementById('detailPanel');
       if (panel.classList.contains('open')) closeDetail();
+      else if (sidebarOpen && window.matchMedia('(max-width: 768px)').matches) toggleSidebar();
     }
     if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      const tag = document.activeElement && document.activeElement.tagName;
-      if (tag !== 'INPUT' && tag !== 'TEXTAREA') {
+      const el = document.activeElement;
+      const typing = el && (el.tagName === 'TEXTAREA' || el.isContentEditable ||
+        (el.tagName === 'INPUT' && !/^(checkbox|radio|button|submit|reset)$/i.test(el.type)));
+      if (!typing) {
         e.preventDefault();
         if (!sidebarOpen) toggleSidebar();
         document.getElementById('searchInput').focus();
@@ -1681,7 +1716,7 @@ function initMap() {
       const count = cluster.getChildCount();
       const size = count < 10 ? 'small' : count < 30 ? 'medium' : 'large';
       return L.divIcon({
-        html: '<div>' + count + '</div>',
+        html: '<div><span>' + count + '</span></div>',
         className: 'marker-cluster marker-cluster-' + size,
         iconSize: L.point(40, 40)
       });
@@ -1865,9 +1900,11 @@ function updateKPIs(rigs) {
   let backlog = 0;
   rigs.forEach(function (r) {
     if (r.dayRate == null) return;
-    const end = parseFlexDate(r.contractEnd);
+    const end = parseFlexDate(r.contractEnd, true);
     if (!end) return;
-    const days = Math.max(0, (end - NOW) / 86400000);
+    const start = parseFlexDate(r.contractStart);
+    const from = start && start > NOW ? start : NOW;
+    const days = Math.max(0, (end - from) / 86400000);
     backlog += r.dayRate * days;
   });
 
@@ -1930,7 +1967,9 @@ function buildLegend() {
 }
 
 function toggleLegend() {
-  document.getElementById('mapLegend').classList.toggle('collapsed');
+  const collapsed = document.getElementById('mapLegend').classList.toggle('collapsed');
+  const btn = document.querySelector('.legend-toggle');
+  if (btn) btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
 }
 
 /* ============================================
@@ -2017,52 +2056,62 @@ function highlightSelectedMarker() {
 /* ============================================
    DATE PARSING / CONTRACT MATH
    ============================================ */
-function parseFlexDate(str) {
+/* Parses "Jul 2026", "Q2 2027", "Mid-2027", "End 2027", "2028" etc.
+   With asEnd, returns the end of that period (a contract ending "Jul 2026"
+   runs through July, not to Jul 1). */
+function parseFlexDate(str, asEnd) {
   if (!str || str === '-') return null;
   const months = { Jan: 0, Feb: 1, Mar: 2, Apr: 3, May: 4, Jun: 5, Jul: 6, Aug: 7, Sep: 8, Oct: 9, Nov: 10, Dec: 11 };
-  for (const m in months) {
-    if (str.includes(m)) {
-      const ym = str.match(/\d{4}/);
-      if (ym) return new Date(parseInt(ym[0], 10), months[m], 1);
-    }
+  const mMatch = str.match(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+(\d{4})/);
+  if (mMatch) {
+    const y = parseInt(mMatch[2], 10), mo = months[mMatch[1]];
+    return asEnd ? new Date(y, mo + 1, 0) : new Date(y, mo, 1);
   }
-  const qMatch = str.match(/Q(\d)\s*(\d{4})/);
-  if (qMatch) return new Date(parseInt(qMatch[2], 10), (parseInt(qMatch[1], 10) - 1) * 3, 1);
+  const qMatch = str.match(/Q([1-4])\s*(\d{4})/);
+  if (qMatch) {
+    const y = parseInt(qMatch[2], 10), q0 = (parseInt(qMatch[1], 10) - 1) * 3;
+    return asEnd ? new Date(y, q0 + 3, 0) : new Date(y, q0, 1);
+  }
   const yearOnly = str.match(/(\d{4})/);
   if (yearOnly) {
     const y = parseInt(yearOnly[1], 10);
     const low = str.toLowerCase();
-    if (low.includes('early')) return new Date(y, 2, 1);
-    if (low.includes('mid')) return new Date(y, 6, 1);
-    if (low.includes('late') || low.includes('end')) return new Date(y, 10, 1);
-    return new Date(y, 6, 1);
+    if (low.includes('early')) return asEnd ? new Date(y, 3, 30) : new Date(y, 0, 1);
+    if (low.includes('mid')) return asEnd ? new Date(y, 6, 31) : new Date(y, 5, 1);
+    if (low.includes('late') || low.includes('end')) return asEnd ? new Date(y, 11, 31) : new Date(y, 9, 1);
+    return asEnd ? new Date(y, 11, 31) : new Date(y, 0, 1);
   }
   return null;
 }
 
+const MS_PER_MONTH = 1000 * 60 * 60 * 24 * 30.44;
+
+function fmtMonths(mo) {
+  return mo < 1 ? '<1 mo' : mo < 24 ? Math.round(mo) + ' mo' : (Math.round(mo / 12 * 10) / 10) + ' yr';
+}
+
 function contractInfo(start, end) {
-  const s = parseFlexDate(start), e = parseFlexDate(end);
+  const s = parseFlexDate(start), e = parseFlexDate(end, true);
   if (!s || !e || e <= s) return { has: false };
   const pct = Math.max(0, Math.min(100, (NOW - s) / (e - s) * 100));
-  const ms = e - NOW;
   let remaining;
-  if (ms <= 0) remaining = 'Ended';
-  else {
-    const mo = ms / (1000 * 60 * 60 * 24 * 30.44);
-    remaining = mo < 1 ? '<1 mo left' : mo < 24 ? Math.round(mo) + ' mo left' : (Math.round(mo / 12 * 10) / 10) + ' yr left';
-  }
+  if (e <= NOW) remaining = 'Ended';
+  else if (s > NOW) remaining = 'Starts in ' + fmtMonths((s - NOW) / MS_PER_MONTH);
+  else remaining = fmtMonths((e - NOW) / MS_PER_MONTH) + ' left';
   return { has: true, pct: Math.round(pct), remaining: remaining, start: s, end: e };
 }
 
 function monthsUntil(str) {
-  const d = parseFlexDate(str);
-  return d ? (d - NOW) / (1000 * 60 * 60 * 24 * 30.44) : null;
+  const d = parseFlexDate(str, true);
+  return d ? (d - NOW) / MS_PER_MONTH : null;
 }
 
+/* Available/idle now, or the current contract ends within NEAR_TERM_MONTHS
+   (an already-lapsed end date counts too: the rig is open for work). */
 function isNearTerm(rig) {
   if (MARKETABLE_IDLE.includes(rig.status) || rig.status === 'Held for sale') return true;
   const mo = monthsUntil(rig.contractEnd);
-  return mo != null && mo >= 0 && mo <= NEAR_TERM_MONTHS;
+  return mo != null && mo <= NEAR_TERM_MONTHS;
 }
 
 /* ============================================
@@ -2104,9 +2153,9 @@ function renderListView() {
     const statusInfo = getStatusInfo(rig.status);
     const rate = rig.dayRate != null ? '$' + rig.dayRate.toLocaleString('en-US') : '—';
     const near = isNearTerm(rig) ? ' near-term' : '';
-    return '<tr class="list-row' + near + '" tabindex="0" role="button" data-rig-id="' + escapeHtml(rig.id) +
-        '" aria-label="' + escapeHtml(rig.name + ', ' + rig.contractor + ', ' + rig.status + '. Open details.') + '">' +
-      '<td class="cell-name">' + escapeHtml(rig.name) + '</td>' +
+    return '<tr class="list-row' + near + '" data-rig-id="' + escapeHtml(rig.id) + '">' +
+      '<td class="cell-name"><button type="button" class="row-link" title="Show ' + escapeHtml(rig.name) + ' on the map">' +
+        escapeHtml(rig.name) + '</button></td>' +
       '<td><span class="contractor-dot" style="background:' + color + '" aria-hidden="true"></span>' + escapeHtml(shortContractor(rig.contractor)) + '</td>' +
       '<td>' + escapeHtml(rig.type) + '</td>' +
       '<td>' + escapeHtml(rig.region) + '</td>' +
@@ -2135,7 +2184,8 @@ function applySort() {
   filteredRigs.sort(function (a, b) {
     let va = a[field], vb = b[field];
     if (dateField) {
-      const da = parseFlexDate(va), db = parseFlexDate(vb);
+      const asEnd = field === 'contractEnd';
+      const da = parseFlexDate(va, asEnd), db = parseFlexDate(vb, asEnd);
       va = da ? da.getTime() : Infinity;
       vb = db ? db.getTime() : Infinity;
     } else if (field === 'dayRate') {
@@ -2180,17 +2230,18 @@ function updateSortHeaders() {
    ============================================ */
 function exportCSV() {
   const cols = ['name', 'contractor', 'type', 'generation', 'waterDepth_ft', 'hookload_tons', 'buildYear',
-                'region', 'lat', 'lng', 'customer', 'status', 'contractStart', 'contractEnd', 'dayRate'];
+                'region', 'lat', 'lng', 'customer', 'status', 'contractStart', 'contractEnd', 'dayRate', 'backlogNote'];
   const head = ['Rig Name', 'Contractor', 'Type', 'Generation', 'Water Depth (ft)', 'Hookload (t)', 'Build Year',
-                'Region', 'Latitude', 'Longitude', 'Customer', 'Status', 'Contract Start', 'Contract End', 'Day Rate (USD)'];
+                'Region', 'Latitude', 'Longitude', 'Customer', 'Status', 'Contract Start', 'Contract End', 'Day Rate (USD)', 'Backlog Note'];
   const esc = function (v) {
     v = v == null ? '' : String(v);
-    return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+    return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
   };
   const lines = [head.join(',')].concat(
     filteredRigs.map(r => cols.map(c => esc(r[c])).join(','))
   );
-  const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
+  // BOM so Excel opens the UTF-8 file with the right encoding
+  const blob = new Blob(['\uFEFF' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -2206,8 +2257,14 @@ function focusRig(rigId) {
   const rig = RIG_DATA.find(r => r.id === rigId);
   if (!rig) return;
   setView('map');
+  map.invalidateSize();
   map.setView([rig.lat, rig.lng], 8, { animate: !prefersReduced });
-  setTimeout(function () { openDetail(rig); }, prefersReduced ? 0 : 350);
+  setTimeout(function () {
+    const marker = markersById[rig.id];
+    // Nearby rigs can still be clustered at this zoom: zoom/spiderfy until the marker is visible
+    if (marker && !marker._icon) markerClusterGroup.zoomToShowLayer(marker, function () { openDetail(rig); });
+    else openDetail(rig);
+  }, prefersReduced ? 0 : 350);
 }
 
 /* ============================================
@@ -2237,13 +2294,15 @@ function histogramChart(title, rigs) {
   const bins = [];
   for (let lo = 100000; lo < 650000; lo += 50000) bins.push({ lo: lo, hi: lo + 50000, count: 0 });
   rated.forEach(function (r) {
-    const b = bins.find(b => r.dayRate >= b.lo && r.dayRate < b.hi);
-    if (b) b.count++;
+    const i = Math.floor((r.dayRate - bins[0].lo) / 50000);
+    bins[Math.max(0, Math.min(bins.length - 1, i))].count++;
   });
   const max = Math.max(1, ...bins.map(b => b.count));
   const cols = bins.map(function (b) {
     const h = (b.count / max) * 100;
-    return '<div class="hist-col" title="$' + (b.lo / 1000) + 'k–$' + (b.hi / 1000) + 'k: ' + b.count + ' rigs">' +
+    const last = b === bins[bins.length - 1];
+    const range = last ? '$' + (b.lo / 1000) + 'k+' : '$' + (b.lo / 1000) + 'k–$' + (b.hi / 1000) + 'k';
+    return '<div class="hist-col" title="' + range + ': ' + b.count + ' rig' + (b.count === 1 ? '' : 's') + '">' +
       '<div class="hist-bar-wrap"><div class="hist-bar" style="height:' + h + '%"></div></div>' +
       '<div class="hist-x">' + (b.lo / 1000) + 'k</div></div>';
   }).join('');
@@ -2275,7 +2334,9 @@ function ganttChart(rigs) {
   const rows = withDates.map(function (x) {
     const left = pos(x.ci.start), width = Math.max(0.8, pos(x.ci.end) - left);
     const col = getStatusInfo(x.r.status).color;
-    return '<div class="gantt-row" title="' + escapeHtml(x.r.name + ' — ' + x.r.contractStart + ' → ' + x.r.contractEnd) + '" data-rig-id="' + escapeHtml(x.r.id) + '">' +
+    const label = x.r.name + ' — ' + x.r.contractStart + ' → ' + x.r.contractEnd;
+    return '<div class="gantt-row" role="button" tabindex="0" title="' + escapeHtml(label) + '" aria-label="' + escapeHtml(label + '. Show on map.') +
+      '" data-rig-id="' + escapeHtml(x.r.id) + '">' +
       '<div class="gantt-name">' + escapeHtml(x.r.name) + '</div>' +
       '<div class="gantt-track">' +
         '<div class="gantt-bar" style="left:' + left + '%;width:' + width + '%;background:' + col + '"></div>' +
@@ -2316,10 +2377,16 @@ function renderInsights() {
     ganttChart(rigs);
 
   const gantt = document.getElementById('ganttChart');
-  if (gantt) gantt.addEventListener('click', function (e) {
-    const row = e.target.closest('.gantt-row');
-    if (row) focusRig(row.dataset.rigId);
-  });
+  if (gantt) {
+    gantt.addEventListener('click', function (e) {
+      const row = e.target.closest('.gantt-row');
+      if (row) focusRig(row.dataset.rigId);
+    });
+    gantt.addEventListener('keydown', function (e) {
+      const row = e.target.closest('.gantt-row');
+      if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); focusRig(row.dataset.rigId); }
+    });
+  }
 }
 
 /* ============================================
