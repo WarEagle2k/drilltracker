@@ -699,6 +699,13 @@ a:hover { color: var(--color-primary-hover); }
   transition: all var(--transition-fast);
 }
 .detail-close:hover { background: var(--color-surface-2); color: var(--color-text); }
+.detail-actions { display: flex; align-items: center; gap: var(--space-1); flex-shrink: 0; }
+.detail-map-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: var(--radius-full);
+  border: 1px solid var(--color-border); font-size: var(--text-xs); color: var(--color-text-muted); white-space: nowrap;
+}
+.detail-map-btn:hover { color: var(--color-text); border-color: var(--color-primary); }
+.detail-map-btn[hidden] { display: none; }
 .detail-rig-name { font-size: var(--text-lg); font-weight: 700; line-height: 1.2; margin-bottom: var(--space-1); }
 .detail-contractor { font-size: var(--text-sm); color: var(--color-text-muted); }
 
@@ -844,44 +851,60 @@ a:hover { color: var(--color-primary-hover); }
 
 /* ============================================
    LIST VIEW
+   Columns respond to the space the list gets (the sidebar may be open), not the
+   window: Type and Location drop below 900px, and below 640px rows become cards.
    ============================================ */
-.list-view { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.list-view { display: none; flex: 1; flex-direction: column; overflow: hidden; container: list / inline-size; }
 .list-view.active { display: flex; }
 
+.list-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-2) var(--space-5);
+  padding: var(--space-2) var(--space-4); border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface); font-size: var(--text-xs); color: var(--color-text-muted); flex-shrink: 0;
+}
+.list-count { font-weight: 600; color: var(--color-text); }
+.list-key { display: inline-flex; align-items: center; gap: 6px; }
+.list-key strong { color: var(--color-text); font-variant-numeric: tabular-nums; }
+.list-key-mark { width: 3px; height: 14px; border-radius: 2px; background: var(--color-warning); }
+.list-sort { display: none; margin-left: auto; align-items: center; gap: 6px; }
+.list-sort select {
+  font: inherit; color: var(--color-text); background: var(--color-surface-2);
+  border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 4px 6px;
+}
+.list-sort-dir { width: 28px; height: 28px; border: 1px solid var(--color-border); border-radius: var(--radius-md); color: var(--color-text); }
+
 .list-table-wrapper { flex: 1; overflow: auto; overscroll-behavior: contain; }
-.list-table { width: 100%; min-width: 860px; table-layout: fixed; border-collapse: collapse; font-size: var(--text-xs); }
-/* fixed proportional columns, so every column fits beside the open sidebar */
-.list-table th:nth-child(1) { width: 18%; }
-.list-table th:nth-child(2) { width: 14%; }
-.list-table th:nth-child(3) { width: 8%; }
-.list-table th:nth-child(4) { width: 12%; }
-.list-table th:nth-child(5) { width: 14%; }
-.list-table th:nth-child(6) { width: 11%; }
-.list-table th:nth-child(7) { width: 11%; }
-.list-table th:nth-child(8) { width: 12%; }
+.list-table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: var(--text-xs); }
+/* fixed proportional columns */
+.list-table .col-name       { width: 19%; }
+.list-table .col-contractor { width: 14%; }
+.list-table .col-type       { width: 8%; }
+.list-table .col-location   { width: 11%; }
+.list-table .col-customer   { width: 14%; }
+.list-table .col-dayRate    { width: 10%; }
+.list-table .col-bookedTo   { width: 13%; }
+.list-table .col-status     { width: 11%; }
 .list-table thead { position: sticky; top: 0; z-index: 10; }
 .list-table th {
   background: var(--color-surface-2);
   padding: var(--space-2) var(--space-3);
   text-align: left;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   color: var(--color-text-muted);
   border-bottom: 1px solid var(--color-border);
   user-select: none;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   transition: color var(--transition-fast);
 }
 .list-table th:hover { color: var(--color-text); }
 .list-table th.sorted { color: var(--color-primary); }
+.list-table th.col-dayRate { text-align: right; }
 .th-btn {
-  display: inline-flex; align-items: center; gap: 4px;
-  font: inherit; color: inherit; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px; max-width: 100%;
+  font: inherit; color: inherit; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; font-size: 11px;
 }
-.sort-arrow { display: inline-block; opacity: 0.4; }
+.th-label { overflow: hidden; text-overflow: ellipsis; } /* the label truncates, the arrow never does */
+.sort-arrow { flex-shrink: 0; opacity: 0.4; }
 .list-table th.sorted .sort-arrow { opacity: 1; color: var(--color-primary); }
 
 .list-table td {
@@ -894,9 +917,18 @@ a:hover { color: var(--color-primary-hover); }
 .list-table tbody tr { cursor: pointer; transition: background var(--transition-fast); }
 .list-table tbody tr:nth-child(even) { background: color-mix(in srgb, var(--color-text) 2.5%, transparent); }
 .list-table tbody tr:hover { background: var(--color-primary-highlight); }
-.list-table .mono-cell { font-family: var(--font-mono); font-variant-numeric: tabular-nums lining-nums; }
+.list-table tbody tr.is-selected { background: color-mix(in srgb, var(--color-primary) 16%, transparent); }
+.list-table tbody tr.is-selected .cell-name { box-shadow: inset 3px 0 0 var(--color-primary); }
 .cell-name { font-weight: 600; }
 .list-row.near-term .cell-name { box-shadow: inset 3px 0 0 var(--color-warning); }
+.cell-rate { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums lining-nums; }
+.cell-date { font-family: var(--font-mono); font-variant-numeric: tabular-nums lining-nums; }
+.cell-rel { color: var(--color-text-faint); }
+.cell-muted { color: var(--color-text-faint); font-family: var(--font-body); }
+.cell-chip {
+  display: inline-block; padding: 1px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600;
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent); color: var(--color-text);
+}
 .contractor-dot, .status-dot { display: inline-block; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
 .contractor-dot { width: 8px; height: 8px; }
 .status-dot { width: 7px; height: 7px; }
@@ -905,6 +937,51 @@ a:hover { color: var(--color-primary-hover); }
 
 /* the rig name is a real button; rows keep table semantics */
 .row-link { font: inherit; font-weight: 600; color: inherit; text-align: left; padding: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+abbr.cell-muted { text-decoration: none; cursor: help; }
+
+/* on wide screens the open panel pushes the list and insights aside instead of covering them */
+@media (min-width: 1200px) {
+  .main-content.panel-open .list-view,
+  .main-content.panel-open .insights-view { margin-right: 400px; }
+}
+
+@container list (max-width: 1000px) {
+  .cell-rel { display: none; }
+}
+
+@container list (max-width: 900px) {
+  .list-table .col-type, .list-table .cell-type,
+  .list-table .col-location, .list-table .cell-location { display: none; }
+}
+
+/* phones and narrow panes: each rig becomes a two-column card; sorting moves to the toolbar */
+@container list (max-width: 640px) {
+  .list-sort { display: inline-flex; }
+  .list-key { font-size: 11px; }
+  .list-table, .list-table tbody { display: block; }
+  .list-table thead { display: none; }
+  .list-table tbody tr {
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--space-3);
+    grid-template-areas: "name status" "contractor booked" "customer rate";
+    padding: var(--space-2) var(--space-4) var(--space-2) var(--space-4); border-bottom: 1px solid var(--color-divider);
+  }
+  .list-table td { display: block; padding: 0; border: 0; min-width: 0; }
+  .list-table .cell-type, .list-table .cell-location { display: none; }
+  .list-table .cell-name { grid-area: name; font-size: var(--text-sm); box-shadow: none !important; }
+  .list-table .cell-status { grid-area: status; text-align: right; }
+  .list-table .cell-contractor { grid-area: contractor; color: var(--color-text-muted); }
+  .list-table .cell-booked { grid-area: booked; text-align: right; }
+  .list-table .cell-customer { grid-area: customer; color: var(--color-text-muted); }
+  .list-table .cell-rate { grid-area: rate; }
+  .list-table tbody tr.near-term { box-shadow: inset 3px 0 0 var(--color-warning); }
+  .list-table tbody tr.is-selected { box-shadow: inset 3px 0 0 var(--color-primary); }
+  .list-table .list-empty { grid-column: 1 / -1; }
+  .list-table .cell-none { display: none; } /* no contract: no empty third line */
+  /* without column headers, label the two numbers */
+  .list-table .cell-rate::before { content: 'Day rate '; color: var(--color-text-faint); font-family: var(--font-body); }
+  .list-table .cell-date::before { content: 'Booked to '; color: var(--color-text-faint); font-family: var(--font-body); }
+}
 
 /* ============================================
    INSIGHTS VIEW
@@ -1097,13 +1174,6 @@ a:hover { color: var(--color-primary-hover); }
 /* ============================================
    RESPONSIVE
    ============================================ */
-@media (max-width: 1200px) {
-  /* type and location are filters and in the detail panel; drop them before the table gets cramped */
-  .list-table { min-width: 640px; }
-  .list-table th:nth-child(3), .list-table td:nth-child(3),
-  .list-table th:nth-child(4), .list-table td:nth-child(4) { display: none; }
-}
-
 @media (max-width: 1024px) {
   .kpi-strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
@@ -1138,11 +1208,6 @@ a:hover { color: var(--color-primary-hover); }
 
   .detail-panel { width: 100%; border-left: none; }
 
-  .list-table { min-width: 0; }
-  .list-table th:nth-child(3), .list-table td:nth-child(3),
-  .list-table th:nth-child(4), .list-table td:nth-child(4),
-  .list-table th:nth-child(5), .list-table td:nth-child(5) { display: none; }
-
 
   .gantt-grid { left: 92px; }
   .gantt-row { grid-template-columns: 92px 1fr; }
@@ -1156,8 +1221,6 @@ a:hover { color: var(--color-primary-hover); }
   .kpi-label { font-size: 10px; letter-spacing: 0.03em; white-space: normal; }
   .kpi-note { font-size: 10px; }
   .kpi-value { font-size: var(--text-sm); }
-  .list-table th:nth-child(2), .list-table td:nth-child(2) { display: none; }
-  .list-table th, .list-table td { padding: var(--space-2) 6px; }
   .footer-scope { display: none; } /* the scope line is in the README; keep the footer to two lines */
   /* the wordmark collided with the view toggle; hide it visually but keep the heading */
   .logo-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
