@@ -107,6 +107,12 @@ html {
   --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
   --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
   --shadow-xl: 0 20px 50px rgba(0,0,0,0.6);
+
+  --map-sea:        #0a1628;
+  --map-land:       #1a2942;
+  --map-border:     #33466b;
+  --map-label:      #8494b0;
+  --map-label-sea:  #4f6a94;
 }
 
 /* LIGHT MODE */
@@ -137,6 +143,12 @@ html {
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
   --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
   --shadow-xl: 0 20px 50px rgba(0,0,0,0.16);
+
+  --map-sea:        #d9e3ee;
+  --map-land:       #f8f9fb;
+  --map-border:     #b9c2d0;
+  --map-label:      #5b6779;
+  --map-label-sea:  #7f97b5;
 }
 
 html, body { height: 100%; overflow: hidden; }
@@ -1108,7 +1120,19 @@ a:hover { color: var(--color-primary-hover); }
 .marker-cluster span { line-height: 30px; }
 
 /* map background matches the theme while tiles load (Leaflet default is light grey) */
-.leaflet-container { background: var(--color-bg); }
+.leaflet-container { background: var(--map-sea); }
+
+/* bundled basemap (basemap.js): land, borders and labels drawn in the theme's colours */
+.basemap-land { fill: var(--map-land); fill-opacity: 1; stroke: var(--map-border); stroke-width: 0.6; }
+.map-label {
+  display: flex; align-items: center; justify-content: center; white-space: nowrap; pointer-events: none;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--map-label);
+  text-shadow: 0 0 3px var(--map-land), 0 0 3px var(--map-land);
+}
+.map-label-sea {
+  font-style: italic; font-weight: 400; letter-spacing: 0.12em; text-transform: none; font-size: 11px;
+  color: var(--map-label-sea); text-shadow: 0 0 3px var(--map-sea), 0 0 3px var(--map-sea);
+}
 
 /* status badges need darker text on the light theme for contrast */
 [data-theme="light"] .badge-firm        { background: rgba(5,150,105,0.12);  color: #047857; }
@@ -1370,6 +1394,7 @@ a:hover { color: var(--color-primary-hover); }
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
+<script src="basemap.js"></script>
 <script>
 /* ============================================
    RIG DATA
@@ -1510,7 +1535,7 @@ const DATA_AS_OF_LABEL = 'October 4, 2026';
 /* ============================================
    STATE
    ============================================ */
-let map, markerClusterGroup, tileLayer;
+let map, markerClusterGroup, labelLayer;
 let filteredRigs = [...RIG_DATA];
 let currentSort = { field: 'name', asc: true };
 let currentView = 'map';
@@ -1661,38 +1686,107 @@ function initTheme() {
     root.setAttribute('data-theme', theme);
     try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
     syncTheme(theme);
-    updateMapTiles(theme);
     buildLegend();
     if (currentView === 'insights') renderInsights();
   });
 }
 
-function makeTileLayer(theme) {
-  return L.tileLayer(
-    theme === 'dark'
-      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-      : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/" target="_blank" rel="noopener">CARTO</a>',
-      subdomains: 'abcd', maxZoom: 19
-    }
-  );
+/* ============================================
+   BASEMAP — bundled Natural Earth outline (basemap.js), drawn as vectors.
+   No tile provider and no API key; colours come from the theme's CSS variables.
+   ============================================ */
+const MAP_MAX_ZOOM = 8; // the 1:50m outline looks coarse beyond regional zoom
+
+/* Seas and basins that matter for offshore drilling: n = name, p = [lng, lat], z = lowest zoom shown */
+const SEA_LABELS = [
+  { n: 'North Atlantic Ocean', p: [-42, 33], z: 2 },
+  { n: 'South Atlantic Ocean', p: [-14, -27], z: 2 },
+  { n: 'North Pacific Ocean', p: [-150, 30], z: 2 },
+  { n: 'South Pacific Ocean', p: [-125, -27], z: 2 },
+  { n: 'Indian Ocean', p: [78, -24], z: 2 },
+  { n: 'Gulf of Mexico', p: [-90.5, 25.3], z: 3 },
+  { n: 'Caribbean Sea', p: [-75, 15], z: 4 },
+  { n: 'North Sea', p: [3, 56.5], z: 4 },
+  { n: 'Norwegian Sea', p: [3, 67.5], z: 4 },
+  { n: 'Barents Sea', p: [38, 74], z: 4 },
+  { n: 'Mediterranean Sea', p: [18.5, 34.8], z: 4 },
+  { n: 'Gulf of Guinea', p: [2, 1.5], z: 4 },
+  { n: 'Arabian Sea', p: [64, 16], z: 4 },
+  { n: 'Bay of Bengal', p: [89, 14], z: 4 },
+  { n: 'South China Sea', p: [114, 13.5], z: 4 },
+  { n: 'Black Sea', p: [34, 43.3], z: 5 },
+  { n: 'Caspian Sea', p: [50.6, 41.5], z: 5 },
+  { n: 'Red Sea', p: [38, 20.5], z: 5 },
+  { n: 'Timor Sea', p: [127, -11.5], z: 5 },
+  { n: 'Gulf of Thailand', p: [101.3, 9.8], z: 6 },
+  { n: 'Andaman Sea', p: [96, 11], z: 6 },
+  { n: 'Java Sea', p: [112, -5], z: 6 },
+  { n: 'Bass Strait', p: [146, -39.8], z: 6 }
+];
+
+/* A ring is stored as [lng0, lat0, dLng, dLat, ...] in hundredths of a degree */
+function decodeRing(a) {
+  const ring = [];
+  let x = 0, y = 0;
+  for (let i = 0; i < a.length; i += 2) {
+    x += a[i]; y += a[i + 1];
+    ring.push([x / 100, y / 100]);
+  }
+  return ring;
 }
 
-function updateMapTiles(theme) {
-  if (!map || !tileLayer) return;
-  map.removeLayer(tileLayer);
-  tileLayer = makeTileLayer(theme);
-  tileLayer.addTo(map);
+function makeBasemapLayer() {
+  const features = BASEMAP.countries.map(function (c) {
+    return { type: 'Feature', properties: {},
+             geometry: { type: 'MultiPolygon', coordinates: c.g.map(r => [decodeRing(r)]) } };
+  });
+  return L.geoJSON(features, {
+    interactive: false,
+    renderer: L.svg({ padding: 0.5 }),
+    style: { className: 'basemap-land' }
+  });
+}
+
+/* Labels are re-placed on each zoom: seas first, then countries in Natural Earth's
+   order of importance, skipping any label that would overlap one already placed. */
+function updateMapLabels() {
+  labelLayer.clearLayers();
+  const zoom = map.getZoom();
+  const placed = [];
+  const candidates = SEA_LABELS.map(l => ({ n: l.n, p: l.p, z: l.z, sea: true }))
+    .concat(BASEMAP.countries.map(c => ({ n: c.n, p: c.p, z: c.z + 0.5, sea: false }))) // a little sparser than Natural Earth suggests
+    .filter(l => l.z <= zoom)
+    .sort((a, b) => (a.z - b.z) || (b.sea - a.sea));
+
+  candidates.forEach(function (l) {
+    const latlng = [l.p[1], l.p[0]];
+    const pt = map.project(latlng, zoom);
+    const w = l.n.length * 7.5 + 10, h = 16;
+    const box = [pt.x - w / 2, pt.y - h / 2, pt.x + w / 2, pt.y + h / 2];
+    if (placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) return;
+    placed.push(box);
+    L.marker(latlng, {
+      pane: 'labels', interactive: false, keyboard: false,
+      icon: L.divIcon({ className: 'map-label' + (l.sea ? ' map-label-sea' : ''), html: escapeHtml(l.n), iconSize: [w, h] })
+    }).addTo(labelLayer);
+  });
 }
 
 function initMap() {
   map = L.map('map', {
-    center: [15, 0], zoom: 3, minZoom: 2, maxZoom: 14,
+    center: [15, 0], zoom: 3, minZoom: 2, maxZoom: MAP_MAX_ZOOM,
+    maxBounds: [[-62, -180], [85, 180]], maxBoundsViscosity: 1,
     zoomControl: true, attributionControl: true
   });
-  tileLayer = makeTileLayer(currentTheme());
-  tileLayer.addTo(map);
+  map.attributionControl.addAttribution('Map data: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>');
+  makeBasemapLayer().addTo(map);
+
+  // labels sit above the land but below the rig markers
+  map.createPane('labels').style.zIndex = 450;
+  map.getPane('labels').style.pointerEvents = 'none';
+  labelLayer = L.layerGroup().addTo(map);
+  map.on('zoomend', updateMapLabels);
+  updateMapLabels();
 
   markerClusterGroup = L.markerClusterGroup({
     maxClusterRadius: 50,
@@ -2260,7 +2354,7 @@ function focusRig(rigId) {
   if (!rig) return;
   setView('map');
   map.invalidateSize();
-  map.setView([rig.lat, rig.lng], 8, { animate: !prefersReduced });
+  map.setView([rig.lat, rig.lng], 7, { animate: !prefersReduced });
   setTimeout(function () {
     const marker = markersById[rig.id];
     // Nearby rigs can still be clustered at this zoom: zoom/spiderfy until the marker is visible
