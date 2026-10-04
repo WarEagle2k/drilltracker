@@ -1,5 +1,5 @@
 /* DrillTracker Insights view. Loaded after app.js and uses its data and helpers
-   (RIG_DATA, filteredRigs, AS_OF, FIRMNESS, escapeHtml, focusRig, ...).
+   (RIG_DATA, filteredRigs, AS_OF, FIRMNESS, escapeHtml, openDetail, ...).
 
    Every chart follows the filters, draws its colours from CSS variables (so the
    theme switch needs no re-render), has a hover/focus tooltip and a table view.
@@ -583,15 +583,15 @@ function drawTimeline(id, rigs) {
       const label = x.r.name + ' — ' + d.status + ', booked to ' + d.bookedToLabel;
       return '<div class="gantt-row" role="button" tabindex="0"' + tip({ title: x.r.name, rows: x.segs.map(s => ({
           value: (s.k.customer || 'Undisclosed'), label: s.k.start + ' – ' + (s.k.end || 'undisclosed') + (s.k.dayRate ? ' · ' + fmtK(s.k.dayRate) : ''),
-          swatch: 'var(--firm-' + s.k.firmness + ')' })), note: d.status + ' · booked to ' + d.bookedToLabel + ' · click to show on the map' }) +
-        ' aria-label="' + escapeHtml(label + '. Show on map.') + '" data-rig-id="' + escapeHtml(x.r.id) + '">' +
+          swatch: 'var(--firm-' + s.k.firmness + ')' })), note: d.status + ' · booked to ' + d.bookedToLabel + ' · click for details' }) +
+        ' aria-label="' + escapeHtml(label + '. Show details.') + '" data-rig-id="' + escapeHtml(x.r.id) + '">' +
         '<div class="gantt-name">' + escapeHtml(x.r.name) + '</div><div class="gantt-track">' + bars + '</div></div>';
     }).join('') + '</div>';
   const g = host.querySelector('#ganttChart');
-  g.addEventListener('click', e => { const row = e.target.closest('.gantt-row'); if (row) { hideTip(); focusRig(row.dataset.rigId); } });
+  g.addEventListener('click', e => { const row = e.target.closest('.gantt-row'); if (row) { hideTip(); openDetail(RIG_BY_ID[row.dataset.rigId], row); } });
   g.addEventListener('keydown', e => {
     const row = e.target.closest('.gantt-row');
-    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); hideTip(); focusRig(row.dataset.rigId); }
+    if (row && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); hideTip(); openDetail(RIG_BY_ID[row.dataset.rigId], row); }
   });
   setTable(id, ['Rig', 'Customer', 'Start', 'End', 'Day rate', 'Terms'], rows.flatMap(x => x.segs.map(s =>
     [x.r.name, s.k.customer || 'Undisclosed', s.k.start, s.k.end || 'undisclosed', s.k.dayRate ? fmtRate(s.k.dayRate) : '—', FIRMNESS[s.k.firmness]])));
@@ -632,7 +632,7 @@ function renderInsights() {
       card('vizMix', 'Fleet mix', 'Rigs shown by status, type and region') +
     '</div>' +
     card('vizTimeline', 'Contract timeline', plural(rigs.filter(r => r.derived.contracts.some(x => x.s)).length, 'rig') +
-      ' · sorted by booked-to date · red line = ' + DATA_AS_OF_LABEL + ' · click a row to show the rig', { wide: true, legend: timelineLegend });
+      ' · sorted by booked-to date · red line = ' + DATA_AS_OF_LABEL + ' · click a row for details', { wide: true, legend: timelineLegend });
 
   drawCoverage('vizCoverage', rigs);
   drawRollOff('vizRollOff', rigs);

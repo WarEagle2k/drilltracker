@@ -231,6 +231,7 @@ let currentSort = { field: 'name', asc: true };
 let currentView = 'map';
 let sidebarOpen = true;
 let selectedRigId = null;
+let detailOpener = null; // the list row or timeline row that opened the panel, if any
 const markersById = {};
 const kpiFrames = {};
 const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -279,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function () {
   wireActions();
   wireGlobalKeys();
   wireKpiHelp();
+  wireListSort();
   const hashRig = readHash();
   applyFilters();
   updateSortHeaders();
@@ -322,6 +324,7 @@ function wireActions() {
       case 'remove-search': clearSearch(); break;
       case 'toggle-legend': toggleLegend(); break;
       case 'close-detail': closeDetail(true); break;
+      case 'show-on-map': if (selectedRigId) focusRig(selectedRigId); break;
       case 'sort': sortTable(el.dataset.field); break;
     }
   });
@@ -951,7 +954,9 @@ function readHash() {
 }
 
 function openRigFromHash(id) {
-  if (id && id !== selectedRigId && filteredRigs.some(r => r.id === id)) focusRig(id);
+  if (id && id !== selectedRigId && filteredRigs.some(r => r.id === id)) {
+    if (currentView === 'map') focusRig(id); else openDetail(RIG_BY_ID[id]);
+  }
   else if (!id && selectedRigId) closeDetail(false);
 }
 
@@ -1063,9 +1068,12 @@ function contractsTable(rig) {
     '<tbody>' + rows + '</tbody></table>';
 }
 
-function openDetail(rig) {
+function openDetail(rig, opener) {
   selectedRigId = rig.id;
+  detailOpener = opener || null;
   highlightSelectedMarker();
+  highlightSelectedRow();
+  document.getElementById('detailMapBtn').hidden = currentView === 'map';
   const d = rig.derived;
 
   document.getElementById('detailName').textContent = rig.name;
@@ -1126,6 +1134,9 @@ function openDetail(rig) {
     '</dl>' + staleNote;
 
   document.getElementById('detailPanel').classList.add('open');
+  document.querySelector('.main-content').classList.add('panel-open');
+  const row = document.querySelector('.list-row[data-rig-id="' + rig.id + '"]');
+  if (row && currentView === 'list') row.scrollIntoView({ block: 'nearest' });
   document.getElementById('detailClose').focus();
   writeHash();
 }
@@ -1136,19 +1147,38 @@ function field(label, value, wide) {
     '<dd class="detail-field-value' + (wide ? ' detail-field-value--text' : '') + '">' + escapeHtml(value) + '</dd></div>';
 }
 
-/* Closing returns focus to the rig's marker (or the map, if the marker is inside a
-   cluster); the element that opened the panel may since have been hidden. */
+/* Closing returns focus to whatever opened the panel if it is still on screen (a list
+   or timeline row); otherwise, on the map, to the rig's marker (or the map itself if
+   the marker is inside a cluster). */
 function closeDetail(restoreFocus) {
   const id = selectedRigId;
   if (!id) return;
   document.getElementById('detailPanel').classList.remove('open');
+  document.querySelector('.main-content').classList.remove('panel-open');
   selectedRigId = null;
   highlightSelectedMarker();
+  highlightSelectedRow();
   writeHash();
-  if (!restoreFocus || !map) return;
+  const opener = detailOpener;
+  detailOpener = null;
+  if (!restoreFocus) return;
+  if (opener && document.body.contains(opener) && opener.offsetParent) { opener.focus(); return; }
+  if (currentView === 'list') {
+    const btn = document.querySelector('.list-row[data-rig-id="' + id + '"] .row-link');
+    if (btn) { btn.focus(); return; }
+  }
+  if (!map || currentView !== 'map') return;
   const marker = markersById[id];
   const el = marker && marker.getElement();
   (el || map.getContainer()).focus();
+}
+
+function highlightSelectedRow() {
+  document.querySelectorAll('.list-row').forEach(function (tr) {
+    const on = tr.dataset.rigId === selectedRigId;
+    tr.classList.toggle('is-selected', on);
+    if (on) tr.setAttribute('aria-current', 'true'); else tr.removeAttribute('aria-current');
+  });
 }
 
 function highlightSelectedMarker() {
@@ -1163,8 +1193,8 @@ function highlightSelectedMarker() {
    VIEW TOGGLE
    ============================================ */
 function setView(view, fromHash) {
-  if (view !== 'map' && selectedRigId) closeDetail(false);
   currentView = view;
+  document.getElementById('detailMapBtn').hidden = view === 'map';
   document.getElementById('mapContainer').classList.toggle('hidden', view !== 'map');
   document.getElementById('listView').classList.toggle('active', view === 'list');
   document.getElementById('insightsView').classList.toggle('active', view === 'insights');
@@ -1187,31 +1217,43 @@ function setView(view, fromHash) {
    ============================================ */
 function renderListView() {
   const tbody = document.getElementById('listTableBody');
+  document.getElementById('listCount').textContent = filteredRigs.length + ' of ' + RIG_DATA.length + ' rigs';
+  document.getElementById('listNearCount').textContent = filteredRigs.filter(r => r.derived.nearTerm).length;
   if (!filteredRigs.length) {
-    tbody.innerHTML = '<tr><td colspan="8" class="list-empty">No rigs match your filters. <button type="button" class="link-btn" data-action="reset-filters">Reset filters</button></td></tr>';
+    tbody.innerHTML = '<tr role="row"><td role="cell" colspan="8" class="list-empty">No rigs match your search and filters. <button type="button" class="link-btn" data-action="reset-filters">Clear search and filters</button></td></tr>';
     return;
   }
+  const muted = t => '<span class="cell-muted">' + escapeHtml(t) + '</span>';
+  const notDisclosed = '<abbr class="cell-muted" title="Not disclosed">n/d</abbr>';
   tbody.innerHTML = filteredRigs.map(function (rig) {
     const d = rig.derived;
-    return '<tr class="list-row' + (d.nearTerm ? ' near-term' : '') + '" data-rig-id="' + escapeHtml(rig.id) + '">' +
-      '<td class="cell-name"><button type="button" class="row-link" title="Show ' + escapeHtml(rig.name) + ' on the map">' +
-        escapeHtml(rig.name) + '</button></td>' +
-      '<td><span class="contractor-dot" style="background:' + getContractorColor(rig.contractor) + '" aria-hidden="true"></span>' + escapeHtml(rig.contractor) + '</td>' +
-      '<td>' + escapeHtml(rig.type === 'Semisubmersible' ? 'Semisub' : rig.type) + '</td>' +
-      '<td>' + escapeHtml(locationLabel(rig)) + '</td>' +
-      '<td>' + escapeHtml(d.customer || '—') + '</td>' +
-      '<td class="mono-cell">' + fmtRate(d.dayRate) + '</td>' +
-      '<td class="mono-cell">' + escapeHtml(d.bookedToLabel) + '</td>' +
-      '<td><span class="status-dot" style="background:' + statusColor(d.status) + '" aria-hidden="true"></span>' + escapeHtml(d.status) + '</td>' +
+    const rate = d.dayRate != null ? fmtRate(d.dayRate) : d.shown ? notDisclosed : muted('—');
+    let booked;
+    if (d.available) booked = '<span class="cell-chip">' + escapeHtml(d.bookedToLabel) + '</span>';
+    else if (d.bookedOpen) booked = muted('Undisclosed');
+    else booked = '<span class="cell-date">' + escapeHtml(d.bookedToLabel) + '</span>' +
+      '<span class="cell-rel"> · ' + fmtMonths((d.bookedTo - AS_OF) / MS_PER_MONTH) + '</span>';
+    const loc = locationLabel(rig);
+    return '<tr role="row" class="list-row' + (d.nearTerm ? ' near-term' : '') + (rig.id === selectedRigId ? ' is-selected' : '') +
+        '" data-rig-id="' + escapeHtml(rig.id) + '">' +
+      '<td role="cell" class="cell-name"><button type="button" class="row-link" title="' + escapeHtml(rig.name) + ' — show details">' + escapeHtml(rig.name) + '</button></td>' +
+      '<td role="cell" class="cell-contractor" title="' + escapeHtml(rig.contractor) + '"><span class="contractor-dot" style="background:' + getContractorColor(rig.contractor) + '" aria-hidden="true"></span>' + escapeHtml(rig.contractor) + '</td>' +
+      '<td role="cell" class="cell-type">' + escapeHtml(rig.type === 'Semisubmersible' ? 'Semisub' : rig.type) + '</td>' +
+      '<td role="cell" class="cell-location" title="' + escapeHtml(loc) + '">' + escapeHtml(loc) + '</td>' +
+      '<td role="cell" class="cell-customer' + (d.customer ? '' : ' cell-none') + '" title="' + escapeHtml(d.customer || '') + '">' + (d.customer && d.customer !== 'Undisclosed' ? escapeHtml(d.customer) : muted(d.customer || '—')) + '</td>' +
+      '<td role="cell" class="cell-rate' + (d.shown ? '' : ' cell-none') + '">' + rate + '</td>' +
+      '<td role="cell" class="cell-booked">' + booked + '</td>' +
+      '<td role="cell" class="cell-status"><span class="status-dot" style="background:' + statusColor(d.status) + '" aria-hidden="true"></span>' + escapeHtml(d.status) + '</td>' +
     '</tr>';
   }).join('');
 }
 
+/* A row opens the detail panel over the list, so the reader keeps their place */
 function onListActivate(e) {
   const row = e.target.closest('.list-row');
-  if (!row) return;
+  if (!row || !RIG_BY_ID[row.dataset.rigId]) return;
   e.preventDefault();
-  focusRig(row.dataset.rigId);
+  openDetail(RIG_BY_ID[row.dataset.rigId], row.querySelector('.row-link'));
 }
 
 const SORT_KEYS = {
@@ -1249,7 +1291,25 @@ function sortTable(field) {
   writeHash();
 }
 
+function wireListSort() {
+  document.getElementById('listSort').addEventListener('change', function () {
+    currentSort = { field: this.value, asc: true };
+    applySort(); updateSortHeaders(); renderListView(); writeHash();
+  });
+  document.getElementById('listSortDir').addEventListener('click', function () {
+    currentSort.asc = !currentSort.asc;
+    applySort(); updateSortHeaders(); renderListView(); writeHash();
+  });
+}
+
 function updateSortHeaders() {
+  const sel = document.getElementById('listSort');
+  if (sel) sel.value = currentSort.field;
+  const dir = document.getElementById('listSortDir');
+  if (dir) {
+    dir.textContent = currentSort.asc ? '↑' : '↓';
+    dir.setAttribute('aria-label', 'Sorted ' + (currentSort.asc ? 'ascending' : 'descending') + '; reverse the order');
+  }
   document.querySelectorAll('.list-table th').forEach(function (th) {
     const on = th.dataset.field === currentSort.field;
     th.classList.toggle('sorted', on);

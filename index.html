@@ -211,39 +211,43 @@
         <button type="button" class="btn-reset" data-action="reset-filters">Clear search and filters</button>
       </div>
 
-      <!-- DETAIL PANEL: a non-modal region, not a dialog -->
-      <section class="detail-panel" id="detailPanel" aria-labelledby="detailName">
-        <div class="detail-header">
-          <div>
-            <h2 class="detail-rig-name" id="detailName">—</h2>
-            <div class="detail-contractor" id="detailContractor">—</div>
-          </div>
-          <button type="button" class="detail-close" id="detailClose" data-action="close-detail" aria-label="Close rig details">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-        <div class="detail-body" id="detailBody"></div>
-      </section>
     </div>
 
     <!-- LIST VIEW -->
     <div class="list-view" id="listView">
+      <div class="list-toolbar">
+        <span class="list-count" id="listCount"></span>
+        <span class="list-key"><span class="list-key-mark" aria-hidden="true"></span>Open now or booked for less than 9 months <strong id="listNearCount"></strong></span>
+        <label class="list-sort">Sort by
+          <select id="listSort">
+            <option value="name">Rig Name</option>
+            <option value="contractor">Contractor</option>
+            <option value="type">Type</option>
+            <option value="location">Location</option>
+            <option value="customer">Customer</option>
+            <option value="dayRate">Day Rate</option>
+            <option value="bookedTo">Booked To</option>
+            <option value="status">Status</option>
+          </select>
+          <button type="button" class="list-sort-dir" id="listSortDir" aria-label="Reverse sort order">↑</button>
+        </label>
+      </div>
       <div class="list-table-wrapper">
-        <table class="list-table">
-          <caption class="sr-only">Rigs matching the current filters. Rows marked with an amber edge are open now or booked for less than nine months.</caption>
-          <thead>
-            <tr>
-              <th scope="col" data-field="name" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="name">Rig Name <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
-              <th scope="col" data-field="contractor" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="contractor">Contractor <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
-              <th scope="col" data-field="type" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="type">Type <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
-              <th scope="col" data-field="location" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="location">Location <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
-              <th scope="col" data-field="customer" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="customer">Customer <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
-              <th scope="col" data-field="dayRate" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="dayRate">Day Rate <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
-              <th scope="col" data-field="bookedTo" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="bookedTo">Booked To <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
-              <th scope="col" data-field="status" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="status">Status <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+        <table class="list-table" role="table">
+          <caption class="sr-only">Rigs matching the current filters. Rows marked with an amber edge are open now or booked for less than nine months. Select a rig to see its details.</caption>
+          <thead role="rowgroup">
+            <tr role="row">
+              <th scope="col" role="columnheader" class="col-name" data-field="name" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="name"><span class="th-label">Rig Name</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" role="columnheader" class="col-contractor" data-field="contractor" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="contractor"><span class="th-label">Contractor</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" role="columnheader" class="col-type" data-field="type" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="type"><span class="th-label">Type</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" role="columnheader" class="col-location" data-field="location" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="location"><span class="th-label">Location</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" role="columnheader" class="col-customer" data-field="customer" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="customer"><span class="th-label">Customer</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" role="columnheader" class="col-dayRate" data-field="dayRate" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="dayRate"><span class="th-label">Day Rate</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" role="columnheader" class="col-bookedTo" data-field="bookedTo" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="bookedTo"><span class="th-label">Booked To</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" role="columnheader" class="col-status" data-field="status" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="status"><span class="th-label">Status</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
             </tr>
           </thead>
-          <tbody id="listTableBody"></tbody>
+          <tbody id="listTableBody" role="rowgroup"></tbody>
         </table>
       </div>
     </div>
@@ -252,6 +256,26 @@
     <div class="insights-view" id="insightsView">
       <div class="insights-scroll" id="insightsScroll"></div>
     </div>
+
+    <!-- DETAIL PANEL: a non-modal region over whichever view is showing -->
+    <section class="detail-panel" id="detailPanel" aria-labelledby="detailName">
+      <div class="detail-header">
+        <div>
+          <h2 class="detail-rig-name" id="detailName">—</h2>
+          <div class="detail-contractor" id="detailContractor">—</div>
+        </div>
+        <div class="detail-actions">
+          <button type="button" class="detail-map-btn" id="detailMapBtn" data-action="show-on-map" hidden>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 7 8 11.7z"/><circle cx="12" cy="10" r="3"/></svg>
+            Show on map
+          </button>
+          <button type="button" class="detail-close" id="detailClose" data-action="close-detail" aria-label="Close rig details">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="detail-body" id="detailBody"></div>
+    </section>
   </main>
 
   <footer class="footer">
