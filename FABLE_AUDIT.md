@@ -17,7 +17,7 @@ Applied on branch `fable-audit-quick-fixes`, uncommitted, and checked in a local
 | C1 — percent KPI rounding | Fixed. Also clamped the animation's first frame, which could briefly overshoot (82 rigs showing as 92). |
 | C2 — blanks first on descending sort | Fixed. Blank rates and dates now sort last in both directions. |
 | C5 — search skips notes | Fixed. "Talos" now finds West Vela. |
-| P1 — KPI labels | "Utilization" is now "Contracted · 6 not yet started"; "Est. Backlog" is now "Disclosed Backlog · 30 of 82 rigs". Both have a hover explanation. |
+| P1 — KPI labels | "Utilization" is now "Contracted · 6 not yet started"; "Est. Backlog" is now "Disclosed Backlog · 30 of 82 rigs". Each has a "?" button that shows its definition (works by touch, keyboard and screen reader). |
 | P4 — approximate locations | "Locations approximate" added to the map legend. |
 | P8 — scope statement | Footer now says "A curated set of 82 rigs across 13 contractors, not complete fleets", generated from the data. |
 | C3 — four data rows | **Not changed.** Three of the four (Santorini, Deep Value Driller, Stena IceMAX) have no end date because the term is undisclosed, so the data is accurate. Borr Ran needs a source check: its extension ran to Sep 2026 and nothing in the data says what happened next. |
