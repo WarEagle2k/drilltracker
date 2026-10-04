@@ -992,6 +992,22 @@ a:hover { color: var(--color-primary-hover); }
 .kpi-label { font-size: var(--text-xs); }
 .kpi-note { white-space: nowrap; font-weight: 500; color: var(--color-text-faint); font-size: 10px; text-transform: none; letter-spacing: 0; }
 
+/* KPI definition: a real button (touch, keyboard and screen readers), not a hover-only title */
+.kpi-item { position: relative; }
+.kpi-help {
+  display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 2px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-full); vertical-align: middle;
+  font-size: 10px; font-weight: 600; line-height: 1; color: var(--color-text-muted); transition: all var(--transition-fast);
+}
+.kpi-help:hover, .kpi-help[aria-expanded="true"] { color: var(--color-primary); border-color: var(--color-primary); }
+.kpi-help-text {
+  position: absolute; top: calc(100% + 4px); left: var(--space-3); right: var(--space-3); z-index: 1100; min-width: 200px;
+  padding: var(--space-2) var(--space-3); background: var(--color-surface-2); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); box-shadow: var(--shadow-md); font-size: var(--text-xs); line-height: 1.4; color: var(--color-text);
+}
+.kpi-help-text[hidden] { display: none; }
+@media (max-width: 768px) { .kpi-help { width: 24px; height: 24px; } }
+
 /* distinct status badges */
 .badge-committed { background: rgba(129,140,248,0.16); color: #818cf8; }
 .badge-warmstacked { background: rgba(251,146,60,0.16); color: #fb923c; }
@@ -1047,6 +1063,7 @@ a:hover { color: var(--color-primary-hover); }
 .map-legend.collapsed .legend-chevron { transform: rotate(-90deg); }
 .legend-row { display: flex; align-items: center; gap: var(--space-2); padding: 2px 0; color: var(--color-text-muted); }
 .legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+.legend-note { margin-top: var(--space-2); padding-top: var(--space-2); border-top: 1px solid var(--color-divider); color: var(--color-text-faint); font-size: 10px; }
 
 /* empty state overlay */
 .empty-state { position: absolute; inset: 0; z-index: 400; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-3); color: var(--color-text-muted); background: rgba(10,22,40,0.55); backdrop-filter: blur(2px); pointer-events: none; }
@@ -1239,8 +1256,10 @@ a:hover { color: var(--color-primary-hover); }
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
       </div>
       <div class="kpi-content">
-        <div class="kpi-label">Utilization</div>
+        <div class="kpi-label">Contracted <span class="kpi-note" id="kpiUtilNote"></span>
+          <button type="button" class="kpi-help" aria-label="About the Contracted metric" aria-expanded="false" aria-controls="kpiUtilHelp" aria-describedby="kpiUtilHelp">?</button></div>
         <div class="kpi-value" id="kpiUtil">—</div>
+        <div class="kpi-help-text" id="kpiUtilHelp" hidden>Share of the rigs shown that hold a contract (firm, operating, committed or LOI), out of contracted plus available. Includes contracts that have not started yet.</div>
       </div>
     </div>
     <div class="kpi-item">
@@ -1257,8 +1276,10 @@ a:hover { color: var(--color-primary-hover); }
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
       </div>
       <div class="kpi-content">
-        <div class="kpi-label">Est. Backlog</div>
+        <div class="kpi-label">Disclosed Backlog <span class="kpi-note" id="kpiBacklogNote"></span>
+          <button type="button" class="kpi-help" aria-label="About the Disclosed Backlog metric" aria-expanded="false" aria-controls="kpiBacklogHelp" aria-describedby="kpiBacklogHelp">?</button></div>
         <div class="kpi-value" id="kpiBacklog">—</div>
+        <div class="kpi-help-text" id="kpiBacklogHelp" hidden>Remaining days on the current contract × day rate, for rigs with a disclosed rate only. Excludes follow-on contracts and rate steps.</div>
       </div>
     </div>
     <div class="kpi-item">
@@ -1294,7 +1315,7 @@ a:hover { color: var(--color-primary-hover); }
         <div class="filter-section">
           <div class="search-wrapper">
             <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="text" class="search-input" id="searchInput" placeholder="Search rig, contractor, customer…" aria-label="Search rigs by name, contractor, customer, region, type, or status">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search rig, contractor, customer…" aria-label="Search rigs by name, contractor, customer, region, type, status, or notes">
             <button type="button" class="search-clear" id="searchClear" onclick="clearSearch()" aria-label="Clear search" hidden>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -1402,6 +1423,7 @@ a:hover { color: var(--color-primary-hover); }
     <div>
       <a href="https://www.perplexity.ai/computer" target="_blank" rel="noopener noreferrer">Created with Perplexity Computer</a>
       &nbsp;·&nbsp; Data as of October 4, 2026 · Jul–Aug 2026 fleet status reports + Aug–Oct 2026 press &amp; AIS updates
+      <span id="footerScope"></span>
     </div>
     <div class="footer-sources">
       Transocean · Seadrill · Noble · Valaris · Odfjell · Borr · Saipem · Stena · COSL · Northern Ocean · Eldorado disclosures &amp; trade press
@@ -1594,7 +1616,10 @@ document.addEventListener('DOMContentLoaded', function () {
   buildFilters();
   applyFilters();
   wireGlobalKeys();
+  wireKpiHelp();
   updateSortHeaders();
+  document.getElementById('footerScope').textContent = ' · A curated set of ' + RIG_DATA.length + ' rigs across ' +
+    new Set(RIG_DATA.map(r => r.contractor)).size + ' contractors, not complete fleets';
   // On small screens the sidebar overlays the map, so start with it closed
   if (window.matchMedia('(max-width: 768px)').matches) {
     toggleSidebar();
@@ -1617,6 +1642,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function wireGlobalKeys() {
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
+      if (closeKpiHelp(true)) return;
       const panel = document.getElementById('detailPanel');
       if (panel.classList.contains('open')) closeDetail();
       else if (sidebarOpen && window.matchMedia('(max-width: 768px)').matches) toggleSidebar();
@@ -1636,6 +1662,29 @@ function wireGlobalKeys() {
     if (e.key === 'Escape' && this.value) {
       e.stopPropagation();
       clearSearch();
+    }
+  });
+}
+
+/* KPI definition popovers: toggled by their "?" button; Escape or a click elsewhere closes */
+function closeKpiHelp(refocus) {
+  const open = document.querySelector('.kpi-help[aria-expanded="true"]');
+  if (!open) return false;
+  open.setAttribute('aria-expanded', 'false');
+  document.getElementById(open.getAttribute('aria-controls')).hidden = true;
+  if (refocus) open.focus();
+  return true;
+}
+
+function wireKpiHelp() {
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('.kpi-help');
+    const wasOpen = btn && btn.getAttribute('aria-expanded') === 'true';
+    if (!btn && e.target.closest('.kpi-help-text')) return;
+    closeKpiHelp(false);
+    if (btn && !wasOpen) {
+      btn.setAttribute('aria-expanded', 'true');
+      document.getElementById(btn.getAttribute('aria-controls')).hidden = false;
     }
   });
 }
@@ -1847,7 +1896,7 @@ function applyFilters() {
   filteredRigs = RIG_DATA.filter(function (rig) {
     if (search) {
       const hay = (rig.name + ' ' + rig.contractor + ' ' + rig.customer + ' ' + rig.region + ' ' +
-                   rig.type + ' ' + rig.status + ' ' + rig.generation).toLowerCase();
+                   rig.type + ' ' + rig.status + ' ' + rig.generation + ' ' + rig.backlogNote).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     if (!contractors.includes(rig.contractor)) return false;
@@ -1894,15 +1943,21 @@ function updateKPIs(rigs) {
   const rigsWithRate = rigs.filter(r => r.dayRate != null);
   const avgRate = rigsWithRate.length ? Math.round(rigsWithRate.reduce((s, r) => s + r.dayRate, 0) / rigsWithRate.length) : null;
 
-  const contracted = rigs.filter(r => CONTRACTED.includes(r.status)).length;
+  const contractedRigs = rigs.filter(r => CONTRACTED.includes(r.status));
+  const contracted = contractedRigs.length;
+  const notStarted = contractedRigs.filter(function (r) {
+    const start = parseFlexDate(r.contractStart);
+    return start && start > NOW;
+  }).length;
   const idle = rigs.filter(r => MARKETABLE_IDLE.includes(r.status)).length;
   const util = (contracted + idle) ? Math.round(contracted / (contracted + idle) * 100) : null;
 
-  let backlog = 0;
+  let backlog = 0, backlogRigs = 0;
   rigs.forEach(function (r) {
     if (r.dayRate == null) return;
     const end = parseFlexDate(r.contractEnd, true);
     if (!end) return;
+    backlogRigs++;
     const start = parseFlexDate(r.contractStart);
     const from = start && start > NOW ? start : NOW;
     const days = Math.max(0, (end - from) / 86400000);
@@ -1918,12 +1973,16 @@ function updateKPIs(rigs) {
 
   const rateLabel = document.getElementById('kpiRateNote');
   if (rateLabel) rateLabel.textContent = rigsWithRate.length + ' disclosed';
+  const utilNote = document.getElementById('kpiUtilNote');
+  if (utilNote) utilNote.textContent = notStarted ? notStarted + ' not yet started' : '';
+  const backlogNote = document.getElementById('kpiBacklogNote');
+  if (backlogNote) backlogNote.textContent = backlogRigs + ' of ' + rigs.length + ' rigs';
 }
 
 function fmtValue(val, fmt) {
   if (val == null) return '—';
   if (fmt === 'currency') return '$' + Math.round(val).toLocaleString('en-US');
-  if (fmt === 'percent') return val + '%';
+  if (fmt === 'percent') return Math.round(val) + '%';
   if (fmt === 'compact') {
     if (val >= 1e9) return '$' + (val / 1e9).toFixed(1) + 'B';
     if (val >= 1e6) return '$' + Math.round(val / 1e6) + 'M';
@@ -1945,7 +2004,8 @@ function animateValue(id, target, fmt) {
   const duration = 600, start = performance.now(), startVal = current;
 
   function step(ts) {
-    const progress = Math.min((ts - start) / duration, 1);
+    // the frame timestamp can precede start; clamp so the first frame cannot overshoot
+    const progress = Math.max(0, Math.min((ts - start) / duration, 1));
     const eased = 1 - Math.pow(1 - progress, 3);
     el.textContent = fmtValue(startVal + (target - startVal) * eased, fmt);
     if (progress < 1) requestAnimationFrame(step);
@@ -1963,8 +2023,9 @@ function buildLegend() {
   const rows = present.map(c =>
     '<div class="legend-row"><span class="legend-dot" style="background:' + getContractorColor(c) + '"></span>' +
     escapeHtml(c) + '</div>').join('');
-  el.querySelector('.legend-body').innerHTML = rows ||
-    '<div class="legend-row" style="color:var(--color-text-faint)">No rigs shown</div>';
+  el.querySelector('.legend-body').innerHTML = (rows ||
+    '<div class="legend-row" style="color:var(--color-text-faint)">No rigs shown</div>') +
+    '<div class="legend-note">Locations approximate</div>';
 }
 
 function toggleLegend() {
@@ -2189,15 +2250,16 @@ function applySort() {
     if (dateField) {
       const asEnd = field === 'contractEnd';
       const da = parseFlexDate(va, asEnd), db = parseFlexDate(vb, asEnd);
-      va = da ? da.getTime() : Infinity;
-      vb = db ? db.getTime() : Infinity;
+      va = da ? da.getTime() : null;
+      vb = db ? db.getTime() : null;
     } else if (field === 'dayRate') {
-      va = va == null ? Infinity : va;
-      vb = vb == null ? Infinity : vb;
+      // undisclosed rates stay null
     } else {
       va = (va == null ? '' : String(va)).toLowerCase();
       vb = (vb == null ? '' : String(vb)).toLowerCase();
     }
+    // blanks (no date / undisclosed rate) sort last in both directions
+    if (va == null || vb == null) return va == null ? (vb == null ? 0 : 1) : -1;
     if (va < vb) return currentSort.asc ? -1 : 1;
     if (va > vb) return currentSort.asc ? 1 : -1;
     return 0;
