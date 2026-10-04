@@ -224,7 +224,8 @@ function plural(n, word) {
 /* ============================================
    STATE
    ============================================ */
-let map = null, markerLayer = null, labelLayer = null;
+let map = null, markerLayer = null, labelLayer = null, basemapLayer = null;
+let mapLabels = [];
 let filteredRigs = RIG_DATA.slice();
 let currentSort = { field: 'name', asc: true };
 let currentView = 'map';
@@ -413,7 +414,8 @@ function currentTheme() {
   return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
 }
 
-/* Everything theme-dependent is a CSS variable, so switching needs no re-render */
+/* Everything theme-dependent is a CSS variable, so switching needs no re-render,
+   apart from the canvas basemap, which is restyled once */
 function initTheme() {
   const toggle = document.querySelector('[data-theme-toggle]');
   const root = document.documentElement;
@@ -432,6 +434,7 @@ function initTheme() {
     root.setAttribute('data-theme', theme);
     try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
     syncTheme(theme);
+    if (basemapLayer) basemapLayer.setStyle(basemapStyle());
   });
 }
 
@@ -479,6 +482,15 @@ function decodeRing(a) {
   return ring;
 }
 
+/* The outline is drawn on a canvas, not as SVG: ~95,000 points as SVG paths made the
+   browser repaint a huge vector layer on every zoom and pan. Canvas cannot read CSS
+   classes, so the colours come from the theme's variables and are reapplied on a theme change. */
+function basemapStyle() {
+  const css = getComputedStyle(document.documentElement);
+  return { fillColor: css.getPropertyValue('--map-land').trim(), fillOpacity: 1,
+           color: css.getPropertyValue('--map-border').trim(), weight: 0.6, opacity: 1 };
+}
+
 function makeBasemapLayer() {
   const features = BASEMAP.countries.map(function (c) {
     return { type: 'Feature', properties: {},
@@ -486,35 +498,104 @@ function makeBasemapLayer() {
   });
   return L.geoJSON(features, {
     interactive: false,
-    renderer: L.svg({ padding: 0.5 }),
-    style: { className: 'basemap-land' }
+    renderer: L.canvas({ padding: 0.25 }),
+    smoothFactor: 2, // simplify outlines to ~2px at the current zoom while drawing
+    style: basemapStyle
   });
 }
 
-/* Labels are re-placed on each zoom: seas first, then countries in Natural Earth's
-   order of importance, skipping any label that would overlap one already placed. */
+/* Label markers are made once; each zoom only shows or hides them. Seas come first,
+   then countries in Natural Earth's order of importance, and a label that would
+   overlap one already placed is hidden. */
+function buildMapLabels() {
+  const countries = typeof BASEMAP !== 'undefined' ? BASEMAP.countries : [];
+  mapLabels = SEA_LABELS.map(l => ({ n: l.n, p: l.p, z: l.z, sea: true }))
+    .concat(countries.map(c => ({ n: c.n, p: c.p, z: c.z + 0.5, sea: false }))) // a little sparser than Natural Earth suggests
+    .sort((a, b) => (a.z - b.z) || (b.sea - a.sea))
+    .map(function (l) {
+      const w = l.n.length * 7.5 + 10, h = 16;
+      const latlng = L.latLng(l.p[1], l.p[0]);
+      return { z: l.z, w: w, h: h, latlng: latlng, marker: L.marker(latlng, {
+        pane: 'labels', interactive: false, keyboard: false,
+        icon: L.divIcon({ className: 'map-label' + (l.sea ? ' map-label-sea' : ''), html: escapeHtml(l.n), iconSize: [w, h] })
+      }) };
+    });
+}
+
 function updateMapLabels() {
-  labelLayer.clearLayers();
   const zoom = map.getZoom();
   const placed = [];
-  const countries = typeof BASEMAP !== 'undefined' ? BASEMAP.countries : [];
-  const candidates = SEA_LABELS.map(l => ({ n: l.n, p: l.p, z: l.z, sea: true }))
-    .concat(countries.map(c => ({ n: c.n, p: c.p, z: c.z + 0.5, sea: false }))) // a little sparser than Natural Earth suggests
-    .filter(l => l.z <= zoom)
-    .sort((a, b) => (a.z - b.z) || (b.sea - a.sea));
-
-  candidates.forEach(function (l) {
-    const latlng = [l.p[1], l.p[0]];
-    const pt = map.project(latlng, zoom);
-    const w = l.n.length * 7.5 + 10, h = 16;
-    const box = [pt.x - w / 2, pt.y - h / 2, pt.x + w / 2, pt.y + h / 2];
-    if (placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1])) return;
-    placed.push(box);
-    L.marker(latlng, {
-      pane: 'labels', interactive: false, keyboard: false,
-      icon: L.divIcon({ className: 'map-label' + (l.sea ? ' map-label-sea' : ''), html: escapeHtml(l.n), iconSize: [w, h] })
-    }).addTo(labelLayer);
+  mapLabels.forEach(function (l) {
+    let show = l.z <= zoom;
+    if (show) {
+      const pt = map.project(l.latlng, zoom);
+      const box = [pt.x - l.w / 2, pt.y - l.h / 2, pt.x + l.w / 2, pt.y + l.h / 2];
+      show = !placed.some(b => box[0] < b[2] && box[2] > b[0] && box[1] < b[3] && box[3] > b[1]);
+      if (show) placed.push(box);
+    }
+    const on = labelLayer.hasLayer(l.marker);
+    if (show && !on) labelLayer.addLayer(l.marker);
+    else if (!show && on) labelLayer.removeLayer(l.marker);
   });
+}
+
+/* Continuous zoom for the mouse wheel and trackpad (two-finger scroll, or pinch, which
+   the browser reports as a wheel event with ctrlKey). Leaflet's own wheel handler waits
+   40 ms, then animates to the next zoom step and ignores input until it lands, so a
+   trackpad gesture zooms in notches. This follows the gesture every frame around the
+   cursor, the way Leaflet's touch pinch-zoom does (map._moveStart, _move, _moveEnd),
+   and fires zoomend once, when the gesture stops, so clusters and labels update then.
+   Those are internal Leaflet methods: re-check this if Leaflet is upgraded from 1.9.4. */
+const WHEEL_ZOOM_RATE = 1 / 300;  // zoom levels per pixel of scroll
+const PINCH_ZOOM_RATE = 1 / 100;  // pinch reports smaller deltas
+const WHEEL_EASE = 0.45;          // share of the remaining distance covered each frame
+const WHEEL_END_MS = 150;         // a pause this long ends the gesture
+
+function smoothWheelZoom(map) {
+  const container = map.getContainer();
+  let active = false, target = 0, anchorPoint = null, anchorLatLng = null;
+  let frame = null, endTimer = null, ending = false;
+
+  container.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    const px = e.deltaY * (e.deltaMode === 1 ? 20 : e.deltaMode === 2 ? 400 : 1);
+    if (!px) return;
+    if (!active) {
+      map._stop();
+      map._moveStart(true, false);
+      active = true;
+      target = map.getZoom();
+    }
+    target = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(),
+      target - px * (e.ctrlKey ? PINCH_ZOOM_RATE : WHEEL_ZOOM_RATE)));
+    anchorPoint = map.mouseEventToContainerPoint(e);
+    anchorLatLng = map.containerPointToLatLng(anchorPoint);
+    ending = false;
+    clearTimeout(endTimer);
+    endTimer = setTimeout(function () { ending = true; if (!frame) finish(); }, WHEEL_END_MS);
+    if (!frame) frame = requestAnimationFrame(step);
+  }, { passive: false });
+
+  function step() {
+    frame = null;
+    const zoom = map.getZoom();
+    let next = zoom + (target - zoom) * WHEEL_EASE;
+    if (Math.abs(target - next) < 0.002) next = target;
+    // keep the point under the cursor fixed while zooming
+    const offset = anchorPoint.subtract(map.getSize().divideBy(2));
+    let center = map.unproject(map.project(anchorLatLng, next).subtract(offset), next);
+    if (map.options.maxBounds) center = map._limitCenter(center, next, map.options.maxBounds);
+    map._move(center, next, { pinch: true, round: false });
+    if (next !== target) frame = requestAnimationFrame(step);
+    else if (ending) finish();
+  }
+
+  function finish() {
+    if (!active) return;
+    active = false;
+    ending = false;
+    map._moveEnd(true);
+  }
 }
 
 /* If Leaflet did not load (CDN blocked, offline), say so and keep the list and insights working */
@@ -529,18 +610,23 @@ function initMap() {
   }
   map = L.map('map', {
     center: [15, 0], zoom: 3, minZoom: 2, maxZoom: MAP_MAX_ZOOM,
+    // continuous zoom: smoothWheelZoom (below) replaces Leaflet's stepped wheel zoom
+    zoomSnap: 0, scrollWheelZoom: false,
     maxBounds: [[-62, -180], [85, 180]], maxBoundsViscosity: 1,
     zoomControl: true, attributionControl: true
   });
   if (typeof BASEMAP !== 'undefined') {
     map.attributionControl.addAttribution('Map data: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>');
-    makeBasemapLayer().addTo(map);
+    basemapLayer = makeBasemapLayer().addTo(map);
   }
+
+  smoothWheelZoom(map);
 
   // labels sit above the land but below the rig markers
   map.createPane('labels').style.zIndex = 450;
   map.getPane('labels').style.pointerEvents = 'none';
   labelLayer = L.layerGroup().addTo(map);
+  buildMapLabels();
   map.on('zoomend', updateMapLabels);
   updateMapLabels();
 
