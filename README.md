@@ -44,6 +44,10 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 - *Avg Floater Rate*: mean disclosed day rate of the drillships and semisubmersibles shown, using the current contract (or the next one for rigs not yet working). Jackups are excluded; Insights shows the average for each type. When fewer than five rates are disclosed, the count is highlighted.
 - *Disclosed Backlog*: for firm contracts with a disclosed rate, days remaining after the data date × day rate, including follow-on contracts and rate steps. Options, LOIs and conditional awards are excluded, as is any rig without a disclosed rate.
 
+## Filtering
+
+Filters start empty, and an empty group doesn't filter. Ticking options narrows the rigs shown. Options within a group combine with OR (Brazil or Guyana); groups combine with AND (and Drillship). The number beside each option is how many rigs it has within your other choices. Options that would show nothing are greyed out, so only the search can produce an empty result. Active filters appear as removable chips above the list, and as a summary over the map.
+
 ## Sharing a view
 
 The URL hash keeps the view, search, filters, sort and open rig, so a link reproduces what you see. For example:
@@ -53,7 +57,7 @@ The URL hash keeps the view, search, filters, sort and open rig, so a link repro
 #rig=rig-018
 ```
 
-Filter values are comma-separated; `-` means none selected.
+A filter lists the values shown, comma-separated; a filter that isn't in the link isn't applied.
 
 ## Files
 

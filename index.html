@@ -141,6 +141,7 @@
       <div class="filter-header">
         <h2>Filters</h2>
         <span class="filter-count" id="filterCount" aria-live="polite" aria-atomic="true"></span>
+        <button type="button" class="filter-clear-all" id="clearAllFilters" data-action="reset-filters" hidden>Clear all</button>
       </div>
       <div class="filter-body">
         <div class="filter-section">
@@ -152,6 +153,11 @@
             </button>
           </div>
         </div>
+
+        <div class="active-filters" id="activeFilters" hidden>
+          <div class="filter-chips" aria-label="Active filters"></div>
+        </div>
+        <p class="filter-hint">Tick options to narrow the rigs shown. Each number is how many rigs that option has within your other choices.</p>
 
         <div class="filter-section" role="group" aria-labelledby="fsStatus">
           <h3 class="filter-section-title" id="fsStatus">Status</h3>
@@ -174,10 +180,7 @@
           <div id="countryFilters" role="group" aria-label="Country"></div>
         </details>
 
-        <div class="filter-actions">
-          <button type="button" class="btn-reset" data-action="reset-filters">Reset all filters</button>
-          <button type="button" class="btn-clear" data-action="deselect-all">Clear selection</button>
-        </div>
+
       </div>
     </aside>
 
@@ -197,10 +200,15 @@
         <div class="legend-note"><span class="legend-dot legend-dot--reported" aria-hidden="true"></span>Centre dot: reported position. Others are approximate, placed in the operating area.</div>
       </div>
 
+      <div class="filter-pill" id="filterPill" hidden>
+        <span id="filterPillText"></span>
+        <button type="button" data-action="reset-filters">Clear filters</button>
+      </div>
+
       <div class="empty-state" id="emptyState" hidden>
         <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        <div class="empty-title">No rigs match your filters</div>
-        <button type="button" class="btn-reset" data-action="reset-filters">Reset filters</button>
+        <div class="empty-title" id="emptyTitle">No rigs match your filters</div>
+        <button type="button" class="btn-reset" data-action="reset-filters">Clear search and filters</button>
       </div>
 
       <!-- DETAIL PANEL: a non-modal region, not a dialog -->
