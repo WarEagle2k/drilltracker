@@ -171,7 +171,7 @@ function deriveRig(rig) {
     available: available,
     bookedTo: available || bookedOpen ? null : booked,
     bookedToLabel: available ? (status === 'Unconfirmed' ? 'Not confirmed' : 'Open now')
-      : bookedOpen ? 'Term undisclosed' : bookedBy.k.end,
+      : bookedOpen ? 'Undisclosed' : bookedBy.k.end,
     bookedOpen: bookedOpen,
     nearTerm: nearTerm,
     backlog: backlog,
@@ -281,6 +281,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const hashRig = readHash();
   applyFilters();
   updateSortHeaders();
+  fitToRigs(false);
   openRigFromHash(hashRig);
   // On small screens the sidebar overlays the map, so start with it closed
   if (window.matchMedia('(max-width: 768px)').matches) {
@@ -382,17 +383,12 @@ function clearSearch() {
 
 /* Footer text and scope line come from the data, so a refresh needs no manual edits */
 function renderFooter() {
-  const contractors = [...new Set(RIG_DATA.map(r => r.contractor))].sort();
-  const dated = RIG_DATA.map(r => r.derived.sourceDate).filter(Boolean).sort((a, b) => a - b);
-  const range = dated.length
-    ? MONTHS[dated[0].getMonth()] + ' ' + dated[0].getFullYear() + '–' +
-      MONTHS[dated[dated.length - 1].getMonth()] + ' ' + dated[dated.length - 1].getFullYear()
-    : null;
+  const contractors = new Set(RIG_DATA.map(r => r.contractor)).size;
+  const fresh = RIG_DATA.filter(r => !r.derived.sourceStale).length;
   document.getElementById('footerAsOf').textContent = 'Data as of ' + DATA_AS_OF_LABEL +
-    (range ? ' · sources dated ' + range : '');
+    ' · ' + fresh + ' of ' + RIG_DATA.length + ' rigs sourced in the prior ' + Math.round(STALE_SOURCE_DAYS / 30) + ' months';
   document.getElementById('footerScope').textContent = 'A curated set of ' + RIG_DATA.length + ' rigs across ' +
-    contractors.length + ' contractors, not complete fleets';
-  document.getElementById('footerSources').textContent = contractors.join(' · ') + ' disclosures, trade press & AIS';
+    contractors + ' contractors, not complete fleets';
 }
 
 function renderStaleBanner() {
@@ -564,6 +560,7 @@ function initMap() {
     }
   }) : L.layerGroup();
   map.addLayer(markerLayer);
+  new FitControl().addTo(map);
 
   // Enter or Space on a focused rig marker opens it (Leaflet only handles clicks)
   map.getContainer().addEventListener('keydown', function (e) {
@@ -575,6 +572,29 @@ function initMap() {
     openDetail(RIG_BY_ID[node.dataset.rigId]);
   });
 }
+
+/* Zoom to the rigs currently shown; the default world view leaves some regions off-screen */
+function fitToRigs(animate) {
+  if (!map || !filteredRigs.length) return;
+  const bounds = L.latLngBounds(filteredRigs.map(r => [r.lat, r.lng]));
+  map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6, animate: animate && !prefersReduced });
+}
+
+const FitControl = window.L ? L.Control.extend({
+  options: { position: 'topleft' },
+  onAdd: function () {
+    const bar = L.DomUtil.create('div', 'leaflet-bar fit-control');
+    const btn = L.DomUtil.create('a', '', bar);
+    btn.href = '#';
+    btn.setAttribute('role', 'button');
+    btn.title = 'Zoom to the rigs shown';
+    btn.setAttribute('aria-label', 'Zoom to the rigs shown');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>';
+    L.DomEvent.disableClickPropagation(bar);
+    L.DomEvent.on(btn, 'click', function (e) { L.DomEvent.preventDefault(e); fitToRigs(true); });
+    return bar;
+  }
+}) : null;
 
 function createMarkers(rigs) {
   if (!map) return;
@@ -703,8 +723,12 @@ function applyFilters() {
 
   applySort();
   createMarkers(filteredRigs);
+  // if the filter leaves nothing in view, bring the matching rigs into view
+  if (map && currentView === 'map' && filteredRigs.length &&
+      !filteredRigs.some(r => map.getBounds().contains([r.lat, r.lng]))) fitToRigs(true);
   updateKPIs(filteredRigs);
   updateFilterCount(filteredRigs.length);
+  updateCountrySummary();
   buildLegend();
   renderEmptyState(filteredRigs.length === 0);
   if (currentView === 'list') renderListView();
@@ -725,6 +749,13 @@ function resetFilters() {
   document.getElementById('searchInput').value = '';
   setAllCheckboxes(true);
   applyFilters();
+}
+
+function updateCountrySummary() {
+  const all = document.querySelectorAll('#countryFilters input').length;
+  const on = getCheckedValues('countryFilters').length;
+  document.getElementById('countrySummary').textContent = on === all ? 'all' : on + ' of ' + all;
+  if (on < all) document.getElementById('countrySection').open = true;
 }
 
 function updateFilterCount(count) {
@@ -857,10 +888,8 @@ function buildLegend() {
   const rows = present.map(c =>
     '<div class="legend-row"><span class="legend-dot" style="background:' + getContractorColor(c) + '"></span>' +
     escapeHtml(c) + '</div>').join('');
-  document.querySelector('#mapLegend .legend-body').innerHTML = (rows ||
-    '<div class="legend-row legend-empty">No rigs shown</div>') +
-    '<div class="legend-note"><span class="legend-dot legend-dot--reported" aria-hidden="true"></span>' +
-    'Centre dot: reported position. Others are approximate, placed in the operating area.</div>';
+  document.querySelector('#mapLegend .legend-body').innerHTML = rows ||
+    '<div class="legend-row legend-empty">No rigs shown</div>';
 }
 
 function toggleLegend() {
@@ -1027,7 +1056,7 @@ function renderListView() {
       '<td class="cell-name"><button type="button" class="row-link" title="Show ' + escapeHtml(rig.name) + ' on the map">' +
         escapeHtml(rig.name) + '</button></td>' +
       '<td><span class="contractor-dot" style="background:' + getContractorColor(rig.contractor) + '" aria-hidden="true"></span>' + escapeHtml(rig.contractor) + '</td>' +
-      '<td>' + escapeHtml(rig.type) + '</td>' +
+      '<td>' + escapeHtml(rig.type === 'Semisubmersible' ? 'Semisub' : rig.type) + '</td>' +
       '<td>' + escapeHtml(locationLabel(rig)) + '</td>' +
       '<td>' + escapeHtml(d.customer || '—') + '</td>' +
       '<td class="mono-cell">' + fmtRate(d.dayRate) + '</td>' +
@@ -1215,7 +1244,7 @@ function ganttChart(rigs) {
   if (!rows.length) return '<section class="chart-card chart-card-wide"><h3 class="chart-title">Contract Timeline</h3><p class="chart-empty">No datable contracts in the current selection.</p></section>';
 
   const minT = new Date(AS_OF.getFullYear() - 1, 0, 1).getTime();
-  const ends = rows.flatMap(x => x.segs.map(s => s.e ? s.e.getTime() : 0));
+  const ends = rows.flatMap(x => x.segs.filter(s => s.k.firmness !== 'option').map(s => s.e ? s.e.getTime() : 0));
   const maxT = Math.max(addMonths(AS_OF, 12).getTime(), ...ends);
   const span = maxT - minT;
   const pos = t => Math.max(0, Math.min(100, ((t - minT) / span) * 100));
