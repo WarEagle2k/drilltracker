@@ -33,6 +33,15 @@ Applied on branch `fable-audit-quick-fixes`, uncommitted, and checked in a local
 | C20 — tests | Added `scripts/test-dates.js` (48 checks on date parsing and contract maths, run against the real functions in `index.html`). |
 | C3 — Borr Ran | Source checked. Borr's Aug 11, 2026 fleet status report still lists the rig operating for Eni to Sep 2026, and no later update was found. Dates and status are unchanged; the note now says the current status is unconfirmed. Recheck at Borr's next fleet status report. |
 
+## Progress — bundled basemap (October 4, 2026)
+
+| Item | Status |
+|---|---|
+| N1 — basemap watermark | **Fixed by removing the tile provider.** The map now draws a world outline bundled in the repo (`basemap.js`, built from Natural Earth 1:50m countries, public domain) in the theme's own colours. No API key and no third-party tile requests. |
+| Labels | Country names use Natural Earth's label points and importance; 23 seas and basins relevant to offshore drilling are listed in `SEA_LABELS` in `index.html`. Overlapping labels are skipped. |
+| Zoom | Capped at 8, because the outline looks coarse closer in. The map no longer wraps around the date line. |
+| Rebuilding | `scripts/build-basemap.js` regenerates `basemap.js`; the download command is in its header. |
+
 ### Two new findings from running the app
 
 | # | Sev | Finding |
