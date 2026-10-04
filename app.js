@@ -315,7 +315,8 @@ function wireActions() {
       case 'export-csv': exportCSV(); break;
       case 'clear-search': clearSearch(); break;
       case 'reset-filters': resetFilters(); break;
-      case 'deselect-all': deselectAll(); break;
+      case 'remove-filter': removeFilter(el.dataset.group, el.dataset.value); break;
+      case 'remove-search': clearSearch(); break;
       case 'toggle-legend': toggleLegend(); break;
       case 'close-detail': closeDetail(true); break;
       case 'sort': sortTable(el.dataset.field); break;
@@ -714,35 +715,62 @@ function createMarkers(rigs) {
 }
 
 /* ============================================
-   FILTERS
+   FILTERS — faceted: nothing ticked in a group means no filter on it; ticking
+   narrows. Options in a group combine with OR, groups with AND. Each option's
+   count is how many rigs it would show given the other groups and the search,
+   and options that would show none are disabled, so no combination is a dead end.
    ============================================ */
-function buildFilters() {
+const SEARCH_TEXT = new Map();
+function searchText(rig) {
+  if (!SEARCH_TEXT.has(rig.id)) {
+    SEARCH_TEXT.set(rig.id, [rig.name, rig.contractor, rig.owner, rig.region, rig.country, rig.type, rig.derived.status, classLabel(rig), rig.note]
+      .concat(rig.contracts.map(k => (k.customer || '') + ' ' + (k.note || '')))
+      .join(' ').toLowerCase());
+  }
+  return SEARCH_TEXT.get(rig.id);
+}
+
+/* selections: { groupKey: [values] }; a missing or empty list means no filter.
+   skipKey leaves one group out, which is how an option's count is worked out. */
+function rigMatches(rig, selections, search, skipKey) {
+  if (search && !searchText(rig).includes(search)) return false;
+  return FILTER_GROUPS.every(function (g) {
+    const on = selections[g.key];
+    return g.key === skipKey || !on || !on.length || on.includes(g.get(rig));
+  });
+}
+
+function facetCounts(rigs, selections, search) {
+  const out = {};
   FILTER_GROUPS.forEach(function (g) {
     const counts = {};
-    RIG_DATA.forEach(r => { const v = g.get(r); counts[v] = (counts[v] || 0) + 1; });
-    const values = Object.keys(counts).sort(function (a, b) {
+    rigs.forEach(function (r) {
+      if (rigMatches(r, selections, search, g.key)) { const v = g.get(r); counts[v] = (counts[v] || 0) + 1; }
+    });
+    out[g.key] = counts;
+  });
+  return out;
+}
+
+function buildFilters() {
+  FILTER_GROUPS.forEach(function (g) {
+    const values = [...new Set(RIG_DATA.map(g.get))].sort(function (a, b) {
       if (g.order) return g.order.indexOf(a) - g.order.indexOf(b);
       if (a === NO_COUNTRY || b === NO_COUNTRY) return a === NO_COUNTRY ? 1 : -1;
       return a.localeCompare(b);
     });
-    buildCheckboxGroup(g, values, counts);
+    buildCheckboxGroup(g, values);
   });
 }
 
-/* Each option is a label (checkbox + text + count) followed by a separate "only" button,
-   so the button is not nested inside the label */
-function buildCheckboxGroup(group, items, counts) {
+function buildCheckboxGroup(group, items) {
   const container = document.getElementById(group.id);
   container.innerHTML = '';
   items.forEach(function (item) {
-    const row = document.createElement('div');
-    row.className = 'filter-option';
-
     const label = document.createElement('label');
     label.className = 'filter-checkbox';
     const cb = document.createElement('input');
     cb.type = 'checkbox';
-    cb.checked = true;
     cb.value = item;
     cb.addEventListener('change', applyFilters);
     label.appendChild(cb);
@@ -763,24 +791,8 @@ function buildCheckboxGroup(group, items, counts) {
 
     const cnt = document.createElement('span');
     cnt.className = 'filter-opt-count';
-    cnt.innerHTML = counts[item] + '<span class="sr-only"> ' + (counts[item] === 1 ? 'rig' : 'rigs') + '</span>';
     label.appendChild(cnt);
-    row.appendChild(label);
-
-    const only = document.createElement('button');
-    only.type = 'button';
-    only.className = 'filter-only';
-    only.textContent = 'only';
-    only.setAttribute('aria-label', 'Show only ' + item);
-    only.addEventListener('click', function () {
-      container.querySelectorAll('input[type="checkbox"]').forEach(function (other) {
-        other.checked = (other.value === item);
-      });
-      applyFilters();
-    });
-    row.appendChild(only);
-
-    container.appendChild(row);
+    container.appendChild(label);
   });
 }
 
@@ -788,21 +800,36 @@ function getCheckedValues(containerId) {
   return [...document.getElementById(containerId).querySelectorAll('input:checked')].map(cb => cb.value);
 }
 
-function searchText(rig) {
-  return [rig.name, rig.contractor, rig.owner, rig.region, rig.country, rig.type, rig.derived.status, classLabel(rig), rig.note]
-    .concat(rig.contracts.map(k => (k.customer || '') + ' ' + (k.note || '')))
-    .join(' ').toLowerCase();
+function getSelections() {
+  const sel = {};
+  FILTER_GROUPS.forEach(function (g) { sel[g.key] = getCheckedValues(g.id); });
+  return sel;
+}
+
+function getSearch() {
+  return document.getElementById('searchInput').value.toLowerCase().trim();
+}
+
+/* Counts and disabled state follow the other groups and the search. A ticked option
+   stays enabled even at zero, so it can always be unticked. */
+function updateFacets(selections, search) {
+  const counts = facetCounts(RIG_DATA, selections, search);
+  FILTER_GROUPS.forEach(function (g) {
+    document.getElementById(g.id).querySelectorAll('.filter-checkbox').forEach(function (label) {
+      const cb = label.querySelector('input');
+      const n = counts[g.key][cb.value] || 0;
+      cb.disabled = n === 0 && !cb.checked;
+      label.classList.toggle('is-empty', n === 0);
+      label.querySelector('.filter-opt-count').innerHTML = n + '<span class="sr-only"> ' + (n === 1 ? 'rig' : 'rigs') + '</span>';
+    });
+  });
 }
 
 function applyFilters() {
-  const search = document.getElementById('searchInput').value.toLowerCase().trim();
+  const search = getSearch();
   document.getElementById('searchClear').hidden = !search;
-  const checked = FILTER_GROUPS.map(g => ({ g: g, values: getCheckedValues(g.id) }));
-
-  filteredRigs = RIG_DATA.filter(function (rig) {
-    if (search && !searchText(rig).includes(search)) return false;
-    return checked.every(c => c.values.includes(c.g.get(rig)));
-  });
+  const selections = getSelections();
+  filteredRigs = RIG_DATA.filter(r => rigMatches(r, selections, search));
 
   // a detail panel for a rig that is no longer shown would describe something off the map
   if (selectedRigId && !filteredRigs.some(r => r.id === selectedRigId)) closeDetail(false);
@@ -812,49 +839,75 @@ function applyFilters() {
   // if the filter leaves nothing in view, bring the matching rigs into view
   if (map && currentView === 'map' && filteredRigs.length &&
       !filteredRigs.some(r => map.getBounds().contains([r.lat, r.lng]))) fitToRigs(true);
+  updateFacets(selections, search);
   updateKPIs(filteredRigs);
   updateFilterCount(filteredRigs.length);
-  updateCountrySummary();
+  renderActiveFilters(selections);
+  updateCountrySummary(selections);
   buildLegend();
-  renderEmptyState(filteredRigs.length === 0);
+  renderEmptyState(filteredRigs.length === 0, search);
   if (currentView === 'list') renderListView();
   if (currentView === 'insights') renderInsights();
   writeHash();
 }
 
-function setAllCheckboxes(on) {
-  document.querySelectorAll('.filter-body input[type="checkbox"]').forEach(cb => { cb.checked = on; });
+/* Chips for each active filter and the search, each removable, plus "Clear all";
+   the same summary shows as a pill over the map, where the sidebar may be closed. */
+function renderActiveFilters(selections) {
+  const q = document.getElementById('searchInput').value.trim();
+  const chips = [];
+  if (q) chips.push('<button type="button" class="filter-chip" data-action="remove-search" aria-label="Remove search ' + escapeHtml(q) + '">“' + escapeHtml(q) + '” <span aria-hidden="true">×</span></button>');
+  FILTER_GROUPS.forEach(function (g) {
+    selections[g.key].forEach(function (v) {
+      chips.push('<button type="button" class="filter-chip" data-action="remove-filter" data-group="' + escapeHtml(g.id) + '" data-value="' + escapeHtml(v) +
+        '" aria-label="Remove filter ' + escapeHtml(v) + '">' + escapeHtml(v) + ' <span aria-hidden="true">×</span></button>');
+    });
+  });
+  const active = chips.length > 0;
+  const box = document.getElementById('activeFilters');
+  box.hidden = !active;
+  box.querySelector('.filter-chips').innerHTML = chips.join('');
+  document.getElementById('clearAllFilters').hidden = !active;
+
+  const pill = document.getElementById('filterPill');
+  pill.hidden = !active || !filteredRigs.length;
+  document.getElementById('filterPillText').textContent = 'Showing ' + filteredRigs.length + ' of ' + RIG_DATA.length + ' rigs';
 }
 
-function deselectAll() {
-  setAllCheckboxes(false);
+function removeFilter(groupId, value) {
+  const cb = [...document.getElementById(groupId).querySelectorAll('input')].find(c => c.value === value);
+  if (cb) cb.checked = false;
   applyFilters();
 }
 
 function resetFilters() {
   document.getElementById('searchInput').value = '';
-  setAllCheckboxes(true);
+  document.querySelectorAll('.filter-body input[type="checkbox"]').forEach(cb => { cb.checked = false; });
   applyFilters();
 }
 
-function updateCountrySummary() {
-  const all = document.querySelectorAll('#countryFilters input').length;
-  const on = getCheckedValues('countryFilters').length;
-  document.getElementById('countrySummary').textContent = on === all ? 'all' : on + ' of ' + all;
-  if (on < all) document.getElementById('countrySection').open = true;
+function updateCountrySummary(selections) {
+  const n = selections.country.length;
+  document.getElementById('countrySummary').textContent = n ? n + ' selected' : '';
+  if (n) document.getElementById('countrySection').open = true;
 }
 
 function updateFilterCount(count) {
   document.getElementById('filterCount').textContent = count + ' of ' + RIG_DATA.length + ' rigs';
 }
 
-function renderEmptyState(isEmpty) {
+/* With facets the only way to reach zero is the search, so say so */
+function renderEmptyState(isEmpty, search) {
   document.getElementById('emptyState').hidden = !isEmpty;
+  if (isEmpty) document.getElementById('emptyTitle').textContent = search
+    ? 'No rigs match “' + document.getElementById('searchInput').value.trim() + '”' + (FILTER_GROUPS.some(g => getCheckedValues(g.id).length) ? ' with these filters' : '')
+    : 'No rigs match your filters';
 }
 
 /* ============================================
    URL STATE — view, search, filters, sort and the open rig live in the hash,
    so a view can be shared: #view=list&region=South+America&type=Drillship
+   A filter lists the values shown; no entry means no filter.
    ============================================ */
 function stateToHash() {
   const p = new URLSearchParams();
@@ -862,9 +915,8 @@ function stateToHash() {
   const q = document.getElementById('searchInput').value.trim();
   if (q) p.set('q', q);
   FILTER_GROUPS.forEach(function (g) {
-    const all = document.getElementById(g.id).querySelectorAll('input').length;
     const on = getCheckedValues(g.id);
-    if (on.length < all) p.set(g.key, on.length ? on.join(',') : '-');
+    if (on.length) p.set(g.key, on.join(','));
   });
   if (currentSort.field !== 'name' || !currentSort.asc) p.set('sort', (currentSort.asc ? '' : '-') + currentSort.field);
   if (selectedRigId) p.set('rig', selectedRigId);
@@ -882,9 +934,9 @@ function readHash() {
   document.getElementById('searchInput').value = p.get('q') || '';
   FILTER_GROUPS.forEach(function (g) {
     const raw = p.get(g.key);
-    const wanted = raw == null ? null : raw === '-' ? [] : raw.split(',');
+    const wanted = raw && raw !== '-' ? raw.split(',') : []; // "-" came from older links and meant none
     document.getElementById(g.id).querySelectorAll('input').forEach(function (cb) {
-      cb.checked = !wanted || wanted.includes(cb.value);
+      cb.checked = wanted.includes(cb.value);
     });
   });
   const sort = p.get('sort');

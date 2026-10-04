@@ -8,7 +8,7 @@ const vm = require('vm');
 const ROOT = path.join(__dirname, '..');
 const EXPORTS = ['RIG_DATA', 'DATA_AS_OF', 'DATA_AS_OF_LABEL', 'AS_OF', 'CONTRACTOR_COLORS', 'STATUSES', 'FIRMNESS',
                  'REGIONS', 'POSITIONS', 'TYPE_SIZES', 'NEAR_TERM_MONTHS', 'parseFlexDate', 'parseIsoDate',
-                 'contractInfo', 'fmtMonths', 'deriveRig', 'isNearTerm', 'classLabel'];
+                 'contractInfo', 'fmtMonths', 'deriveRig', 'isNearTerm', 'classLabel', 'FILTER_GROUPS', 'rigMatches', 'facetCounts'];
 
 function loadApp(opts) {
   const noop = function () {};
