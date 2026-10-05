@@ -40,7 +40,7 @@ const FIRMNESS = {
   option:      'Option'
 };
 
-const REGIONS = ['Gulf of Mexico', 'South America', 'North Sea', 'West Africa', 'Mediterranean & Black Sea', 'Asia Pacific'];
+const REGIONS = ['Gulf of America', 'South America', 'North Sea', 'West Africa', 'Mediterranean & Black Sea', 'Asia Pacific'];
 const POSITIONS = { ais: 'Reported by AIS', field: 'At the named field', area: 'Approximate: placed in the operating area' };
 const TYPE_SIZES = { 'Drillship': 10, 'Semisubmersible': 8, 'Jackup': 6 };
 /* Zoomed in, markers become side-view silhouettes of the rig type (icons/, built by
@@ -480,7 +480,7 @@ const SEA_LABELS = [
   { n: 'North Pacific Ocean', p: [-150, 30], z: 2 },
   { n: 'South Pacific Ocean', p: [-125, -27], z: 2 },
   { n: 'Indian Ocean', p: [78, -24], z: 2 },
-  { n: 'Gulf of Mexico', p: [-90.5, 25.3], z: 3 },
+  { n: 'Gulf of America', p: [-90.5, 25.3], z: 3 },
   { n: 'Caribbean Sea', p: [-75, 15], z: 4 },
   { n: 'North Sea', p: [3, 56.5], z: 4 },
   { n: 'Norwegian Sea', p: [3, 67.5], z: 4 },
@@ -1086,12 +1086,15 @@ function writeHash() {
   if (url !== location.pathname + location.search + location.hash) history.replaceState(null, '', url);
 }
 
+/* Names changed since older links were shared */
+const RENAMED = { 'Gulf of Mexico': 'Gulf of America' };
+
 function readHash() {
   const p = new URLSearchParams(location.hash.replace(/^#/, ''));
   document.getElementById('searchInput').value = p.get('q') || '';
   FILTER_GROUPS.forEach(function (g) {
     const raw = p.get(g.key);
-    const wanted = raw && raw !== '-' ? raw.split(',') : []; // "-" came from older links and meant none
+    const wanted = raw && raw !== '-' ? raw.split(',').map(v => RENAMED[v] || v) : []; // "-" came from older links and meant none
     document.getElementById(g.id).querySelectorAll('input').forEach(function (cb) {
       cb.checked = wanted.includes(cb.value);
     });
