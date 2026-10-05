@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous" />
-<link rel="stylesheet" href="styles.css?v=8d59df9e">
+<link rel="stylesheet" href="styles.css?v=2140e7b2">
 </head>
 <body>
 
@@ -71,6 +71,11 @@
           <span>Insights</span>
         </button>
       </div>
+      <button type="button" class="icon-btn export-btn changes-btn" id="changesBtn" data-action="open-changes" aria-haspopup="dialog" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg>
+        <span class="export-label">Changes</span>
+        <span class="filter-badge" id="changesBadge" aria-hidden="true"></span>
+      </button>
       <button type="button" class="icon-btn export-btn" id="exportBtn" data-action="export-csv" aria-label="Export the rigs shown to CSV" title="Export the rigs shown to CSV">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span class="export-label">CSV</span>
@@ -364,11 +369,22 @@
   </footer>
 </div>
 
+<dialog class="changes-dialog" id="changesDialog" aria-labelledby="changesTitle">
+  <div class="changes-head">
+    <h2 id="changesTitle">Changes</h2>
+    <button type="button" class="detail-close" data-action="close-changes" aria-label="Close changes">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="changes-body" id="changesBody"></div>
+</dialog>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
 <script src="basemap.js?v=5385baf5"></script>
 <script src="rigs.js?v=4bc30ae4"></script>
-<script src="app.js?v=72b376ce"></script>
+<script src="changes.js?v=e8486beb"></script>
+<script src="app.js?v=5b0f5755"></script>
 <script src="insights.js?v=829bb401"></script>
 </body>
 </html>

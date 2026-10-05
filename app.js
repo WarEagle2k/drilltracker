@@ -355,6 +355,16 @@ function wireActions() {
       case 'show-on-map': if (selectedRigId) focusRig(selectedRigId); break;
       case 'detail-step': stepDetail(+el.dataset.step); break;
       case 'sort': sortTable(el.dataset.field); break;
+      case 'open-changes': openChanges(); break;
+      case 'show-earlier': {
+        const table = el.nextElementSibling;
+        table.classList.add('show-earlier-rows');
+        table.tabIndex = -1; table.focus(); // the button goes; keep focus where the rows appeared
+        el.remove();
+        break;
+      }
+      case 'close-changes': document.getElementById('changesDialog').close(); break;
+      case 'open-changed-rig': openChangedRig(el.dataset.rigId); break;
     }
   });
 }
@@ -362,6 +372,7 @@ function wireActions() {
 function wireGlobalKeys() {
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') {
+      if (document.querySelector('dialog[open]')) return; // the dialog closes itself
       if (closeKpiHelp(true)) return;
       if (selectedRigId) closeDetail(true);
       else if (sidebarOpen && window.matchMedia('(max-width: 768px)').matches) toggleSidebar();
@@ -979,6 +990,7 @@ function applyFilters() {
   updateFacets(selections, search);
   updateKPIs(filteredRigs);
   updateFilterCount(filteredRigs.length);
+  updateChangesButton();
   renderActiveFilters(selections);
   updateGroupHeads(selections);
   buildLegend();
@@ -1251,17 +1263,79 @@ function toggleLegend() {
 }
 
 /* ============================================
+   CHANGES SINCE THE LAST REFRESH (changes.js, built by scripts/build-changes.js)
+   ============================================ */
+const HAS_CHANGES = typeof CHANGES !== 'undefined' && CHANGES.asOf === DATA_AS_OF;
+const CHANGE_GROUPS = [
+  ['more', 'More work booked'], ['less', 'Less work booked'], ['other', 'Other changes'],
+  ['added', 'Added to the tracker'], ['removed', 'No longer tracked']
+];
+
+function rigChanges(id) { return HAS_CHANGES ? CHANGES.rigs[id] || null : null; }
+
+function changeLines(ch) {
+  return '<ul class="change-lines">' + ch.lines.map(l => '<li class="change--' + escapeHtml(l.kind) + '">' + escapeHtml(l.text) + '</li>').join('') + '</ul>';
+}
+
+/* The header button counts the changed rigs among those shown */
+function updateChangesButton() {
+  const btn = document.getElementById('changesBtn');
+  btn.hidden = !HAS_CHANGES;
+  if (!HAS_CHANGES) return;
+  const n = filteredRigs.filter(r => CHANGES.rigs[r.id]).length;
+  document.getElementById('changesBadge').textContent = n;
+  document.getElementById('changesBadge').hidden = !n;
+  btn.setAttribute('aria-label', 'Changes since ' + CHANGES.sinceLabel + ': ' + n + (n === 1 ? ' rig' : ' rigs'));
+  btn.title = 'What changed since the ' + CHANGES.sinceLabel + ' refresh';
+}
+
+function openChanges() {
+  const shown = filteredRigs.filter(r => CHANGES.rigs[r.id]);
+  const filtered = filteredRigs.length < RIG_DATA.length;
+  const removed = filtered ? [] : Object.keys(CHANGES.rigs).filter(id => !RIG_BY_ID[id]);
+  document.getElementById('changesTitle').textContent = 'Changes since ' + CHANGES.sinceLabel;
+  const sections = CHANGE_GROUPS.map(function (g) {
+    const rigs = shown.filter(r => CHANGES.rigs[r.id].group === g[0]).sort((a, b) => a.name.localeCompare(b.name));
+    const gone = removed.filter(id => CHANGES.rigs[id].group === g[0]);
+    if (!rigs.length && !gone.length) return '';
+    return '<section class="changes-group"><h3>' + g[1] + ' <span>' + (rigs.length + gone.length) + '</span></h3>' +
+      rigs.map(r => '<div class="changes-rig"><button type="button" class="changes-rig-name" data-action="open-changed-rig" data-rig-id="' + escapeHtml(r.id) + '">' +
+        escapeHtml(r.name) + '</button><span class="changes-rig-sub">' + escapeHtml(r.contractor) + '</span>' + changeLines(CHANGES.rigs[r.id]) + '</div>').join('') +
+      gone.map(id => '<div class="changes-rig"><span class="changes-rig-name">' + escapeHtml(CHANGES.rigs[id].name) + '</span>' + changeLines(CHANGES.rigs[id]) + '</div>').join('') +
+      '</section>';
+  }).join('');
+  document.getElementById('changesBody').innerHTML =
+    '<p class="changes-intro">The ' + DATA_AS_OF_LABEL + ' data compared with the previous refresh' +
+      (filtered ? ', for the ' + filteredRigs.length + ' rigs shown. Clear the filters to see every rig.' : '.') +
+      (CHANGES.compared === 'rigs' ? ' That refresh recorded one contract per rig, so this compares booked-to dates, customers and rates. From the next refresh, each new, extended or exercised contract is listed too.' : '') + '</p>' +
+    (sections || '<p class="changes-intro">No changes among the rigs shown.</p>');
+  document.getElementById('changesDialog').showModal();
+  document.getElementById('changesBody').scrollTop = 0;
+}
+
+/* Closing the dialog hands focus back to the Changes button, so open the rig after that */
+function openChangedRig(id) {
+  const dialog = document.getElementById('changesDialog'), rig = RIG_BY_ID[id];
+  if (rig) dialog.addEventListener('close', () => openDetail(rig, document.getElementById('changesBtn')), { once: true });
+  dialog.close();
+}
+
+/* ============================================
    DETAIL PANEL
    ============================================ */
 function firmTag(firmness) {
   return '<span class="firm-tag firm-tag--' + escapeHtml(firmness) + '">' + escapeHtml(FIRMNESS[firmness] || firmness) + '</span>';
 }
 
+/* Ended contracts are kept as history; all but the latest two fold away */
+const PAST_SHOWN = 2;
+
 function contractsTable(rig) {
   const d = rig.derived;
+  const ended = d.contracts.filter(x => x.e && x.e < AS_OF), folded = ended.slice(0, Math.max(0, ended.length - PAST_SHOWN));
   const rows = d.contracts.map(function (x) {
     const past = x.e && x.e < AS_OF;
-    const cls = x === d.current ? ' class="is-current"' : past ? ' class="is-past"' : '';
+    const cls = x === d.current ? ' class="is-current"' : past ? ' class="is-past' + (folded.includes(x) ? ' is-earlier' : '') + '"' : '';
     return '<tr' + cls + '>' +
       '<td class="mono-cell period-cell"><span>' + escapeHtml(x.k.start || '?') + ' –</span> <span>' + escapeHtml(x.k.end || 'undisclosed') + '</span></td>' +
       '<td>' + escapeHtml(x.k.customer || 'Undisclosed') +
@@ -1269,7 +1343,8 @@ function contractsTable(rig) {
       '<td class="mono-cell">' + (x.k.dayRate != null ? fmtRateShort(x.k.dayRate) : '—') + '</td>' +
       '<td>' + firmTag(x.k.firmness) + '</td></tr>';
   }).join('');
-  return '<table class="contracts-table"><caption class="sr-only">Contracts for ' + escapeHtml(rig.name) + '</caption>' +
+  return (folded.length ? '<button type="button" class="show-earlier" data-action="show-earlier">Show ' + folded.length + ' earlier contract' + (folded.length === 1 ? '' : 's') + '</button>' : '') +
+    '<table class="contracts-table"><caption class="sr-only">Contracts for ' + escapeHtml(rig.name) + '</caption>' +
     '<thead><tr><th scope="col">Period</th><th scope="col">Customer</th><th scope="col">Rate</th><th scope="col">Terms</th></tr></thead>' +
     '<tbody>' + rows + '</tbody></table>';
 }
@@ -1398,6 +1473,7 @@ function openDetail(rig, opener, opts) {
       (d.firmness ? '<span class="badge badge-neutral">' + escapeHtml(FIRMNESS[d.firmness]) + ' contract</span>' : '') +
     '</div>' +
     dayRateBlock +
+    (rigChanges(rig.id) ? '<div class="detail-changes"><h3 class="detail-section-title">Since ' + escapeHtml(CHANGES.sinceLabel) + '</h3>' + changeLines(rigChanges(rig.id)) + '</div>' : '') +
     '<dl class="detail-grid">' +
       customerField + field('Booked to', d.bookedToLabel, !customerField) +
       field('Location', (rig.country ? rig.country + ' · ' : '') + rig.region, true, true) +
