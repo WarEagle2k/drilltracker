@@ -47,7 +47,7 @@ const TYPE_SIZES = { 'Drillship': 10, 'Semisubmersible': 8, 'Jackup': 6 };
    scripts/build-icons.py). w x h is the size on the map; the anchor is the waterline. */
 const ICON_ZOOM = 6;
 const RIG_ICONS = {
-  'Drillship':       { file: 'drillship', w: 66, h: 28 },
+  'Drillship':       { file: 'drillship', w: 61, h: 28 },
   'Semisubmersible': { file: 'semisub',   w: 43, h: 32 },
   'Jackup':          { file: 'jackup',    w: 36, h: 36 }
 };

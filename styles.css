@@ -700,7 +700,7 @@ a:hover { color: var(--color-primary-hover); }
 .legend-size { display: inline-block; border-radius: 50%; border: 1.5px solid var(--color-text-faint); }
 /* zoomed in, the key shows the silhouettes the markers have become */
 .legend-icon { display: none; background: var(--color-text-muted); }
-.legend-icon.rig-icon--drillship { width: 33px; height: 14px; }
+.legend-icon.rig-icon--drillship { width: 30px; height: 14px; }
 .legend-icon.rig-icon--semisub   { width: 21px; height: 16px; }
 .legend-icon.rig-icon--jackup    { width: 18px; height: 18px; }
 .map-legend.icons-on .legend-size { display: none; }
