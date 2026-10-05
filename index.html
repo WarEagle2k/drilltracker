@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous" />
-<link rel="stylesheet" href="styles.css?v=a8a804c4">
+<link rel="stylesheet" href="styles.css?v=bd378dce">
 </head>
 <body>
 
@@ -241,14 +241,13 @@
       <div id="map"></div>
 
       <div class="map-legend" id="mapLegend">
-        <div class="legend-head">
+        <button type="button" class="legend-head legend-toggle" data-action="toggle-legend" aria-expanded="true" aria-controls="legendCollapsible">
           <span class="legend-heading">Map key</span>
-          <button type="button" class="legend-toggle" data-action="toggle-legend" aria-label="Collapse the map key" aria-expanded="true">
-            <span class="legend-chevron" aria-hidden="true">▾</span>
-          </button>
-        </div>
-        <div class="legend-collapsible">
-          <div class="legend-modes" role="group" aria-label="Colour markers by">
+          <span class="legend-chevron" aria-hidden="true"></span>
+        </button>
+        <div class="legend-collapsible" id="legendCollapsible">
+          <div class="legend-modes-label" id="legendModesLabel">Colour by</div>
+          <div class="legend-modes" role="group" aria-labelledby="legendModesLabel">
             <button type="button" class="legend-mode" data-action="color-mode" data-mode="availability" aria-pressed="true">Availability</button>
             <button type="button" class="legend-mode" data-action="color-mode" data-mode="contractor" aria-pressed="false">Contractor</button>
           </div>
@@ -258,7 +257,10 @@
             <span><i class="legend-size" style="width:16px;height:16px"></i><i class="legend-icon rig-icon rig-icon--semisub"></i>Semisub</span>
             <span><i class="legend-size" style="width:12px;height:12px"></i><i class="legend-icon rig-icon rig-icon--jackup"></i>Jackup</span>
           </div>
-          <div class="legend-note"><span class="legend-dot legend-dot--reported" aria-hidden="true"></span>Dot (centre of a disc, or under a rig): reported position. Others are approximate, placed in the operating area.</div>
+          <div class="legend-note">
+            <div class="legend-note-row"><span class="legend-cluster" id="legendCluster" aria-hidden="true"><span>5</span></span>A group of nearby rigs; the ring shows its mix. Zoom in or select it to split it.</div>
+            <div class="legend-note-row"><span class="legend-dot legend-dot--reported" aria-hidden="true"></span>Dot: reported position. Without one, a rig is placed roughly in its operating area.</div>
+          </div>
         </div>
       </div>
 
@@ -363,7 +365,7 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
 <script src="basemap.js?v=5385baf5"></script>
 <script src="rigs.js?v=4bc30ae4"></script>
-<script src="app.js?v=f9820159"></script>
+<script src="app.js?v=d3dbeb4c"></script>
 <script src="insights.js?v=829bb401"></script>
 </body>
 </html>

@@ -711,23 +711,31 @@ a:hover { color: var(--color-primary-hover); }
 
 /* map key: colour mode, categories with counts, marker size, position note */
 .map-legend {
-  position: absolute; bottom: var(--space-4); right: var(--space-4); z-index: 450; width: 236px; overflow: hidden;
+  position: absolute; bottom: var(--space-4); right: var(--space-4); z-index: 450; width: 236px;
+  max-height: calc(100% - 2 * var(--space-4)); overflow-y: auto; overscroll-behavior: contain; /* never taller than the map */
   background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);
   box-shadow: var(--shadow-md); font-size: var(--text-xs);
 }
-.legend-head { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3); }
+.legend-head { display: flex; align-items: center; gap: var(--space-2); width: 100%; min-height: 30px; padding: var(--space-1) var(--space-3); text-align: left; }
+.legend-modes-label { margin: 0 var(--space-3) 4px; font-size: 10px; color: var(--color-text-faint); }
 .legend-heading { text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; font-weight: 600; color: var(--color-text-muted); white-space: nowrap; }
 .legend-modes { display: flex; margin: 0 var(--space-3) var(--space-2); background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
 .legend-mode { flex: 1; padding: 3px 8px; font-size: 11px; color: var(--color-text-muted); }
 .legend-mode:not([aria-pressed="true"]):hover { color: var(--color-text); }
 .legend-mode[aria-pressed="true"] { background: var(--color-primary); color: var(--color-text-inverse); font-weight: 600; }
-.legend-toggle { margin-left: auto; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); border-radius: var(--radius-sm); }
-.legend-toggle:hover { color: var(--color-text); background: var(--color-surface-2); }
-.legend-chevron { transition: transform var(--transition-fast); }
+.legend-toggle { color: var(--color-text-muted); }
+.legend-toggle:hover .legend-heading, .legend-toggle:hover .legend-chevron { color: var(--color-text); }
+.legend-chevron {
+  margin-left: auto; width: 7px; height: 7px; border: solid currentColor; border-width: 0 1.5px 1.5px 0;
+  transform: translateY(-2px) rotate(45deg); transition: transform var(--transition-fast);
+}
 .map-legend.collapsed .legend-collapsible { display: none; }
 .map-legend.collapsed { width: auto; }
-.map-legend.collapsed .legend-chevron { transform: rotate(180deg); }
-.legend-body { padding: 0 var(--space-3) var(--space-1); max-height: 30vh; overflow-y: auto; }
+.map-legend.collapsed .legend-chevron { transform: translateY(1px) rotate(-135deg); }
+/* tall enough for all twelve contractors on a laptop; scrolls (with a fade) only on short screens */
+.legend-body { padding: 0 var(--space-3) var(--space-1); max-height: min(45vh, 312px); overflow-y: auto; }
+.legend-body.is-scrollable { -webkit-mask-image: linear-gradient(#000 calc(100% - 14px), transparent); mask-image: linear-gradient(#000 calc(100% - 14px), transparent); }
+.legend-body:not(:hover):not(:focus-within) { scrollbar-width: none; }
 .legend-row { display: flex; align-items: center; gap: var(--space-2); padding: 2px 0; color: var(--color-text-muted); }
 .legend-row--zero { opacity: 0.5; }
 .legend-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -749,8 +757,19 @@ a:hover { color: var(--color-primary-hover); }
   content: ''; position: absolute; left: 2.5px; top: 2.5px; width: 4px; height: 4px; border-radius: 50%; background: #fff;
 }
 .legend-note {
-  margin: var(--space-2) var(--space-3) 0; padding: var(--space-2) 0; border-top: 1px solid var(--color-divider);
-  color: var(--color-text-faint); font-size: 10px; line-height: 1.4;
+  display: grid; gap: 6px; margin: var(--space-2) var(--space-3) 0; padding: var(--space-2) 0; border-top: 1px solid var(--color-divider);
+  color: var(--color-text-faint); font-size: 10px; line-height: 1.35;
+}
+.legend-note-row { display: flex; align-items: flex-start; gap: 8px; }
+.legend-note-row .legend-dot--reported { margin: 1px 4px 0 3px; }
+/* a small copy of a cluster: neutral disc, count, ring of the current colours */
+.legend-cluster {
+  flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; padding: 2.5px;
+  background: var(--color-text-faint);
+}
+.legend-cluster span {
+  width: 100%; height: 100%; border-radius: 50%; display: grid; place-items: center; background: var(--color-surface);
+  color: var(--color-text); font: 700 8px/1 var(--font-body);
 }
 
 /* empty state overlay */
