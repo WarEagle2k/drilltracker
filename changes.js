@@ -66,6 +66,18 @@ const CHANGES = {
     "rig-087": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for CNR International, booked to May 2027"}]},
     "rig-088": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for bp, booked to Apr 2027"}]},
     "rig-089": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Shell, booked to Jul 2028"}]},
-    "rig-090": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Oct 2030"}]}
+    "rig-090": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Oct 2030"}]},
+    "rig-091": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for an undisclosed customer, booked to Nov 2026"}]},
+    "rig-092": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for ONGC from Q1 2027, booked to Q1 2029"}]},
+    "rig-093": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Occidental, booked to Nov 2026"}]},
+    "rig-094": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Shell, booked to Jul 2030"}]},
+    "rig-095": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Murphy Oil, booked to Jan 2027"}]},
+    "rig-096": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Jan 2027"}]},
+    "rig-097": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for TotalEnergies from Nov 2026, booked to Q3 2029"}]},
+    "rig-098": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for an undisclosed customer, booked to Oct 2026"}]},
+    "rig-099": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Dec 2030"}]},
+    "rig-100": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for TotalEnergies from Dec 2026, booked to Q4 2029"}]},
+    "rig-101": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Woodside from Q2 2027, booked to Q1 2028"}]},
+    "rig-102": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for TAQA, booked to Jun 2028"}]}
   }
 };
