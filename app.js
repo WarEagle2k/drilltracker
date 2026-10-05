@@ -769,6 +769,10 @@ function glideToBounds(bounds, pickZoom, done) {
 }
 
 function glideTo(centre, zoom, done) {
+  // aim where the map is allowed to rest: flyTo ignores maxBounds, so it would land past the
+  // world's edge and then snap back (setView and fitBounds apply the limit up front)
+  zoom = map._limitZoom(zoom);
+  centre = map._limitCenter(L.latLng(centre), zoom, map.options.maxBounds);
   if (prefersReduced) { map.setView(centre, zoom, { animate: false }); if (done) done(); return; }
   startFlightBasemap();
   if (done) map.once('moveend', done);
