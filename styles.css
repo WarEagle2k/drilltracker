@@ -1479,3 +1479,19 @@ button.changes-rig-name:hover { text-decoration-color: currentColor; }
   .changes-btn .filter-badge { position: absolute; top: 2px; right: 0; box-shadow: 0 0 0 2px var(--color-surface); }
   .changes-dialog { width: calc(100vw - 16px); max-height: 88vh; }
 }
+
+/* Short screens (a phone on its side): one compact row of KPIs and a slimmer header, so the
+   map keeps most of the height */
+@media (max-height: 500px) and (min-width: 600px) {
+  .header { padding: var(--space-1) var(--space-3); }
+  .kpi-strip { display: flex; }
+  .kpi-item { padding: var(--space-1) var(--space-3); align-items: center; }
+  .kpi-icon, .kpi-note { display: none; }
+  .kpi-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+  .kpi-value { font-size: var(--text-base); }
+}
+
+/* touch: map buttons big enough to tap */
+@media (pointer: coarse) {
+  .leaflet-touch .leaflet-bar a { width: 40px; height: 40px; line-height: 40px; }
+}
