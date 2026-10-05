@@ -192,12 +192,25 @@
       <div id="map"></div>
 
       <div class="map-legend" id="mapLegend">
-        <button type="button" class="legend-toggle" data-action="toggle-legend" aria-label="Toggle contractor legend" aria-expanded="true">
-          <span class="legend-heading">Contractors</span>
-          <span class="legend-chevron" aria-hidden="true">▾</span>
-        </button>
-        <div class="legend-body"></div>
-        <div class="legend-note"><span class="legend-dot legend-dot--reported" aria-hidden="true"></span>Centre dot: reported position. Others are approximate, placed in the operating area.</div>
+        <div class="legend-head">
+          <span class="legend-heading">Map key</span>
+          <button type="button" class="legend-toggle" data-action="toggle-legend" aria-label="Collapse the map key" aria-expanded="true">
+            <span class="legend-chevron" aria-hidden="true">▾</span>
+          </button>
+        </div>
+        <div class="legend-collapsible">
+          <div class="legend-modes" role="group" aria-label="Colour markers by">
+            <button type="button" class="legend-mode" data-action="color-mode" data-mode="availability" aria-pressed="true">Availability</button>
+            <button type="button" class="legend-mode" data-action="color-mode" data-mode="contractor" aria-pressed="false">Contractor</button>
+          </div>
+          <div class="legend-body"></div>
+          <div class="legend-sizes" aria-label="Marker size shows the rig type">
+            <span><i class="legend-size" style="width:20px;height:20px"></i>Drillship</span>
+            <span><i class="legend-size" style="width:16px;height:16px"></i>Semisub</span>
+            <span><i class="legend-size" style="width:12px;height:12px"></i>Jackup</span>
+          </div>
+          <div class="legend-note"><span class="legend-dot legend-dot--reported" aria-hidden="true"></span>Centre dot: reported position. Others are approximate, placed in the operating area.</div>
+        </div>
       </div>
 
       <div class="filter-pill" id="filterPill" hidden>

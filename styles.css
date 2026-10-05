@@ -88,6 +88,11 @@ html {
   --seq-4: #86b6ef;
   --seq-5: #cde2fb;
   --viz-deemph: #3a4b6b;
+
+  /* map availability: ordinal orange (validated --ordinal on the dark sea), grey for the rest */
+  --avail-open:   #fb923c;
+  --avail-near:   #c2410c;
+  --avail-booked: #4a5a78;
   --viz-grid: #22314f;
 
   --map-sea:        #0a1628;
@@ -144,6 +149,10 @@ html {
   --seq-4: #1c5cab;
   --seq-5: #0d366b;
   --viz-deemph: #c5ccd8;
+
+  --avail-open:   #9a3412;
+  --avail-near:   #ea7a3c;
+  --avail-booked: #a7b2c3;
   --viz-grid: #e6e9ef;
 
   --map-sea:        #d9e3ee;
@@ -571,31 +580,45 @@ a:hover { color: var(--color-primary-hover); }
 /* "zoom to the rigs shown" control under the zoom buttons */
 .fit-control a { display: flex !important; align-items: center; justify-content: center; }
 
-/* Leaflet cluster styles */
-.marker-cluster { background: rgba(var(--cluster), 0.2) !important; border: 2px solid rgba(var(--cluster), 0.6) !important; }
-.marker-cluster div {
-  background: rgba(var(--cluster), 0.85) !important;
-  color: var(--cluster-text) !important;
-  font-family: var(--font-mono) !important;
-  font-weight: 600 !important;
-  font-size: 12px !important;
-  font-variant-numeric: tabular-nums !important;
+/* clusters: a neutral disc with the count; the ring shows what is inside */
+.rig-cluster { display: flex; align-items: center; justify-content: center; }
+.rig-cluster-ring {
+  width: 100%; height: 100%; border-radius: 50%; padding: 4px;
+  box-shadow: 0 0 0 1.5px var(--color-surface), var(--shadow-md);
 }
-.marker-cluster span { line-height: 30px; } /* MarkerCluster.Default.css centres the count via the inner span */
-.marker-cluster-small { background: rgba(var(--cluster), 0.15) !important; }
-.marker-cluster-small div { background: rgba(var(--cluster), 0.75) !important; }
-.marker-cluster-large { background: rgba(var(--cluster), 0.25) !important; }
-.marker-cluster-large div { background: rgba(var(--cluster), 0.95) !important; }
+.rig-cluster-ring span {
+  display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; border-radius: 50%;
+  background: var(--color-surface); color: var(--color-text); font-family: var(--font-body); font-weight: 700; font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.rig-cluster:hover .rig-cluster-ring { transform: scale(1.08); }
+.rig-cluster:focus-visible { outline: none; }
+.rig-cluster:focus-visible .rig-cluster-ring { box-shadow: 0 0 0 2px var(--color-primary); }
 
 /* rig markers; a centre dot marks a reported (not approximate) position */
 .rig-marker {
   position: relative;
   border-radius: 50%;
   border: 1.5px solid rgba(10,22,40,0.55);
+  box-shadow: 0 0 0 1.5px rgba(255,255,255,0.9), 0 1px 4px rgba(0,0,0,0.35);
   transition: transform 150ms ease, box-shadow 150ms ease;
   cursor: pointer;
 }
-.rig-marker:hover { transform: scale(1.3); box-shadow: 0 0 12px rgba(255,255,255,0.3); z-index: 1000 !important; }
+.rig-marker:hover { transform: scale(1.3); z-index: 1000 !important; }
+/* the hit area is bigger than the mark */
+.rig-marker::before { content: ''; position: absolute; inset: -8px; border-radius: 50%; }
+.leaflet-marker-icon:focus-visible { outline: none; }
+.leaflet-marker-icon:focus-visible .rig-marker { box-shadow: 0 0 0 3px var(--color-primary) !important; }
+
+/* marker hover / focus card */
+.leaflet-tooltip.rig-tip {
+  padding: 8px 10px; border-radius: var(--radius-md); border: 1px solid var(--color-border);
+  background: var(--color-surface-2); color: var(--color-text-muted); box-shadow: var(--shadow-md);
+  font-family: var(--font-body); font-size: 11px; line-height: 1.45; white-space: nowrap;
+}
+.leaflet-tooltip-top.rig-tip::before { border-top-color: var(--color-border); }
+.rig-tip-name { display: block; font-size: 12px; color: var(--color-text); }
+.rig-tip-muted { color: var(--color-text-faint); }
 .rig-marker.selected { box-shadow: 0 0 0 3px var(--color-primary), 0 0 10px var(--color-primary) !important; transform: scale(1.25); }
 .rig-marker--reported::after {
   content: ''; position: absolute; left: 50%; top: 50%; width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px;
@@ -615,33 +638,42 @@ a:hover { color: var(--color-primary-hover); }
 }
 .leaflet-control-attribution a { color: var(--color-text-muted) !important; }
 
-/* map legend */
+/* map key: colour mode, categories with counts, marker size, position note */
 .map-legend {
-  position: absolute; bottom: var(--space-4); right: var(--space-4); z-index: 450; max-width: 220px; overflow: hidden;
+  position: absolute; bottom: var(--space-4); right: var(--space-4); z-index: 450; width: 236px; overflow: hidden;
   background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md);
   box-shadow: var(--shadow-md); font-size: var(--text-xs);
 }
-.legend-toggle {
-  display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); width: 100%;
-  padding: var(--space-2) var(--space-3); color: var(--color-text-muted);
-}
-.legend-heading { text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; font-weight: 600; }
+.legend-head { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3); }
+.legend-heading { text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px; font-weight: 600; color: var(--color-text-muted); white-space: nowrap; }
+.legend-modes { display: flex; margin: 0 var(--space-3) var(--space-2); background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: var(--radius-md); overflow: hidden; }
+.legend-mode { flex: 1; padding: 3px 8px; font-size: 11px; color: var(--color-text-muted); }
+.legend-mode:not([aria-pressed="true"]):hover { color: var(--color-text); }
+.legend-mode[aria-pressed="true"] { background: var(--color-primary); color: var(--color-text-inverse); font-weight: 600; }
+.legend-toggle { margin-left: auto; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; color: var(--color-text-muted); border-radius: var(--radius-sm); }
+.legend-toggle:hover { color: var(--color-text); background: var(--color-surface-2); }
 .legend-chevron { transition: transform var(--transition-fast); }
-.legend-body { padding: 0 var(--space-3) var(--space-2); max-height: 32vh; overflow-y: auto; }
-.map-legend.collapsed .legend-body { display: none; }
-.map-legend.collapsed .legend-chevron { transform: rotate(-90deg); }
+.map-legend.collapsed .legend-collapsible { display: none; }
+.map-legend.collapsed { width: auto; }
+.map-legend.collapsed .legend-chevron { transform: rotate(180deg); }
+.legend-body { padding: 0 var(--space-3) var(--space-1); max-height: 30vh; overflow-y: auto; }
 .legend-row { display: flex; align-items: center; gap: var(--space-2); padding: 2px 0; color: var(--color-text-muted); }
+.legend-row--zero { opacity: 0.5; }
+.legend-label { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legend-count { font-variant-numeric: tabular-nums; color: var(--color-text); font-weight: 600; }
 .legend-empty { color: var(--color-text-faint); }
-.legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-.legend-dot--reported { display: inline-block; position: relative; background: var(--color-text-muted); margin-right: 4px; vertical-align: -1px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 0 1px rgba(255,255,255,0.9); }
+.legend-sizes { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin: var(--space-1) var(--space-3) 0; padding-top: var(--space-2); border-top: 1px solid var(--color-divider); color: var(--color-text-faint); font-size: 10px; }
+.legend-sizes span { display: inline-flex; align-items: center; gap: 4px; }
+.legend-size { display: inline-block; border-radius: 50%; border: 1.5px solid var(--color-text-faint); }
+.legend-dot--reported { display: inline-block; position: relative; background: var(--color-text-muted); margin-right: 4px; vertical-align: -1px; box-shadow: none; }
 .legend-dot--reported::after {
   content: ''; position: absolute; left: 2.5px; top: 2.5px; width: 4px; height: 4px; border-radius: 50%; background: #fff;
 }
 .legend-note {
-  margin: 0 var(--space-3); padding: var(--space-2) 0; border-top: 1px solid var(--color-divider);
+  margin: var(--space-2) var(--space-3) 0; padding: var(--space-2) 0; border-top: 1px solid var(--color-divider);
   color: var(--color-text-faint); font-size: 10px; line-height: 1.4;
 }
-.map-legend.collapsed .legend-note { display: none; }
 
 /* empty state overlay */
 .empty-state {

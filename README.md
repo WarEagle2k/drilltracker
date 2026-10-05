@@ -44,6 +44,10 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 - *Avg Floater Rate*: mean disclosed day rate of the drillships and semisubmersibles shown, using the current contract (or the next one for rigs not yet working). Jackups are excluded; Insights shows the average for each type. When fewer than five rates are disclosed, the count is highlighted.
 - *Disclosed Backlog*: for firm contracts with a disclosed rate, days remaining after the data date × day rate, including follow-on contracts and rate steps. Options, LOIs and conditional awards are excluded, as is any rig without a disclosed rate.
 
+## Map
+
+Markers are coloured by **availability** by default: open now, free within 9 months, or booked for 9 months or more. The map key switches to colouring by **contractor**. Marker size shows the rig type, and a centre dot marks a reported position. Each cluster shows its count, with a ring giving the mix of what's inside. Hovering over or focusing a marker shows a summary, and selecting it opens the details.
+
 ## Filtering
 
 Filters start empty, and an empty group doesn't filter. Ticking options narrows the rigs shown. Options within a group combine with OR (Brazil or Guyana); groups combine with AND (and Drillship). The number beside each option is how many rigs it has within your other choices. Options that would show nothing are greyed out, so only the search can produce an empty result. Active filters appear as removable chips above the list, and as a summary over the map.

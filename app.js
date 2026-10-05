@@ -45,6 +45,14 @@ const POSITIONS = { ais: 'Reported by AIS', field: 'At the named field', area: '
 const TYPE_SIZES = { 'Drillship': 10, 'Semisubmersible': 8, 'Jackup': 6 };
 const NO_COUNTRY = 'Not disclosed';
 
+/* Map colour modes. Availability is ordinal emphasis (one orange hue, two steps, grey
+   for the rest; validated on both map surfaces); contractor is the brand set. */
+const AVAILABILITY = {
+  open:   'Open now',
+  near:   'Free within 9 months',
+  booked: 'Booked 9+ months'
+};
+
 const NEAR_TERM_MONTHS = 9;
 const CHAIN_GAP_DAYS = 140;    // a gap this short between contracts counts as continuous work: fleet status reports show mobilization and preparation of up to ~135 days
 const STALE_DATA_DAYS = 45;    // show a banner when the data is older than this
@@ -229,6 +237,7 @@ let mapLabels = [];
 let filteredRigs = RIG_DATA.slice();
 let currentSort = { field: 'name', asc: true };
 let currentView = 'map';
+let colorMode = 'availability';
 let sidebarOpen = true;
 let selectedRigId = null;
 let detailOpener = null; // the list row or timeline row that opened the panel, if any
@@ -323,6 +332,7 @@ function wireActions() {
       case 'remove-filter': removeFilter(el.dataset.group, el.dataset.value); break;
       case 'remove-search': clearSearch(); break;
       case 'toggle-legend': toggleLegend(); break;
+      case 'color-mode': setColorMode(el.dataset.mode); break;
       case 'close-detail': closeDetail(true); break;
       case 'show-on-map': if (selectedRigId) focusRig(selectedRigId); break;
       case 'sort': sortTable(el.dataset.field); break;
@@ -616,7 +626,8 @@ function initMap() {
     return;
   }
   map = L.map('map', {
-    center: [15, 0], zoom: 3, minZoom: 2, maxZoom: MAP_MAX_ZOOM,
+    // a phone is narrower than the world at zoom 2, so let it zoom out far enough to show every rig
+    center: [15, 0], zoom: 3, minZoom: document.getElementById('map').clientWidth < 700 ? 1 : 2, maxZoom: MAP_MAX_ZOOM,
     // continuous zoom: smoothWheelZoom (below) replaces Leaflet's stepped wheel zoom
     zoomSnap: 0, scrollWheelZoom: false,
     maxBounds: [[-62, -180], [85, 180]], maxBoundsViscosity: 1,
@@ -642,15 +653,7 @@ function initMap() {
     spiderfyOnMaxZoom: true,
     showCoverageOnHover: false,
     zoomToBoundsOnClick: true,
-    iconCreateFunction: function (cluster) {
-      const count = cluster.getChildCount();
-      const size = count < 10 ? 'small' : count < 30 ? 'medium' : 'large';
-      return L.divIcon({
-        html: '<div><span>' + count + '</span></div>',
-        className: 'marker-cluster marker-cluster-' + size,
-        iconSize: L.point(40, 40)
-      });
-    }
+    iconCreateFunction: clusterIcon
   }) : L.layerGroup();
   map.addLayer(markerLayer);
   new FitControl().addTo(map);
@@ -670,7 +673,12 @@ function initMap() {
 function fitToRigs(animate) {
   if (!map || !filteredRigs.length) return;
   const bounds = L.latLngBounds(filteredRigs.map(r => [r.lat, r.lng]));
-  map.fitBounds(bounds, { padding: [40, 40], maxZoom: 6, animate: animate && !prefersReduced });
+  // keep markers clear of the zoom controls, the filter pill and the map key
+  const legend = document.getElementById('mapLegend');
+  const legendW = legend && !legend.hidden && !legend.classList.contains('collapsed') && map.getSize().x > 600 ? legend.offsetWidth + 24 : 0;
+  const pill = !document.getElementById('filterPill').hidden;
+  map.fitBounds(bounds, { paddingTopLeft: [64, pill ? 72 : 32], paddingBottomRight: [Math.max(32, legendW), 32],
+                          maxZoom: 6, animate: animate && !prefersReduced });
 }
 
 const FitControl = window.L ? L.Control.extend({
@@ -689,6 +697,28 @@ const FitControl = window.L ? L.Control.extend({
   }
 }) : null;
 
+function rigCategory(rig) {
+  if (colorMode === 'contractor') return rig.contractor;
+  const d = rig.derived;
+  return d.available ? 'open' : d.nearTerm ? 'near' : 'booked';
+}
+
+function categoryColor(cat) {
+  return colorMode === 'contractor' ? getContractorColor(cat) : 'var(--avail-' + cat + ')';
+}
+
+/* Hover and keyboard-focus card for a marker; built with textContent */
+function markerTip(rig) {
+  const d = rig.derived;
+  const el = document.createElement('div');
+  const add = (tag, cls, text) => { const n = document.createElement(tag); n.className = cls; n.textContent = text; el.appendChild(n); return n; };
+  add('strong', 'rig-tip-name', rig.name);
+  add('div', 'rig-tip-line', rig.contractor + ' · ' + (rig.type === 'Semisubmersible' ? 'Semisub' : rig.type));
+  add('div', 'rig-tip-line', d.status + ' · ' + (d.available ? d.bookedToLabel : 'booked to ' + d.bookedToLabel));
+  if (d.customer) add('div', 'rig-tip-line rig-tip-muted', d.customer + (d.dayRate != null ? ' · ' + fmtRate(d.dayRate) + '/day' : ''));
+  return el;
+}
+
 function createMarkers(rigs) {
   if (!map) return;
   markerLayer.clearLayers();
@@ -696,28 +726,60 @@ function createMarkers(rigs) {
   const batch = [];
 
   rigs.forEach(function (rig) {
-    const color = getContractorColor(rig.contractor);
+    const color = categoryColor(rigCategory(rig));
     const size = TYPE_SIZES[rig.type] || 8;
     const cls = 'rig-marker' + (rig.position !== 'area' ? ' rig-marker--reported' : '') +
       (rig.id === selectedRigId ? ' selected' : '');
     const icon = L.divIcon({
       className: '',
       html: '<div class="' + cls + '" data-rig-id="' + escapeHtml(rig.id) + '" style="width:' + (size * 2) + 'px;height:' + (size * 2) +
-            'px;background:' + color + ';box-shadow:0 0 0 1.5px rgba(255,255,255,0.85), 0 0 7px ' + color + 'aa;"></div>',
+            'px;background:' + color + '"></div>',
       iconSize: [size * 2, size * 2],
       iconAnchor: [size, size]
     });
-    const marker = L.marker([rig.lat, rig.lng], {
-      icon: icon, keyboard: true,
-      title: rig.name + ' — ' + rig.contractor + ', ' + rig.derived.status,
-      alt: rig.name + ', ' + rig.type + ', ' + rig.contractor
-    });
+    const marker = L.marker([rig.lat, rig.lng], { icon: icon, keyboard: true, rigId: rig.id });
+    marker.bindTooltip(markerTip(rig), { direction: 'top', offset: [0, -size - 2], className: 'rig-tip', opacity: 1 });
     marker.on('click', function () { openDetail(rig); });
+    marker.on('add', function () {
+      const el = marker.getElement();
+      if (el) el.setAttribute('aria-label', rig.name + ', ' + rig.contractor + ', ' + rig.derived.status + '. Show details.');
+    });
     markersById[rig.id] = marker;
     batch.push(marker);
   });
   if (markerLayer.addLayers) markerLayer.addLayers(batch);
   else batch.forEach(m => markerLayer.addLayer(m));
+}
+
+/* A cluster is a neutral disc with its count; the ring shows what is inside, in the current colours */
+function clusterIcon(cluster) {
+  const kids = cluster.getAllChildMarkers(), n = kids.length;
+  const counts = {};
+  kids.forEach(function (m) { const r = RIG_BY_ID[m.options.rigId]; if (r) { const c = rigCategory(r); counts[c] = (counts[c] || 0) + 1; } });
+  const order = colorMode === 'contractor' ? Object.keys(counts).sort() : Object.keys(AVAILABILITY).filter(k => counts[k]);
+  let at = 0;
+  const stops = order.map(function (c) {
+    const from = at; at += counts[c] / n * 100;
+    return categoryColor(c) + ' ' + from.toFixed(2) + '% ' + at.toFixed(2) + '%';
+  }).join(', ');
+  const px = n < 10 ? 34 : n < 30 ? 40 : 46;
+  const summary = order.map(c => counts[c] + ' ' + (colorMode === 'contractor' ? c : AVAILABILITY[c].toLowerCase())).join(', ');
+  return L.divIcon({
+    html: '<div class="rig-cluster-ring" style="background:conic-gradient(' + stops + ')" aria-label="' +
+          escapeHtml(plural(n, 'rig') + ': ' + summary + '. Zoom in.') + '"><span>' + n + '</span></div>',
+    className: 'rig-cluster', iconSize: L.point(px, px)
+  });
+}
+
+function setColorMode(mode) {
+  if (mode !== 'availability' && mode !== 'contractor') mode = 'availability';
+  colorMode = mode;
+  document.querySelectorAll('[data-action="color-mode"]').forEach(function (b) {
+    b.setAttribute('aria-pressed', b.dataset.mode === mode ? 'true' : 'false');
+  });
+  createMarkers(filteredRigs);
+  buildLegend();
+  writeHash();
 }
 
 /* ============================================
@@ -924,6 +986,7 @@ function stateToHash() {
     const on = getCheckedValues(g.id);
     if (on.length) p.set(g.key, on.join(','));
   });
+  if (colorMode !== 'availability') p.set('color', colorMode);
   if (currentSort.field !== 'name' || !currentSort.asc) p.set('sort', (currentSort.asc ? '' : '-') + currentSort.field);
   if (selectedRigId) p.set('rig', selectedRigId);
   return p.toString().replace(/%2C/g, ',');
@@ -945,6 +1008,11 @@ function readHash() {
       cb.checked = wanted.includes(cb.value);
     });
   });
+  const mode = p.get('color') === 'contractor' ? 'contractor' : 'availability';
+  if (mode !== colorMode) {
+    colorMode = mode;
+    document.querySelectorAll('[data-action="color-mode"]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode ? 'true' : 'false'));
+  }
   const sort = p.get('sort');
   if (sort) currentSort = { field: sort.replace(/^-/, ''), asc: sort[0] !== '-' };
   else currentSort = { field: 'name', asc: true };
@@ -1030,17 +1098,22 @@ function animateValue(id, target, fmt) {
    MAP LEGEND
    ============================================ */
 function buildLegend() {
-  const present = [...new Set(filteredRigs.map(r => r.contractor))].sort();
-  const rows = present.map(c =>
-    '<div class="legend-row"><span class="legend-dot" style="background:' + getContractorColor(c) + '"></span>' +
-    escapeHtml(c) + '</div>').join('');
-  document.querySelector('#mapLegend .legend-body').innerHTML = rows ||
+  const counts = {};
+  filteredRigs.forEach(r => { const c = rigCategory(r); counts[c] = (counts[c] || 0) + 1; });
+  const keys = colorMode === 'contractor' ? Object.keys(counts).sort() : Object.keys(AVAILABILITY);
+  const rows = keys.map(c =>
+    '<div class="legend-row' + (counts[c] ? '' : ' legend-row--zero') + '"><span class="legend-dot" style="background:' + categoryColor(c) + '"></span>' +
+    '<span class="legend-label">' + escapeHtml(colorMode === 'contractor' ? c : AVAILABILITY[c]) + '</span>' +
+    '<span class="legend-count">' + (counts[c] || 0) + '</span></div>').join('');
+  document.querySelector('#mapLegend .legend-body').innerHTML = filteredRigs.length ? rows :
     '<div class="legend-row legend-empty">No rigs shown</div>';
 }
 
 function toggleLegend() {
   const collapsed = document.getElementById('mapLegend').classList.toggle('collapsed');
-  document.querySelector('.legend-toggle').setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  const btn = document.querySelector('.legend-toggle');
+  btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+  btn.setAttribute('aria-label', collapsed ? 'Expand the map key' : 'Collapse the map key');
 }
 
 /* ============================================
@@ -1137,8 +1210,22 @@ function openDetail(rig, opener) {
   document.querySelector('.main-content').classList.add('panel-open');
   const row = document.querySelector('.list-row[data-rig-id="' + rig.id + '"]');
   if (row && currentView === 'list') row.scrollIntoView({ block: 'nearest' });
+  revealBesidePanel(rig);
   document.getElementById('detailClose').focus();
   writeHash();
+}
+
+/* On the map, pan if the panel would cover the selected rig */
+function revealBesidePanel(rig) {
+  if (!map || currentView !== 'map') return;
+  const panelW = document.getElementById('detailPanel').offsetWidth, size = map.getSize();
+  if (panelW >= size.x - 80) return; // full-width panel on phones
+  const pt = map.latLngToContainerPoint([rig.lat, rig.lng]);
+  if (pt.x <= size.x - panelW - 40 && pt.x >= 40) return;
+  // centre the rig in the uncovered part; zoomed right out, the world edge may block the pan, so zoom in a step
+  const z = Math.max(map.getZoom(), 4);
+  const centre = map.unproject(map.project([rig.lat, rig.lng], z).add([panelW / 2, 0]), z);
+  map.setView(centre, z, { animate: !prefersReduced });
 }
 
 function field(label, value, wide) {
