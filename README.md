@@ -93,6 +93,7 @@ A filter lists the values shown, comma-separated; a filter that isn't in the lin
 | `styles.css` | Styles. Theme colours, including status and firmness colours, are CSS variables. |
 | `theme-init.js` | Applies the saved theme before first paint. |
 | `basemap.js` | World outline from Natural Earth (public domain), built by `scripts/build-basemap.js`. |
+| `og-image.png` | The 1200×630 card shown when the link is shared. It includes a screenshot, so its figures are a snapshot. |
 
 There is no build step. Serve the folder with any static server, or open `index.html` directly.
 
@@ -132,7 +133,7 @@ Use `null` for anything missing. The validator rejects placeholder strings such 
    node scripts/test-filters.js
    node scripts/test-insights.js
    ```
-   `validate.js` fails on errors; `--strict` also fails on warnings. `test-dates.js` tests the date and contract logic with a fixed data date, so it does not change with a refresh.
+   `validate.js` fails on errors; `--strict` also fails on warnings. `test-dates.js` tests the date and contract logic with a fixed data date, so it does not change with a refresh. The same checks run on every pull request and push to `main` (`.github/workflows/test.yml`).
 3. Open the page and spot-check a few rigs.
 
 The research toolkit that produces the refresh (`data-updates/`) is kept out of the repository.
