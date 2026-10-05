@@ -112,7 +112,7 @@ Each rig in `rigs.js`:
 | `jackupClass` | Jackups only (`Modern`, `Modern Premium`); otherwise `null`. |
 | `environment` | `Harsh`, `Ultra-Harsh` or `null` (benign). |
 | `waterDepth_ft`, `hookload_tons`, `buildYear` | Numbers. |
-| `region` | One of six markets: Gulf of Mexico, South America, North Sea, West Africa, Mediterranean & Black Sea, Asia Pacific. |
+| `region` | One of six markets: Gulf of America, South America, North Sea, West Africa, Mediterranean & Black Sea, Asia Pacific. |
 | `country` | Where the rig is now, or `null` if undisclosed. |
 | `lat`, `lng`, `position` | `position` is `ais`, `field` or `area` (approximate). |
 | `statusOverride` | `null`, or `Unconfirmed`. |
