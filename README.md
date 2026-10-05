@@ -71,7 +71,9 @@ Every chart follows the filters and has a table view of the same numbers. Hover,
 - **Fleet mix**: rigs by status, type and region. Selecting a row filters by it, and selecting it again removes the filter.
 - **Contract timeline**: one row per rig, one bar per contract. The year axis stays in view as you scroll, and selecting a row opens the rig's details.
 
-Chart colours follow the job they do. Contract firmness is an ordered scale, so it uses one blue ramp. Rig type uses three categorical colours plus a marker shape each. The heatmap uses five steps of one ramp. All were checked for colour-vision deficiency and contrast against both themes.
+Colours follow the CSI brand: a Charcoal header bar with CSI Yellow, Slate for links and selected states in the light theme, and a charcoal dark theme where CSI Yellow does that job. CSI Yellow is never used as text on white (1.5:1); it appears as a fill under Charcoal text or on Charcoal. The CSS variables at the top of `styles.css` hold every colour.
+
+Chart and map colours follow the job they do. Availability on the map is Brick (open now) and Coral (free within 9 months), with grey for the rest. Contract firmness is an ordered scale from Slate to Steel Blue. Rig type uses three categorical colours (blue, Coral, teal) plus a marker shape each. The heatmap uses five steps of Deep Teal. All were checked for colour-vision deficiency and contrast against both themes, and the accessibility check below covers the page in both.
 
 ## Changes since the last refresh
 
