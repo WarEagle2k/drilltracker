@@ -19,6 +19,8 @@ jobs:
           node-version: 22
       - name: Check the scripts parse
         run: for f in app.js insights.js rigs.js basemap.js theme-init.js; do node --check "$f"; done
+      - name: Asset versions match the files
+        run: node scripts/stamp-assets.js --check
       - name: Validate rig data
         run: node scripts/validate.js
       - name: Date logic
