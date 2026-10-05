@@ -760,7 +760,7 @@ a:hover { color: var(--color-primary-hover); }
 .map-legend.collapsed .legend-collapsible { display: none; }
 .map-legend.collapsed { width: auto; }
 .map-legend.collapsed .legend-chevron { transform: translateY(1px) rotate(-135deg); }
-/* tall enough for all twelve contractors on a laptop; scrolls (with a fade) only on short screens */
+/* tall enough for every contractor colour (a dozen and Other) on a laptop; scrolls (with a fade) only on short screens */
 .legend-body { padding: 0 var(--space-3) var(--space-1); max-height: min(45vh, 312px); overflow-y: auto; }
 .legend-body.is-scrollable { -webkit-mask-image: linear-gradient(#000 calc(100% - 14px), transparent); mask-image: linear-gradient(#000 calc(100% - 14px), transparent); }
 .legend-body:not(:hover):not(:focus-within) { scrollbar-width: none; }

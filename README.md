@@ -48,7 +48,7 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 
 ## Map
 
-Markers are coloured by **availability** by default: open now, free within 9 months, or booked for 9 months or more. The map key switches to colouring by **contractor**. Marker size shows the rig type; zoomed in (from zoom 6), markers become side-view silhouettes of a drillship, semisub or jackup, in the same colours. A dot marks a reported position: in the centre of a disc, or under a rig. Each cluster shows its count, with a ring giving the mix of what's inside. The map key explains each of these, with counts for the rigs shown, and folds away to its header. Hovering over or focusing a marker shows a summary, and selecting it opens the details. Selecting a cluster glides to its rigs, stopping a little short of a tight fit so a spread-out basin keeps some context; Zoom to the rigs shown and the details pane's Map button glide too (all jump instead if your system asks for less motion). Rigs stay clear of the map's buttons and key. On a phone, the filters and the map key start folded; held sideways, the KPIs shrink to one row so the map keeps most of the screen.
+Markers are coloured by **availability** by default: open now, free within 9 months, or booked for 9 months or more. The map key switches to colouring by **contractor**; contractors with only a few rigs share one "Other contractors" colour there, though the filters, list and details still name them. Marker size shows the rig type; zoomed in (from zoom 6), markers become side-view silhouettes of a drillship, semisub or jackup, in the same colours. A dot marks a reported position: in the centre of a disc, or under a rig. Each cluster shows its count, with a ring giving the mix of what's inside. The map key explains each of these, with counts for the rigs shown, and folds away to its header. Hovering over or focusing a marker shows a summary, and selecting it opens the details. Selecting a cluster glides to its rigs, stopping a little short of a tight fit so a spread-out basin keeps some context; Zoom to the rigs shown and the details pane's Map button glide too (all jump instead if your system asks for less motion). Rigs stay clear of the map's buttons and key. On a phone, the filters and the map key start folded; held sideways, the KPIs shrink to one row so the map keeps most of the screen.
 
 ## Rig details
 
@@ -121,10 +121,10 @@ Each rig in `rigs.js`:
 | Field | Notes |
 |---|---|
 | `id`, `name` | `rig-NNN`; both unique. |
-| `contractor` | The company that runs the rig. Must have a colour in `CONTRACTOR_COLORS` in `app.js`. |
+| `contractor` | The company that runs the rig. Must have a colour in `CONTRACTOR_COLORS` in `app.js`, or be listed in `OTHER_CONTRACTORS` to share the "Other" colour. |
 | `owner` | Set only when someone else owns the rig (for example Northern Ocean for a rig Odfjell manages); otherwise `null`. |
 | `type` | `Drillship`, `Semisubmersible` or `Jackup`. |
-| `generation` | Floaters only (`6th Gen`, `7th Gen`, `8th Gen`); `null` for jackups. |
+| `generation` | Floaters only (`6th Gen`, `7th Gen`, `8th Gen`); `null` for jackups and for older floaters outside those classes (the note says so). |
 | `jackupClass` | Jackups only (`Modern`, `Modern Premium`); otherwise `null`. |
 | `environment` | `Harsh`, `Ultra-Harsh` or `null` (benign). |
 | `waterDepth_ft`, `hookload_tons`, `buildYear` | Numbers. |

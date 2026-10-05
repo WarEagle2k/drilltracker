@@ -97,6 +97,18 @@ const CHANGES = {
     "rig-118": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Petrobras from Jan 2027, booked to Q3 2029"}]},
     "rig-119": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Petrobras from Jan 2027, booked to Q1 2031"}]},
     "rig-120": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Eni, booked to Dec 2026"}]},
-    "rig-121": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Q2 2029"}]}
+    "rig-121": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Q2 2029"}]},
+    "rig-122": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Nov 2028"}]},
+    "rig-123": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Dec 2027"}]},
+    "rig-124": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Mar 2029"}]},
+    "rig-125": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Dec 2030"}]},
+    "rig-126": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to no published end"}]},
+    "rig-127": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Harbour Energy, booked to Aug 2030"}]},
+    "rig-128": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Oil India, booked to Oct 2026"}]},
+    "rig-129": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Repsol from Nov 2026, booked to Oct 2031"}]},
+    "rig-130": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for ONGC, booked to Jul 2029"}]},
+    "rig-131": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for TotalEnergies"}]},
+    "rig-132": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: available"}]},
+    "rig-133": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Petrobras from 2026, booked to no published end"}]}
   }
 };
