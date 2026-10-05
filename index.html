@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous" />
-<link rel="stylesheet" href="styles.css?v=bd378dce">
+<link rel="stylesheet" href="styles.css?v=f8584da7">
 </head>
 <body>
 
@@ -281,7 +281,10 @@
     <div class="list-view" id="listView">
       <div class="list-toolbar">
         <span class="list-count" id="listCount"></span>
-        <span class="list-key"><span class="list-key-mark" aria-hidden="true"></span>Open now or booked for less than 9 months <strong id="listNearCount"></strong></span>
+        <span class="list-key" title="Coming free: the orange markers on the map">
+          <span class="list-key-item"><span class="list-key-mark list-key-mark--open" aria-hidden="true"></span>Open now <strong id="listOpenCount"></strong></span>
+          <span class="list-key-item"><span class="list-key-mark list-key-mark--near" aria-hidden="true"></span>Free within 9 months <strong id="listNearCount"></strong></span>
+        </span>
         <label class="list-sort">Sort by
           <select id="listSort">
             <option value="name">Rig Name</option>
@@ -298,7 +301,7 @@
       </div>
       <div class="list-table-wrapper">
         <table class="list-table" role="table">
-          <caption class="sr-only">Rigs matching the current filters. Rows marked with an amber edge are open now or booked for less than nine months. Select a rig to see its details.</caption>
+          <caption class="sr-only">Rigs matching the current filters. Rows marked with an orange edge are coming free: open now (darker) or free within nine months. Select a rig to see its details.</caption>
           <thead role="rowgroup">
             <tr role="row">
               <th scope="col" role="columnheader" class="col-name" data-field="name" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="name"><span class="th-label">Rig Name</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
@@ -306,7 +309,7 @@
               <th scope="col" role="columnheader" class="col-type" data-field="type" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="type"><span class="th-label">Type</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
               <th scope="col" role="columnheader" class="col-location" data-field="location" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="location"><span class="th-label">Location</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
               <th scope="col" role="columnheader" class="col-customer" data-field="customer" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="customer"><span class="th-label">Customer</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
-              <th scope="col" role="columnheader" class="col-dayRate" data-field="dayRate" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="dayRate"><span class="th-label">Day Rate</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
+              <th scope="col" role="columnheader" class="col-dayRate" data-field="dayRate" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="dayRate"><span class="th-label"><span class="th-long">Day </span>Rate</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
               <th scope="col" role="columnheader" class="col-bookedTo" data-field="bookedTo" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="bookedTo"><span class="th-label">Booked To</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
               <th scope="col" role="columnheader" class="col-status" data-field="status" aria-sort="none"><button type="button" class="th-btn" data-action="sort" data-field="status"><span class="th-label">Status</span> <span class="sort-arrow" aria-hidden="true">↕</span></button></th>
             </tr>
@@ -365,7 +368,7 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
 <script src="basemap.js?v=5385baf5"></script>
 <script src="rigs.js?v=4bc30ae4"></script>
-<script src="app.js?v=d3dbeb4c"></script>
+<script src="app.js?v=bb45c12e"></script>
 <script src="insights.js?v=829bb401"></script>
 </body>
 </html>

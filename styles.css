@@ -994,9 +994,13 @@ a:hover { color: var(--color-primary-hover); }
   background: var(--color-surface); font-size: var(--text-xs); color: var(--color-text-muted); flex-shrink: 0;
 }
 .list-count { font-weight: 600; color: var(--color-text); }
-.list-key { display: inline-flex; align-items: center; gap: 6px; }
+.list-key { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px var(--space-4); }
+.list-key-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .list-key strong { color: var(--color-text); font-variant-numeric: tabular-nums; }
-.list-key-mark { width: 3px; height: 14px; border-radius: 2px; background: var(--color-warning); }
+/* the same two oranges as the map's availability colouring */
+.list-key-mark { width: 3px; height: 14px; border-radius: 2px; }
+.list-key-mark--open { background: var(--avail-open); }
+.list-key-mark--near { background: var(--avail-near); }
 .list-sort { display: none; margin-left: auto; align-items: center; gap: 6px; }
 .list-sort select {
   font: inherit; color: var(--color-text); background: var(--color-surface-2);
@@ -1051,17 +1055,20 @@ a:hover { color: var(--color-primary-hover); }
 .list-table tbody tr.is-selected { background: color-mix(in srgb, var(--color-primary) 16%, transparent); }
 .list-table tbody tr.is-selected .cell-name { box-shadow: inset 3px 0 0 var(--color-primary); }
 .cell-name { font-weight: 600; }
-.list-row.near-term .cell-name { box-shadow: inset 3px 0 0 var(--color-warning); }
+.list-row.avail-open .cell-name { box-shadow: inset 3px 0 0 var(--avail-open); }
+.list-row.avail-near .cell-name { box-shadow: inset 3px 0 0 var(--avail-near); }
 .cell-rate { text-align: right; font-family: var(--font-mono); font-variant-numeric: tabular-nums lining-nums; }
 .cell-date { font-family: var(--font-mono); font-variant-numeric: tabular-nums lining-nums; }
 .cell-rel { color: var(--color-text-faint); }
 .cell-muted { color: var(--color-text-faint); font-family: var(--font-body); }
 .cell-chip {
-  display: inline-block; padding: 1px 8px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600;
-  background: color-mix(in srgb, var(--color-warning) 18%, transparent); color: var(--color-text);
+  display: inline-block; max-width: 100%; padding: 1px 6px; border-radius: var(--radius-full); font-size: 10px; font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; vertical-align: middle;
+  background: color-mix(in srgb, var(--avail-open) 22%, transparent); color: var(--color-text);
 }
 .contractor-dot, .status-dot { display: inline-block; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
-.contractor-dot { width: 8px; height: 8px; }
+.contractor-dot { width: 8px; height: 8px; display: none; }
+.show-contractor-colors .contractor-dot { display: inline-block; }
 .status-dot { width: 7px; height: 7px; }
 .list-empty { text-align: center; color: var(--color-text-muted); padding: var(--space-10) var(--space-4) !important; white-space: normal; }
 .link-btn { color: var(--color-primary); text-decoration: underline; }
@@ -1084,6 +1091,14 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 @container list (max-width: 900px) {
   .list-table .col-type, .list-table .cell-type,
   .list-table .col-location, .list-table .cell-location { display: none; }
+  /* six columns share the room; Status keeps enough for "Unconfirmed", the text columns give way */
+  .list-table .col-name       { width: 20%; }
+  .list-table .col-contractor { width: 16%; }
+  .list-table .col-customer   { width: 15%; }
+  .list-table .col-dayRate    { width: 12%; }
+  .list-table .col-bookedTo   { width: 16%; }
+  .list-table .col-status     { width: 21%; }
+  .th-long { display: none; }
 }
 
 /* phones and narrow panes: each rig becomes a two-column card; sorting moves to the toolbar */
@@ -1105,7 +1120,8 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
   .list-table .cell-booked { grid-area: booked; text-align: right; }
   .list-table .cell-customer { grid-area: customer; color: var(--color-text-muted); }
   .list-table .cell-rate { grid-area: rate; }
-  .list-table tbody tr.near-term { box-shadow: inset 3px 0 0 var(--color-warning); }
+  .list-table tbody tr.avail-open { box-shadow: inset 3px 0 0 var(--avail-open); }
+  .list-table tbody tr.avail-near { box-shadow: inset 3px 0 0 var(--avail-near); }
   .list-table tbody tr.is-selected { box-shadow: inset 3px 0 0 var(--color-primary); }
   .list-table .list-empty { grid-column: 1 / -1; }
   .list-table .cell-none { display: none; } /* no contract: no empty third line */

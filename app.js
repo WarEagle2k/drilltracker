@@ -724,10 +724,14 @@ const FitControl = window.L ? L.Control.extend({
   }
 }) : null;
 
-function rigCategory(rig) {
-  if (colorMode === 'contractor') return rig.contractor;
+/* open, near or booked, whatever the map is coloured by (the list's row marks use it) */
+function availabilityOf(rig) {
   const d = rig.derived;
   return d.available ? 'open' : d.nearTerm ? 'near' : 'booked';
+}
+
+function rigCategory(rig) {
+  return colorMode === 'contractor' ? rig.contractor : availabilityOf(rig);
 }
 
 function categoryColor(cat) {
@@ -1220,8 +1224,8 @@ function animateValue(id, target, fmt) {
    MAP LEGEND
    ============================================ */
 function buildLegend() {
-  // the sidebar's contractor dots are a key to the map, so they show only while it is coloured by contractor
-  document.getElementById('filterSidebar').classList.toggle('show-contractor-colors', colorMode === 'contractor');
+  // contractor dots (sidebar, list) are a key to the map, so they show only while it is coloured by contractor
+  document.querySelector('.main-content').classList.toggle('show-contractor-colors', colorMode === 'contractor');
   const counts = {};
   filteredRigs.forEach(r => { const c = rigCategory(r); counts[c] = (counts[c] || 0) + 1; });
   const keys = colorMode === 'contractor' ? Object.keys(counts).sort((a, b) => a.localeCompare(b)) : Object.keys(AVAILABILITY);
@@ -1490,8 +1494,11 @@ function setView(view, fromHash) {
 function renderListView() {
   const tbody = document.getElementById('listTableBody');
   if (selectedRigId) updateDetailStepper(); // the list order or contents may have changed
-  document.getElementById('listCount').textContent = filteredRigs.length + ' of ' + RIG_DATA.length + ' rigs';
-  document.getElementById('listNearCount').textContent = filteredRigs.filter(r => r.derived.nearTerm).length;
+  document.getElementById('listCount').textContent = filteredRigs.length === RIG_DATA.length
+    ? 'All ' + RIG_DATA.length + ' rigs' : filteredRigs.length + ' of ' + RIG_DATA.length + ' rigs';
+  // the same split, labels and colours as the map key in availability mode
+  document.getElementById('listOpenCount').textContent = filteredRigs.filter(r => availabilityOf(r) === 'open').length;
+  document.getElementById('listNearCount').textContent = filteredRigs.filter(r => availabilityOf(r) === 'near').length;
   if (!filteredRigs.length) {
     tbody.innerHTML = '<tr role="row"><td role="cell" colspan="8" class="list-empty">No rigs match your search and filters. <button type="button" class="link-btn" data-action="reset-filters">Clear search and filters</button></td></tr>';
     return;
@@ -1500,14 +1507,15 @@ function renderListView() {
   const notDisclosed = '<abbr class="cell-muted" title="Not disclosed">n/d</abbr>';
   tbody.innerHTML = filteredRigs.map(function (rig) {
     const d = rig.derived;
-    const rate = d.dayRate != null ? fmtRate(d.dayRate) : d.shown ? notDisclosed : muted('—');
+    const rate = d.dayRate != null ? '<span title="' + fmtRate(d.dayRate) + ' a day">' + fmtRateShort(d.dayRate) + '</span>' : d.shown ? notDisclosed : muted('—');
     let booked;
     if (d.available) booked = '<span class="cell-chip">' + escapeHtml(d.bookedToLabel) + '</span>';
     else if (d.bookedOpen) booked = muted('Undisclosed');
     else booked = '<span class="cell-date">' + escapeHtml(d.bookedToLabel) + '</span>' +
       '<span class="cell-rel"> · ' + fmtMonths((d.bookedTo - AS_OF) / MS_PER_MONTH) + '</span>';
     const loc = locationLabel(rig);
-    return '<tr role="row" class="list-row' + (d.nearTerm ? ' near-term' : '') + (rig.id === selectedRigId ? ' is-selected' : '') +
+    const avail = availabilityOf(rig);
+    return '<tr role="row" class="list-row' + (avail !== 'booked' ? ' near-term avail-' + avail : '') + (rig.id === selectedRigId ? ' is-selected' : '') +
         '" data-rig-id="' + escapeHtml(rig.id) + '">' +
       '<td role="cell" class="cell-name"><button type="button" class="row-link" title="' + escapeHtml(rig.name) + ' — show details">' + escapeHtml(rig.name) + '</button></td>' +
       '<td role="cell" class="cell-contractor" title="' + escapeHtml(rig.contractor) + '"><span class="contractor-dot" style="background:' + getContractorColor(rig.contractor) + '" aria-hidden="true"></span>' + escapeHtml(rig.contractor) + '</td>' +
