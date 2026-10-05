@@ -31,7 +31,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" crossorigin="anonymous" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" crossorigin="anonymous" />
-<link rel="stylesheet" href="styles.css?v=3fd47a55">
+<link rel="stylesheet" href="styles.css?v=9641596f">
 </head>
 <body>
 
@@ -40,8 +40,9 @@
   <!-- HEADER -->
   <header class="header">
     <div class="header-left">
-      <button type="button" class="icon-btn sidebar-toggle-btn" data-action="toggle-sidebar" aria-label="Toggle filters" aria-expanded="true" aria-controls="filterSidebar">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="15" y2="12"/><line x1="3" y1="18" x2="18" y2="18"/></svg>
+      <button type="button" class="icon-btn sidebar-toggle-btn" data-action="toggle-sidebar" aria-label="Filters" aria-expanded="true" aria-controls="filterSidebar" title="Show or hide filters">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2.2" fill="var(--color-surface)"/><circle cx="15" cy="12" r="2.2" fill="var(--color-surface)"/><circle cx="7" cy="18" r="2.2" fill="var(--color-surface)"/></svg>
+        <span class="filter-badge" id="filterBadge" aria-hidden="true" hidden></span>
       </button>
       <div class="logo">
         <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false">
@@ -70,8 +71,9 @@
           <span>Insights</span>
         </button>
       </div>
-      <button type="button" class="icon-btn" data-action="export-csv" aria-label="Export filtered rigs to CSV" title="Export CSV">
+      <button type="button" class="icon-btn export-btn" id="exportBtn" data-action="export-csv" aria-label="Export the rigs shown to CSV" title="Export the rigs shown to CSV">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="export-label">CSV</span>
       </button>
       <button type="button" class="icon-btn" data-theme-toggle aria-label="Switch to light theme"></button>
     </div>
@@ -344,11 +346,10 @@
   </main>
 
   <footer class="footer">
-    <div>
-      <span id="footerAsOf"></span><span class="footer-scope"> · <span id="footerScope"></span></span> ·
-      Compiled from public disclosures; not investment advice ·
-      <a href="https://github.com/WarEagle2k/drilltracker#readme" target="_blank" rel="noopener">About &amp; method</a>
-    </div>
+    <span class="footer-data" id="footerAsOf"></span>
+    <span class="footer-scope" id="footerScope"></span>
+    <span class="footer-legal">Compiled from public disclosures; not investment advice ·
+      <a href="https://github.com/WarEagle2k/drilltracker#readme" target="_blank" rel="noopener">About &amp; method</a></span>
   </footer>
 </div>
 
@@ -356,7 +357,7 @@
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr" crossorigin="anonymous"></script>
 <script src="basemap.js?v=5385baf5"></script>
 <script src="rigs.js?v=4bc30ae4"></script>
-<script src="app.js?v=32916cff"></script>
+<script src="app.js?v=032991ea"></script>
 <script src="insights.js?v=090c06d5"></script>
 </body>
 </html>

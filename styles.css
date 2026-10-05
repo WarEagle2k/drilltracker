@@ -276,6 +276,18 @@ a:hover { color: var(--color-primary-hover); }
   border-radius: var(--radius-md); color: var(--color-text-muted); transition: all var(--transition-fast);
 }
 .icon-btn:hover { background: var(--color-surface-2); color: var(--color-text); }
+.icon-btn:disabled { opacity: 0.4; cursor: default; background: none; }
+.sidebar-toggle-btn { position: relative; }
+/* how many filters are on, so they're not forgotten while the sidebar is closed */
+.filter-badge {
+  position: absolute; top: 2px; right: 0; min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-full);
+  background: var(--color-primary); color: var(--color-text-inverse); font: 700 10px/16px var(--font-mono); text-align: center;
+  box-shadow: 0 0 0 2px var(--color-surface);
+}
+.filter-badge[hidden] { display: none; }
+/* export says what it does where there is room */
+.export-btn { width: auto; gap: 6px; padding: 0 10px; }
+.export-label { font-size: var(--text-xs); font-weight: 600; }
 
 /* stale-data banner (P5): shown only when the data is old */
 .stale-banner {
@@ -1258,7 +1270,7 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 .footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   padding: var(--space-1) var(--space-4);
   background: var(--color-surface);
   border-top: 1px solid var(--color-border);
@@ -1269,6 +1281,8 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
   min-height: 28px;
   flex-shrink: 0;
 }
+.footer > span { white-space: nowrap; } /* lines break between the groups, not inside them */
+.footer-legal { margin-left: auto; }
 .footer a { color: var(--color-text-muted); text-decoration: underline; }
 .footer a:hover { color: var(--color-primary); }
 
@@ -1296,8 +1310,9 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
   .header { padding: var(--space-2) var(--space-3); }
   .footer { padding: var(--space-1) var(--space-3); }
   .footer { font-size: 10px; }
-  .view-toggle button span { display: none; }
   .view-toggle button { min-height: 38px; }
+  .export-label { display: none; }
+  .export-btn { width: 42px; padding: 0; }
   .icon-btn, .detail-close { width: 42px; height: 42px; }
 
   /* six KPIs in two rows of three, tops aligned so the values line up across each row */
@@ -1338,7 +1353,20 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
   .gantt-row { grid-template-columns: 92px 1fr; }
 }
 
+@media (max-width: 1100px) {
+  .footer-scope { display: none; } /* the scope is in the README; keep the footer to one line where it can be */
+}
+
+@media (max-width: 720px) {
+  .footer-legal { margin-left: 0; } /* on two lines, both start at the left */
+}
+
+@media (max-width: 560px) {
+  .view-toggle button span { display: none; } /* icons only where the labels no longer fit */
+}
+
 @media (max-width: 480px) {
+  .footer > span { white-space: normal; }
   /* compact rows so the map keeps most of the screen: sentence-case labels on one line,
      shortened ("Floater rate", "Backlog") with the full name kept for screen readers */
   .kpi-item { padding: 6px var(--space-2); gap: 0; }
@@ -1346,7 +1374,6 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
   .kpi-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
   .kpi-note { font-size: 10px; }
   .kpi-value { font-size: var(--text-sm); }
-  .footer-scope { display: none; } /* the scope line is in the README; keep the footer to two lines */
   /* the wordmark collided with the view toggle; hide it visually but keep the heading */
   .logo-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
   .header-right { gap: var(--space-1); }
