@@ -84,7 +84,7 @@ html {
   --status-working:     #5FC3B9;
   --status-committed:   #9CC0DC;
   --status-available:   #94a3b8;
-  --status-unconfirmed: #F2846F;
+  --status-unconfirmed: #FCE169;
 
   /* contract firmness: ordinal, one blue ramp, firm = most prominent (validated --ordinal on #111d33) */
   --firm-firm:        #A9C8E0;
@@ -105,8 +105,8 @@ html {
   --viz-deemph: #545252;
 
   /* map availability: ordinal orange (validated --ordinal on the dark sea), grey for the rest */
-  --avail-open:   #F2846F;
-  --avail-near:   #B5452F;
+  --avail-open:   #E15D48;
+  --avail-near:   #A3412F;
   --avail-booked: #5E6366;
   --viz-grid: #353434;
 

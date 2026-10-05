@@ -36,6 +36,7 @@ const STATES = [
   { name: 'details: working', hash: '#view=list&rig=rig-018' },
   { name: 'details: working, dark', hash: '#view=map&rig=rig-002', theme: 'dark' },
   { name: 'details: unconfirmed', hash: '#view=list&rig=rig-074' },
+  { name: 'details: unconfirmed, dark', hash: '#view=list&rig=rig-074', theme: 'dark' },
   { name: 'details: committed, dark', hash: '#view=list&rig=rig-047', theme: 'dark' },
   { name: 'changes dialog', hash: '#view=map', run: "document.getElementById('changesBtn').click()" },
   { name: 'changes dialog, dark', hash: '#view=map', theme: 'dark', run: "document.getElementById('changesBtn').click()" },
