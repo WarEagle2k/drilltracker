@@ -153,13 +153,15 @@ function contractorRunway(rigs) {
    ============================================ */
 function scale(d0, d1, r0, r1) { const k = (r1 - r0) / ((d1 - d0) || 1); return v => r0 + (v - d0) * k; }
 
-function niceStep(max, target) {
+/* integer: for counts of rigs, which have no 2.5 */
+function niceStep(max, target, integer) {
   const raw = max / Math.max(1, target), p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
-  return (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+  const step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 && !(integer && p < 10) ? 2.5 : f <= 5 ? 5 : 10) * p;
+  return integer ? Math.max(1, step) : step;
 }
 
-function ticks(max, target) {
-  const step = niceStep(max, target), out = [];
+function ticks(max, target, integer) {
+  const step = niceStep(max, target, integer), out = [];
   for (let v = 0; v <= max + 1e-9; v += step) out.push(v);
   return out;
 }
@@ -354,7 +356,7 @@ function drawCoverage(id, rigs) {
   });
 
   // nice ticks below the total, then the total itself: the gap under that line is the rigs not booked
-  const yt = ticks(yMax, 4).filter(v => y(v) - y(yMax) > 20).map(v =>
+  const yt = ticks(yMax, 4, true).filter(v => y(v) - y(yMax) > 20).map(v =>
     '<line class="viz-grid" x1="' + M.l + '" x2="' + (W - M.r) + '" y1="' + y(v) + '" y2="' + y(v) + '"/>' +
     '<text class="viz-axis" x="' + (M.l - 6) + '" y="' + (y(v) + 3.5) + '" text-anchor="end">' + v + '</text>').join('') +
     '<line class="viz-total" x1="' + M.l + '" x2="' + (W - M.r) + '" y1="' + y(yMax) + '" y2="' + y(yMax) + '"/>' +
@@ -367,7 +369,7 @@ function drawCoverage(id, rigs) {
   }
   const yr = 12, share = n ? AWARDED.reduce((s, f) => s + data[yr][f], 0) / n : 0;
   const mark = '<line class="viz-ref" x1="' + x(yr) + '" x2="' + x(yr) + '" y1="' + (M.t - 6) + '" y2="' + (H - M.b) + '"/>' +
-    '<text class="viz-annot" x="' + (x(yr) + 6) + '" y="' + (M.t - 10) + '">' + monthLabel(data[yr].t) + ': ' + fmtPct(share) + ' booked</text>';
+    '<text class="viz-annot" x="' + (x(yr) + 6) + '" y="' + (M.t - 10) + '">' + 'A year out (' + monthLabel(data[yr].t) + '): ' + fmtPct(share) + ' booked</text>';
 
   plotOf(id).innerHTML = '<svg class="viz-svg viz-live" width="' + W + '" height="' + H + '" tabindex="0" role="img" aria-label="' +
     escapeHtml('Rigs booked by month for the next three years. ' + monthLabel(data[yr].t) + ': ' + fmtPct(share) + ' have awarded work. Use the left and right arrow keys to read each month.') + '">' +
@@ -675,8 +677,10 @@ function renderInsights() {
   }
   const firmLegend = legend(FIRM_ORDER.map(f => ({ label: FIRMNESS[f], cls: 'viz-fill--' + f })).concat([{ label: 'Not booked', cls: 'viz-swatch--empty' }]));
   const typeLegend = legend(TYPE_ORDER.map(t => ({ label: t, cls: 'viz-shape viz-shape--' + TYPE_KEY[t] })));
-  const scaleLegend = '<div class="viz-scale" aria-hidden="true"><span>0%</span>' +
-    [0, 1, 2, 3, 4, 5].map(i => '<i class="viz-seq-' + i + '"></i>').join('') + '<span>100% of rigs booked</span></div>';
+  // each step labelled with the range it covers: none booked, then fifths
+  const scaleLegend = '<div class="viz-scale" aria-hidden="true"><span class="viz-scale-title">Rigs booked</span>' +
+    ['None', '1–20%', '21–40%', '41–60%', '61–80%', '81–100%'].map((t, i) =>
+      '<span class="viz-scale-step' + (i ? '' : ' viz-scale-step--empty') + '"><i class="viz-seq-' + i + '"></i>' + t + '</span>').join('') + '</div>';
   const timelineLegend = legend(FIRM_ORDER.map(f => ({ label: FIRMNESS[f], cls: 'gantt-bar--' + f }))
     .concat([{ label: 'End undisclosed', cls: 'gantt-bar--firm gantt-bar--open' }]));
 
