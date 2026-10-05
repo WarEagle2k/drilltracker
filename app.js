@@ -43,6 +43,14 @@ const FIRMNESS = {
 const REGIONS = ['Gulf of Mexico', 'South America', 'North Sea', 'West Africa', 'Mediterranean & Black Sea', 'Asia Pacific'];
 const POSITIONS = { ais: 'Reported by AIS', field: 'At the named field', area: 'Approximate: placed in the operating area' };
 const TYPE_SIZES = { 'Drillship': 10, 'Semisubmersible': 8, 'Jackup': 6 };
+/* Zoomed in, markers become side-view silhouettes of the rig type (icons/, built by
+   scripts/build-icons.py). w x h is the size on the map; the anchor is the waterline. */
+const ICON_ZOOM = 6;
+const RIG_ICONS = {
+  'Drillship':       { file: 'drillship', w: 61, h: 28 },
+  'Semisubmersible': { file: 'semisub',   w: 43, h: 32 },
+  'Jackup':          { file: 'jackup',    w: 36, h: 36 }
+};
 const NO_COUNTRY = 'Not disclosed';
 
 /* Map colour modes. Availability is ordinal emphasis (one orange hue, two steps, grey
@@ -238,6 +246,7 @@ let filteredRigs = RIG_DATA.slice();
 let currentSort = { field: 'name', asc: true };
 let currentView = 'map';
 let colorMode = 'availability';
+let iconMode = false;      // markers drawn as rig silhouettes (zoomed in) rather than discs
 let sidebarOpen = true;
 let selectedRigId = null;
 let detailOpener = null; // the list row or timeline row that opened the panel, if any
@@ -647,6 +656,8 @@ function initMap() {
   labelLayer = L.layerGroup().addTo(map);
   buildMapLabels();
   map.on('zoomend', updateMapLabels);
+  map.on('zoomend', syncIconMode);
+  syncIconMode();
   updateMapLabels();
 
   markerLayer = L.markerClusterGroup ? L.markerClusterGroup({
@@ -726,30 +737,68 @@ function createMarkers(rigs) {
   for (const k in markersById) delete markersById[k];
   const batch = [];
 
+  iconMode = map.getZoom() >= ICON_ZOOM;
   rigs.forEach(function (rig) {
-    const color = categoryColor(rigCategory(rig));
-    const size = TYPE_SIZES[rig.type] || 8;
-    const cls = 'rig-marker' + (rig.position !== 'area' ? ' rig-marker--reported' : '') +
-      (rig.id === selectedRigId ? ' selected' : '');
-    const icon = L.divIcon({
-      className: '',
-      html: '<div class="' + cls + '" data-rig-id="' + escapeHtml(rig.id) + '" style="width:' + (size * 2) + 'px;height:' + (size * 2) +
-            'px;background:' + color + '"></div>',
-      iconSize: [size * 2, size * 2],
-      iconAnchor: [size, size]
-    });
-    const marker = L.marker([rig.lat, rig.lng], { icon: icon, keyboard: true, rigId: rig.id });
-    marker.bindTooltip(markerTip(rig), { direction: 'top', offset: [0, -size - 2], className: 'rig-tip', opacity: 1 });
+    const marker = L.marker([rig.lat, rig.lng], { icon: rigIcon(rig, iconMode), keyboard: true, rigId: rig.id });
+    marker.bindTooltip(markerTip(rig), { direction: 'top', offset: tipOffset(rig, iconMode), className: 'rig-tip', opacity: 1 });
     marker.on('click', function () { openDetail(rig); });
-    marker.on('add', function () {
-      const el = marker.getElement();
-      if (el) el.setAttribute('aria-label', rig.name + ', ' + rig.contractor + ', ' + rig.derived.status + '. Show details.');
-    });
+    marker.on('add', function () { labelMarker(marker, rig); });
     markersById[rig.id] = marker;
     batch.push(marker);
   });
   if (markerLayer.addLayers) markerLayer.addLayers(batch);
   else batch.forEach(m => markerLayer.addLayer(m));
+}
+
+/* A disc sized by rig type at world and regional zoom; a silhouette of the rig type up close */
+function rigIcon(rig, asIcon) {
+  const color = categoryColor(rigCategory(rig));
+  const cls = 'rig-marker' + (asIcon ? ' rig-marker--icon' : '') + (rig.position !== 'area' ? ' rig-marker--reported' : '') +
+    (rig.id === selectedRigId ? ' selected' : '');
+  const shape = RIG_ICONS[rig.type];
+  if (asIcon && shape) {
+    return L.divIcon({
+      className: '',
+      html: '<div class="' + cls + '" data-rig-id="' + escapeHtml(rig.id) + '" style="width:' + shape.w + 'px;height:' + shape.h + 'px">' +
+            '<span class="rig-icon rig-icon--' + shape.file + '" style="background:' + color + '"></span></div>',
+      iconSize: [shape.w, shape.h],
+      iconAnchor: [shape.w / 2, shape.h - 2]
+    });
+  }
+  const size = TYPE_SIZES[rig.type] || 8;
+  return L.divIcon({
+    className: '',
+    html: '<div class="' + cls + '" data-rig-id="' + escapeHtml(rig.id) + '" style="width:' + (size * 2) + 'px;height:' + (size * 2) +
+          'px;background:' + color + '"></div>',
+    iconSize: [size * 2, size * 2],
+    iconAnchor: [size, size]
+  });
+}
+
+function tipOffset(rig, asIcon) {
+  const shape = RIG_ICONS[rig.type];
+  return asIcon && shape ? [0, -shape.h] : [0, -(TYPE_SIZES[rig.type] || 8) - 2];
+}
+
+/* setIcon replaces the marker's element, so the label is set again each time */
+function labelMarker(marker, rig) {
+  const el = marker.getElement();
+  if (el) el.setAttribute('aria-label', rig.name + ', ' + rig.type + ', ' + rig.contractor + ', ' + rig.derived.status + '. Show details.');
+}
+
+/* Crossing ICON_ZOOM swaps every marker between disc and silhouette */
+function syncIconMode() {
+  const on = map.getZoom() >= ICON_ZOOM;
+  document.getElementById('mapLegend').classList.toggle('icons-on', on);
+  if (on === iconMode) return;
+  iconMode = on;
+  Object.keys(markersById).forEach(function (id) {
+    const marker = markersById[id], rig = RIG_BY_ID[id];
+    marker.setIcon(rigIcon(rig, on));
+    const tip = marker.getTooltip();
+    if (tip) tip.options.offset = L.point(tipOffset(rig, on));
+    labelMarker(marker, rig);
+  });
 }
 
 /* A cluster is a neutral disc with its count; the ring shows what is inside, in the current colours */

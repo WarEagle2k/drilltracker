@@ -100,6 +100,7 @@ html {
   --map-border:     #33466b;
   --map-label:      #8494b0;
   --map-label-sea:  #4f6a94;
+  --map-icon-shadow: rgba(0, 0, 0, 0.6);
   --cluster:        212, 145, 10;
   --cluster-text:   #0a1628;
   --overlay:        rgba(10, 22, 40, 0.55);
@@ -160,6 +161,7 @@ html {
   --map-border:     #b9c2d0;
   --map-label:      #5b6779;
   --map-label-sea:  #7f97b5;
+  --map-icon-shadow: rgba(10, 22, 40, 0.5);
   --cluster:        184, 122, 8;
   --cluster-text:   #ffffff;
   --overlay:        rgba(238, 240, 245, 0.6);
@@ -630,6 +632,31 @@ a:hover { color: var(--color-primary-hover); }
   border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(10,22,40,0.6);
 }
 
+/* zoomed in: a silhouette of the rig type, coloured through a mask so every colour mode and theme
+   shares one file per type. A small dark shadow lifts it off the sea; a light halo would fill the
+   1px gaps in the derrick lattice and make it look solid. The anchor is the waterline. */
+.rig-icon {
+  display: block; width: 100%; height: 100%;
+  -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
+}
+.rig-icon--drillship { -webkit-mask-image: url(icons/drillship.png); mask-image: url(icons/drillship.png); }
+.rig-icon--semisub   { -webkit-mask-image: url(icons/semisub.png);   mask-image: url(icons/semisub.png); }
+.rig-icon--jackup    { -webkit-mask-image: url(icons/jackup.png);    mask-image: url(icons/jackup.png); }
+.rig-marker--icon {
+  border: none; border-radius: 0; box-shadow: none; background: none; transform-origin: 50% 100%;
+  filter: drop-shadow(0 0.75px 0.5px var(--map-icon-shadow)); /* tight, so the edge stays crisp */
+  transition: transform 150ms ease, filter 150ms ease;
+}
+.rig-marker--icon::before { inset: -4px; border-radius: var(--radius-sm); }
+.rig-marker--icon:hover { transform: scale(1.12); }
+.rig-marker--icon.selected {
+  box-shadow: none !important; transform: scale(1.12);
+  filter: drop-shadow(0 0 1px var(--color-primary)) drop-shadow(0 0 1px var(--color-primary)) drop-shadow(0 0 6px var(--color-primary));
+}
+.leaflet-marker-icon:focus-visible .rig-marker--icon { box-shadow: none !important; outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: var(--radius-sm); }
+/* a reported position: the dot sits at the waterline, under the rig */
+.rig-marker--icon.rig-marker--reported::after { top: auto; bottom: -3px; margin: 0 0 0 -2.5px; }
+
 .leaflet-control-zoom a {
   background: var(--color-surface) !important;
   color: var(--color-text) !important;
@@ -671,6 +698,13 @@ a:hover { color: var(--color-primary-hover); }
 .legend-sizes { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin: var(--space-1) var(--space-3) 0; padding-top: var(--space-2); border-top: 1px solid var(--color-divider); color: var(--color-text-faint); font-size: 10px; }
 .legend-sizes span { display: inline-flex; align-items: center; gap: 4px; }
 .legend-size { display: inline-block; border-radius: 50%; border: 1.5px solid var(--color-text-faint); }
+/* zoomed in, the key shows the silhouettes the markers have become */
+.legend-icon { display: none; background: var(--color-text-muted); }
+.legend-icon.rig-icon--drillship { width: 30px; height: 14px; }
+.legend-icon.rig-icon--semisub   { width: 21px; height: 16px; }
+.legend-icon.rig-icon--jackup    { width: 18px; height: 18px; }
+.map-legend.icons-on .legend-size { display: none; }
+.map-legend.icons-on .legend-icon { display: inline-block; }
 .legend-dot--reported { display: inline-block; position: relative; background: var(--color-text-muted); margin-right: 4px; vertical-align: -1px; box-shadow: none; }
 .legend-dot--reported::after {
   content: ''; position: absolute; left: 2.5px; top: 2.5px; width: 4px; height: 4px; border-radius: 50%; background: #fff;

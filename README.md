@@ -46,7 +46,7 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 
 ## Map
 
-Markers are coloured by **availability** by default: open now, free within 9 months, or booked for 9 months or more. The map key switches to colouring by **contractor**. Marker size shows the rig type, and a centre dot marks a reported position. Each cluster shows its count, with a ring giving the mix of what's inside. Hovering over or focusing a marker shows a summary, and selecting it opens the details.
+Markers are coloured by **availability** by default: open now, free within 9 months, or booked for 9 months or more. The map key switches to colouring by **contractor**. Marker size shows the rig type; zoomed in (from zoom 6), markers become side-view silhouettes of a drillship, semisub or jackup, in the same colours. A dot marks a reported position: in the centre of a disc, or under a rig. Each cluster shows its count, with a ring giving the mix of what's inside. Hovering over or focusing a marker shows a summary, and selecting it opens the details.
 
 ## Rig details
 
@@ -93,6 +93,7 @@ A filter lists the values shown, comma-separated; a filter that isn't in the lin
 | `styles.css` | Styles. Theme colours, including status and firmness colours, are CSS variables. |
 | `theme-init.js` | Applies the saved theme before first paint. |
 | `basemap.js` | World outline from Natural Earth (public domain), built by `scripts/build-basemap.js`. |
+| `icons/` | Rig-type silhouettes for the zoomed-in map: alpha masks built by `scripts/build-icons.py` from `icons/src/` (generated with GPT Image via Higgsfield). |
 | `og-image.png` | The 1200×630 card shown when the link is shared. It includes a screenshot, so its figures are a snapshot. |
 
 There is no build step. Serve the folder with any static server, or open `index.html` directly.
