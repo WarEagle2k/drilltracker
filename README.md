@@ -36,7 +36,7 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 
 **Booked to** follows the rig's awarded contracts (not options) from the data date, or from its first commitment, and treats gaps of up to 140 days as continuous (fleet status reports show mobilization and contract preparation of up to about 135 days between contracts). "Open now" means nothing is booked; "Undisclosed" means the latest contract has no published end.
 
-**Near-term** (amber edge in the list): open now, unconfirmed, or booked for less than 9 months.
+**Coming free**: open now, unconfirmed, or booked for less than 9 months. On the map these are the orange markers; in the list, rows with an orange edge (darker for open now), with the same counts as the map key.
 
 **KPIs**
 
