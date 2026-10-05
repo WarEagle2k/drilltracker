@@ -759,6 +759,7 @@ function fitToRigs(animate) {
    there rather than jumping, since Leaflet only animates zooms of up to four levels. No
    motion if the viewer has asked for less. */
 function glideToBounds(bounds, pickZoom, done) {
+  if (!map.getSize().x) return; // a hidden map has no size to fit to; it fits when shown
   const pad = mapPadding();
   const fit = map.getBoundsZoom(bounds, false, L.point(pad.paddingTopLeft).add(pad.paddingBottomRight));
   const zoom = Math.min(MAP_MAX_ZOOM, pickZoom(fit));
@@ -769,6 +770,7 @@ function glideToBounds(bounds, pickZoom, done) {
 }
 
 function glideTo(centre, zoom, done) {
+  if (!map.getSize().x) return; // nowhere to fly while the map is hidden
   // aim where the map is allowed to rest: flyTo ignores maxBounds, so it would land past the
   // world's edge and then snap back (setView and fitBounds apply the limit up front)
   zoom = map._limitZoom(zoom);
