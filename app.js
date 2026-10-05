@@ -335,6 +335,7 @@ function wireActions() {
       case 'color-mode': setColorMode(el.dataset.mode); break;
       case 'close-detail': closeDetail(true); break;
       case 'show-on-map': if (selectedRigId) focusRig(selectedRigId); break;
+      case 'detail-step': stepDetail(+el.dataset.step); break;
       case 'sort': sortTable(el.dataset.field); break;
     }
   });
@@ -1130,7 +1131,7 @@ function contractsTable(rig) {
     const past = x.e && x.e < AS_OF;
     const cls = x === d.current ? ' class="is-current"' : past ? ' class="is-past"' : '';
     return '<tr' + cls + '>' +
-      '<td class="mono-cell">' + escapeHtml(x.k.start || '?') + ' – ' + escapeHtml(x.k.end || 'undisclosed') + '</td>' +
+      '<td class="mono-cell period-cell"><span>' + escapeHtml(x.k.start || '?') + ' –</span> <span>' + escapeHtml(x.k.end || 'undisclosed') + '</span></td>' +
       '<td>' + escapeHtml(x.k.customer || 'Undisclosed') +
         (x.k.note ? '<div class="contract-note">' + escapeHtml(x.k.note) + '</div>' : '') + '</td>' +
       '<td class="mono-cell">' + (x.k.dayRate != null ? fmtRateShort(x.k.dayRate) : '—') + '</td>' +
@@ -1141,7 +1142,73 @@ function contractsTable(rig) {
     '<tbody>' + rows + '</tbody></table>';
 }
 
-function openDetail(rig, opener) {
+/* The rig's current and upcoming contracts on one strip, so follow-on work and gaps show.
+   A contract with no published end is drawn fading out over six months. */
+function runwayBlock(rig) {
+  const d = rig.derived;
+  const ahead = d.contracts.filter(x => x.s && (!x.e || x.e >= AS_OF));
+  if (!ahead.length) return '';
+  const endOf = x => x.e || addMonths(x.s, 6);
+  const t0 = Math.min(AS_OF.getTime(), ...ahead.map(x => x.s.getTime()));
+  const t1 = Math.max(addMonths(AS_OF, 3).getTime(), ...ahead.map(x => endOf(x).getTime()));
+  const pos = t => Math.round((t - t0) / (t1 - t0) * 1000) / 10;
+  const last = ahead.reduce((a, b) => (endOf(b) >= endOf(a) ? b : a));
+  // options first, so awarded work draws on top where they overlap
+  const segs = ahead.slice().sort((a, b) => (b.k.firmness === 'option') - (a.k.firmness === 'option')).map(function (x) {
+    const l = pos(x.s.getTime()), w = Math.max(1, pos(endOf(x).getTime()) - l);
+    const label = (x.k.customer || 'Undisclosed') + ' · ' + (x.k.start || '?') + ' – ' + (x.k.end || 'end undisclosed') +
+      (x.k.dayRate != null ? ' · ' + fmtRateShort(x.k.dayRate) + '/day' : '') + ' · ' + FIRMNESS[x.k.firmness];
+    return '<span class="gantt-bar gantt-bar--' + escapeHtml(x.k.firmness) + (x.e ? '' : ' gantt-bar--open') +
+'" style="left:' + l + '%;width:' + w + '%" title="' + escapeHtml(label) + '"></span>';
+  }).join('');
+  const nowAt = pos(AS_OF.getTime());
+
+  let status = '';
+  if (d.shown) {
+    const ci = contractInfo(d.shown.k.start, d.shown.k.end);
+    if (!ci.has) status = d.current ? 'Current contract has no published end' : 'Next contract from ' + d.shown.k.start;
+    else if (!d.current) status = ci.start <= AS_OF ? 'Next contract due to start' : 'Next contract s' + ci.remaining.slice(1);
+    else status = ci.remaining + ' on the current contract';
+  }
+  const kinds = Object.keys(FIRMNESS).filter(f => ahead.some(x => x.k.firmness === f));
+  return '<h3 class="detail-section-title">Contract timeline</h3>' +
+    '<div class="runway">' +
+      '<div class="runway-track" aria-hidden="true">' + segs +
+        (nowAt > 0 ? '<span class="runway-now" style="left:' + nowAt + '%"></span>' : '') + '</div>' +
+      '<div class="runway-labels"><span>' + escapeHtml(ahead[0].k.start || '') + '</span>' +
+        '<span>' + escapeHtml(last.k.end || 'open') + '</span></div>' +
+      '<div class="runway-status">' + escapeHtml(status) + '</div>' +
+      '<div class="runway-key" aria-hidden="true">' + kinds.map(f => '<span><i class="gantt-bar gantt-bar--' + f + '"></i>' + escapeHtml(FIRMNESS[f]) + '</span>').join('') +
+        '<span><i class="runway-now-key"></i>Today</span></div>' +
+    '</div>';
+}
+
+/* Step through the rigs in the list's order without closing the panel */
+function stepDetail(step) {
+  const i = filteredRigs.findIndex(r => r.id === selectedRigId);
+  const rig = filteredRigs[i + step];
+  if (!rig) return;
+  const row = document.querySelector('.list-row[data-rig-id="' + rig.id + '"] .row-link');
+  openDetail(rig, row, { keepFocus: true });
+  // at either end of the list the pressed button disables itself; keep focus in the footer
+  const btn = document.getElementById(step < 0 ? 'detailPrev' : 'detailNext');
+  if (btn.disabled) document.getElementById(step < 0 ? 'detailNext' : 'detailPrev').focus();
+}
+
+function updateDetailStepper() {
+  const foot = document.getElementById('detailFooter');
+  const i = filteredRigs.findIndex(r => r.id === selectedRigId);
+  foot.hidden = currentView !== 'list' || i < 0 || filteredRigs.length < 2;
+  if (foot.hidden) return;
+  const prev = filteredRigs[i - 1], next = filteredRigs[i + 1];
+  const pb = document.getElementById('detailPrev'), nb = document.getElementById('detailNext');
+  pb.disabled = !prev; nb.disabled = !next;
+  pb.setAttribute('aria-label', prev ? 'Previous rig: ' + prev.name : 'No previous rig');
+  nb.setAttribute('aria-label', next ? 'Next rig: ' + next.name : 'No next rig');
+  document.getElementById('detailPos').textContent = (i + 1) + ' of ' + filteredRigs.length;
+}
+
+function openDetail(rig, opener, opts) {
   selectedRigId = rig.id;
   detailOpener = opener || null;
   highlightSelectedMarker();
@@ -1157,24 +1224,10 @@ function openDetail(rig, opener) {
     ? '<div class="dayrate-label">' + rateLabel + '</div><div class="dayrate-highlight">$' + d.dayRate.toLocaleString('en-US') + '<span class="dayrate-unit">/day</span></div>'
     : '<div class="dayrate-undisclosed">' + (d.shown ? 'Day rate undisclosed' : 'No current or upcoming contract') + '</div>';
 
-  let barBlock = '';
-  if (d.shown) {
-    const ci = contractInfo(d.shown.k.start, d.shown.k.end);
-    // a next contract whose start month has begun has not necessarily started
-    if (ci.has && !d.current) { ci.pct = 0; if (ci.start <= AS_OF) ci.remaining = 'Due to start'; }
-    barBlock = '<h3 class="detail-section-title">' + (d.current ? 'Current contract' : 'Next contract') + '</h3>';
-    barBlock += ci.has
-      ? '<div class="contract-bar-wrapper"><div class="contract-bar">' +
-          '<div class="contract-bar-fill" style="width:' + ci.pct + '%;"></div>' +
-          (ci.pct > 2 && ci.pct < 98 ? '<div class="contract-now" style="left:' + ci.pct + '%;"></div>' : '') +
-        '</div><div class="contract-bar-labels"><span>' + escapeHtml(d.shown.k.start) + '</span>' +
-          '<span class="contract-remaining">' + ci.remaining + '</span>' +
-          '<span>' + escapeHtml(d.shown.k.end) + '</span></div></div>'
-      : '<div class="contract-none">From ' + escapeHtml(d.shown.k.start) + ' (end date not disclosed)</div>';
-  }
-
+  // the source line often names its own date already
+  const asOfLabel = rig.asOf ? fmtIsoDate(rig.asOf) : null;
   const source = rig.source
-    ? escapeHtml(rig.source) + (rig.asOf ? ' · ' + escapeHtml(fmtIsoDate(rig.asOf)) : '')
+    ? escapeHtml(rig.source) + (asOfLabel && !rig.source.includes(asOfLabel) ? ' · ' + escapeHtml(asOfLabel) : '')
     : 'Not recorded';
   const staleNote = d.sourceStale
     ? '<div class="source-stale">' + (d.sourceDate
@@ -1190,7 +1243,7 @@ function openDetail(rig, opener) {
     '</div>' +
     dayRateBlock +
     '<dl class="detail-grid">' +
-      field('Customer', d.customer || 'None', true) +
+      field(d.current || !d.next ? 'Customer' : 'Next customer', d.customer || 'None', true) +
       field('Location', (rig.country ? rig.country + ' · ' : '') + rig.region, true) +
       field('Water Depth', rig.waterDepth_ft.toLocaleString('en-US') + ' ft') +
       field('Hookload', rig.hookload_tons.toLocaleString('en-US') + ' t') +
@@ -1198,7 +1251,7 @@ function openDetail(rig, opener) {
       field('Booked To', d.bookedToLabel) +
       field('Class', classLabel(rig), true) +
     '</dl>' +
-    barBlock +
+    runwayBlock(rig) +
     '<h3 class="detail-section-title">All contracts</h3>' + contractsTable(rig) +
     (rig.note ? '<h3 class="detail-section-title">Notes</h3><div class="backlog-note">' + escapeHtml(rig.note) + '</div>' : '') +
     '<dl class="detail-meta">' +
@@ -1211,7 +1264,9 @@ function openDetail(rig, opener) {
   const row = document.querySelector('.list-row[data-rig-id="' + rig.id + '"]');
   if (row && currentView === 'list') row.scrollIntoView({ block: 'nearest' });
   revealBesidePanel(rig);
-  document.getElementById('detailClose').focus();
+  updateDetailStepper();
+  document.getElementById('detailBody').scrollTop = 0;
+  if (!(opts && opts.keepFocus)) document.getElementById('detailClose').focus();
   writeHash();
 }
 
@@ -1282,6 +1337,7 @@ function highlightSelectedMarker() {
 function setView(view, fromHash) {
   currentView = view;
   document.getElementById('detailMapBtn').hidden = view === 'map';
+  if (selectedRigId) updateDetailStepper();
   document.getElementById('mapContainer').classList.toggle('hidden', view !== 'map');
   document.getElementById('listView').classList.toggle('active', view === 'list');
   document.getElementById('insightsView').classList.toggle('active', view === 'insights');
@@ -1304,6 +1360,7 @@ function setView(view, fromHash) {
    ============================================ */
 function renderListView() {
   const tbody = document.getElementById('listTableBody');
+  if (selectedRigId) updateDetailStepper(); // the list order or contents may have changed
   document.getElementById('listCount').textContent = filteredRigs.length + ' of ' + RIG_DATA.length + ' rigs';
   document.getElementById('listNearCount').textContent = filteredRigs.filter(r => r.derived.nearTerm).length;
   if (!filteredRigs.length) {

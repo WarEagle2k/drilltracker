@@ -48,6 +48,10 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 
 Markers are coloured by **availability** by default: open now, free within 9 months, or booked for 9 months or more. The map key switches to colouring by **contractor**. Marker size shows the rig type, and a centre dot marks a reported position. Each cluster shows its count, with a ring giving the mix of what's inside. Hovering over or focusing a marker shows a summary, and selecting it opens the details.
 
+## Rig details
+
+Selecting a rig opens its details: status, day rate, specs, a contract timeline and every recorded contract with its source. The timeline puts the current and upcoming contracts on one strip against today, so follow-on work and gaps show; a contract with no published end fades out. From the list, Previous and Next step through the rigs in the list's order without closing the panel.
+
 ## Filtering
 
 Filters start empty, and an empty group doesn't filter. Ticking options narrows the rigs shown. Options within a group combine with OR (Brazil or Guyana); groups combine with AND (and Drillship). The number beside each option is how many rigs it has within your other choices. Options that would show nothing are greyed out, so only the search can produce an empty result. Active filters appear as removable chips above the list, and as a summary over the map.
