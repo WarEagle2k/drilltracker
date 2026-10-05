@@ -71,6 +71,10 @@ Every chart follows the filters and has a table view of the same numbers. Hover,
 
 Chart colours follow the job they do. Contract firmness is an ordered scale, so it uses one blue ramp. Rig type uses three categorical colours plus a marker shape each. The heatmap uses five steps of one ramp. All were checked for colour-vision deficiency and contrast against both themes.
 
+## Header
+
+The filters button shows how many filters are on, so they aren't forgotten while the sidebar is closed. **CSV** exports the rigs shown, with every contract, source and note; it is disabled when nothing matches.
+
 ## Sharing a view
 
 The URL hash keeps the view, search, filters, sort and open rig, so a link reproduces what you see. For example:

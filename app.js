@@ -984,6 +984,10 @@ function renderActiveFilters(selections) {
     });
   });
   const active = chips.length > 0;
+  const badge = document.getElementById('filterBadge');
+  badge.hidden = !active;
+  badge.textContent = chips.length;
+  document.querySelector('.sidebar-toggle-btn').setAttribute('aria-label', active ? 'Filters, ' + chips.length + ' active' : 'Filters');
   const box = document.getElementById('activeFilters');
   box.hidden = !active;
   box.querySelector('.filter-chips').innerHTML = chips.join('');
@@ -1050,6 +1054,8 @@ function updateFilterCount(count) {
   const total = RIG_DATA.length;
   document.getElementById('filterCount').textContent = count === total ? 'All ' + total + ' rigs' : count + ' of ' + total + ' rigs';
   document.getElementById('filterDone').textContent = count ? 'Show ' + plural(count, 'rig') : 'No rigs match';
+  const exp = document.getElementById('exportBtn'), what = 'Export the ' + plural(count, 'rig') + ' shown to CSV';
+  exp.setAttribute('aria-label', what); exp.title = what; exp.disabled = !count;
 }
 
 /* With facets the only way to reach zero is the search, so say so */
