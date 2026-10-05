@@ -41,7 +41,7 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 **KPIs**
 
 - *Contracted Share*: Working + Committed rigs ÷ rigs shown.
-- *Avg Floater Rate*: mean disclosed day rate of the drillships and semisubmersibles shown, using the current contract (or the next one for rigs not yet working). Jackups are excluded; Insights shows the average for each type. When fewer than five rates are disclosed, the count is highlighted.
+- *Avg Floater Rate*: mean disclosed day rate of the drillships and semisubmersibles shown, using the current contract (or the next one for rigs not yet working). Jackups are excluded. Insights compares the median floater rate running now with the median of rates starting later. When fewer than five rates are disclosed, the count is highlighted.
 - *Disclosed Backlog*: for firm contracts with a disclosed rate, days remaining after the data date × day rate, including follow-on contracts and rate steps. Options, LOIs and conditional awards are excluded, as is any rig without a disclosed rate.
 
 ## Map
@@ -54,15 +54,16 @@ Filters start empty, and an empty group doesn't filter. Ticking options narrows 
 
 ## Insights
 
-Every chart follows the filters and has a table view of the same numbers.
+Every chart follows the filters and has a table view of the same numbers. Hover, tap or focus a mark to read its values.
 
 - **Booked a year out**: the share of rigs with awarded work (firm, LOI or conditional) twelve months after the data date.
 - **How much of the fleet is booked**: rigs under contract each month for three years, layered by the firmest contract covering that month. Contracts with no published end are counted for six months.
 - **When rigs come free**: rigs by the quarter their booked work ends. The next nine months are highlighted.
 - **Day rates by start date**: every disclosed rate period, by rig type.
 - **Contractor runway**: the share of each contractor's rigs with awarded work, quarter by quarter.
-- **Who the work is for**: rig-years of awarded work after the data date, by customer.
-- **Contract timeline**: one row per rig, one bar per contract.
+- **Who the work is for**: rig-years of awarded work after the data date, for the top ten customers. Work for undisclosed customers is listed last.
+- **Fleet mix**: rigs by status, type and region. Selecting a row filters by it, and selecting it again removes the filter.
+- **Contract timeline**: one row per rig, one bar per contract. The year axis stays in view as you scroll, and selecting a row opens the rig's details.
 
 Chart colours follow the job they do. Contract firmness is an ordered scale, so it uses one blue ramp. Rig type uses three categorical colours plus a marker shape each. The heatmap uses five steps of one ramp. All were checked for colour-vision deficiency and contrast against both themes.
 
