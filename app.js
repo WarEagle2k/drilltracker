@@ -196,6 +196,13 @@ function deriveRig(rig) {
   };
 }
 
+function monthLabel(d) { return MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
+function median(xs) {
+  if (!xs.length) return null;
+  const a = xs.slice().sort((p, q) => p - q), m = a.length >> 1;
+  return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+}
+
 function addMonths(d, n) {
   return new Date(d.getFullYear(), d.getMonth() + n, d.getDate());
 }
@@ -389,6 +396,12 @@ function closeKpiHelp(refocus) {
 }
 
 function wireKpiHelp() {
+  document.getElementById('kpiFreeHelp').textContent =
+    'Rigs open now, or whose booked work ends within ' + NEAR_TERM_MONTHS + ' months (by ' + monthLabel(addMonths(AS_OF, NEAR_TERM_MONTHS)) + '), ' +
+    'and unconfirmed rigs. They are the orange markers on the map.';
+  document.getElementById('kpiRunwayHelp').textContent =
+    'Median time until each rig\'s booked work runs out, following awarded work (not options) across short gaps between contracts. ' +
+    'Open rigs and rigs whose booked work has no published end are left out.';
   document.getElementById('kpiBacklogHelp').textContent =
     'Firm contracts only: days remaining after ' + DATA_AS_OF_LABEL + ' × day rate, including follow-on contracts and rate steps. ' +
     'Rigs without a disclosed rate add nothing; options, LOIs and conditional awards are left out.';
@@ -1140,14 +1153,25 @@ function updateKPIs(rigs) {
   const backlogRigs = rigs.filter(r => r.derived.backlog > 0);
   const backlog = backlogRigs.reduce((s, r) => s + r.derived.backlog, 0);
 
+  // coming free: the orange markers on the map (open now, or booked work ending within NEAR_TERM_MONTHS)
+  const open = rigs.filter(r => r.derived.available).length;
+  const free = rigs.filter(r => r.derived.nearTerm).length;
+  // booked runway: median months of booked work left, for rigs whose booked work has a published end
+  const runways = rigs.filter(r => !r.derived.available && r.derived.bookedTo).map(r => (r.derived.bookedTo - AS_OF) / MS_PER_MONTH);
+  const runway = runways.length ? Math.round(median(runways)) : null;
+
   animateValue('kpiRigs', rigs.length, 'int');
   animateValue('kpiUtil', share, 'percent');
-  animateValue('kpiRate', avgRate, 'currency');
+  animateValue('kpiRate', avgRate, 'thousands');
   animateValue('kpiBacklog', backlog > 0 ? backlog : null, 'compact');
-  animateValue('kpiContractors', new Set(rigs.map(r => r.contractor)).size, 'int');
-  animateValue('kpiRegions', new Set(rigs.map(r => r.region)).size, 'int');
+  animateValue('kpiFree', rigs.length ? free : null, 'int');
+  animateValue('kpiRunway', runway, 'int');
+  document.getElementById('kpiRateUnit').hidden = avgRate == null;
+  document.getElementById('kpiRunwayUnit').hidden = runway == null;
 
-  document.getElementById('kpiUtilNote').textContent = rigs.length ? working + ' working · ' + committed + ' not started' : '';
+  document.getElementById('kpiUtilNote').textContent = rigs.length ? working + ' working · ' + committed + ' committed' : '';
+  document.getElementById('kpiFreeNote').textContent = rigs.length ? open + ' open now · ' + (free - open) + ' by ' + monthLabel(addMonths(AS_OF, NEAR_TERM_MONTHS)) : '';
+  document.getElementById('kpiRunwayNote').textContent = runways.length ? 'median of ' + plural(runways.length, 'rig') : 'no published end dates';
   const rateNote = document.getElementById('kpiRateNote');
   rateNote.textContent = floaters.length ? rated.length + ' of ' + floaters.length + ' disclosed' : 'no floaters shown';
   // with only a handful of rates the average says little; make the count the thing you read
@@ -1158,6 +1182,7 @@ function updateKPIs(rigs) {
 function fmtValue(val, fmt) {
   if (val == null) return '—';
   if (fmt === 'currency') return '$' + Math.round(val).toLocaleString('en-US');
+  if (fmt === 'thousands') return '$' + Math.round(val / 1000) + 'k';
   if (fmt === 'percent') return Math.round(val) + '%';
   if (fmt === 'compact') {
     if (val >= 1e9) return '$' + (val / 1e9).toFixed(1) + 'B';
