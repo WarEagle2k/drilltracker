@@ -148,7 +148,11 @@ Use `null` for anything missing. The validator rejects placeholder strings such 
    node scripts/test-filters.js
    node scripts/test-insights.js
    ```
-   `validate.js` fails on errors; `--strict` also fails on warnings. `test-dates.js` tests the date and contract logic with a fixed data date, so it does not change with a refresh. The same checks run on every pull request and push to `main` (`.github/workflows/test.yml`), along with a check that `changes.js` matches the data.
+   Before a pull request that changes the page, also run the accessibility check (it needs Chrome and, once, `npm install --no-save axe-core@4.13.0`):
+   ```
+   node scripts/test-a11y.js
+   ```
+   `validate.js` fails on errors; `--strict` also fails on warnings. `test-dates.js` tests the date and contract logic with a fixed data date, so it does not change with a refresh. The same checks run on every pull request and push to `main` (`.github/workflows/test.yml`), along with a check that `changes.js` matches the data and the accessibility check: axe-core runs in headless Chrome against 18 states of the page (each view, both themes, the details pane, dialogs and phone layouts) and fails on any WCAG 2.2 AA or best-practice problem.
 3. Build the change list, then stamp the asset versions so browsers fetch the new files instead of cached ones (CI fails if you forget either):
    ```
    node scripts/build-changes.js

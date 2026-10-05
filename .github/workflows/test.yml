@@ -33,3 +33,7 @@ jobs:
         run: node scripts/test-filters.js
       - name: Insights calculations
         run: node scripts/test-insights.js
+      - name: Accessibility (axe-core in the runner's Chrome)
+        run: |
+          npm install --no-save --no-package-lock --silent axe-core@4.13.0
+          node scripts/test-a11y.js
