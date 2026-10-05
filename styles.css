@@ -317,6 +317,9 @@ a:hover { color: var(--color-primary-hover); }
   flex-shrink: 0;
 }
 .kpi-label {
+  display: flex;
+  align-items: center;
+  gap: 2px;
   font-size: 11px;
   white-space: nowrap; /* keeps the "?" button beside its label */
   text-transform: uppercase;
@@ -324,6 +327,7 @@ a:hover { color: var(--color-primary-hover); }
   color: var(--color-text-faint);
   line-height: 1.2;
 }
+.kpi-label-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .kpi-content { min-width: 0; }
 .kpi-note { margin-top: 1px; font-weight: 500; color: var(--color-text-faint); font-size: 11px; line-height: 1.2; }
 .kpi-note:empty { display: none; }
@@ -345,9 +349,10 @@ a:hover { color: var(--color-primary-hover); }
 /* KPI definition: a real button (touch, keyboard and screen readers), not a hover-only title */
 .kpi-help {
   display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 2px;
-  border: 1px solid var(--color-border); border-radius: var(--radius-full); vertical-align: middle;
+  position: relative; flex-shrink: 0; border: 1px solid var(--color-border); border-radius: var(--radius-full);
   font-size: 10px; font-weight: 600; line-height: 1; color: var(--color-text-muted); transition: all var(--transition-fast);
 }
+.kpi-help::after { content: ''; position: absolute; inset: -6px; } /* a 28px touch target around the small circle */
 .kpi-help:hover, .kpi-help[aria-expanded="true"] { color: var(--color-primary); border-color: var(--color-primary); }
 .kpi-help-text {
   position: absolute; top: calc(100% + 4px); left: var(--space-3); right: var(--space-3); z-index: 1100; min-width: 200px;
@@ -1233,10 +1238,13 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
   .view-toggle button { min-height: 38px; }
   .icon-btn, .detail-close { width: 42px; height: 42px; }
 
-  .kpi-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .kpi-item { padding: var(--space-2) var(--space-3); }
+  /* six KPIs in two rows of three, tops aligned so the values line up across each row */
+  .kpi-strip { position: relative; }
+  .kpi-item { position: static; align-items: flex-start; padding: var(--space-2) var(--space-3); }
+  .kpi-icon { display: none; }
   .kpi-value { font-size: var(--text-base); }
-  .kpi-help { width: 24px; height: 24px; }
+  /* the definition opens across the strip, not off the edge of a narrow column */
+  .kpi-help-text { left: var(--space-2); right: var(--space-2); top: calc(100% + 4px); min-width: 0; }
 
   .filter-sidebar {
     position: absolute;
@@ -1262,11 +1270,11 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 }
 
 @media (max-width: 480px) {
-  /* six KPIs in two compact rows so the map keeps most of the screen */
-  .kpi-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .kpi-item { padding: var(--space-1) var(--space-2); gap: 0; }
-  .kpi-icon { display: none; }
-  .kpi-label { font-size: 10px; letter-spacing: 0.03em; white-space: normal; }
+  /* compact rows so the map keeps most of the screen: sentence-case labels on one line,
+     shortened ("Floater rate", "Backlog") with the full name kept for screen readers */
+  .kpi-item { padding: 6px var(--space-2); gap: 0; }
+  .kpi-label { font-size: 11px; letter-spacing: 0; text-transform: none; }
+  .kpi-long { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
   .kpi-note { font-size: 10px; }
   .kpi-value { font-size: var(--text-sm); }
   .footer-scope { display: none; } /* the scope line is in the README; keep the footer to two lines */
