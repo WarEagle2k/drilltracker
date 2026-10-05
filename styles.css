@@ -77,16 +77,16 @@ html {
   --firm-conditional: #3987e5;
   --firm-option:      #256abf;
 
-  /* charts: rig type (categorical slots 1-3, validated all-pairs), heatmap ramp (5 ordinal steps, validated), de-emphasis */
+  /* charts: rig type (categorical slots 1-3, validated all-pairs), heatmap ramp (5 ordinal teal steps, validated; teal so it doesn't read as the firmness blues), de-emphasis */
   --type-drillship: #3987e5;
   --type-semisub:   #d95926;
   --type-jackup:    #199e70;
   --seq-0: #1b2945;
-  --seq-1: #184f95;
-  --seq-2: #256abf;
-  --seq-3: #3987e5;
-  --seq-4: #86b6ef;
-  --seq-5: #cde2fb;
+  --seq-1: #0a625e;
+  --seq-2: #077e79;
+  --seq-3: #079a94;
+  --seq-4: #32b6af;
+  --seq-5: #70cdc7;
   --viz-deemph: #3a4b6b;
 
   /* map availability: ordinal orange (validated --ordinal on the dark sea), grey for the rest */
@@ -143,11 +143,11 @@ html {
   --type-semisub:   #eb6834;
   --type-jackup:    #1baf7a;
   --seq-0: #eef1f6;
-  --seq-1: #86b6ef;
-  --seq-2: #5598e7;
-  --seq-3: #2a78d6;
-  --seq-4: #1c5cab;
-  --seq-5: #0d366b;
+  --seq-1: #66c4be;
+  --seq-2: #28a6a0;
+  --seq-3: #038883;
+  --seq-4: #056965;
+  --seq-5: #004a47;
   --viz-deemph: #c5ccd8;
 
   --avail-open:   #9a3412;
@@ -1074,11 +1074,12 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 .viz-shape--jackup { background: var(--type-jackup); clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 .viz-legend .gantt-bar--open { width: 18px; }
 .viz-key { display: inline-block; width: 8px; height: 8px; border-radius: 2px; background: var(--color-primary); vertical-align: 0; }
-.viz-scale { display: flex; align-items: center; gap: 2px; margin-bottom: var(--space-3); font-size: 11px; color: var(--color-text-muted); }
+.viz-scale { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 2px; margin-bottom: var(--space-3); font-size: 10px; color: var(--color-text-muted); }
 .viz-scale[hidden] { display: none; }
-.viz-scale i { width: 22px; height: 10px; border-radius: 2px; }
-.viz-scale span:first-child { margin-right: 6px; }
-.viz-scale span:last-child { margin-left: 6px; }
+.viz-scale-step { display: flex; flex-direction: column; gap: 3px; min-width: 44px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.viz-scale-step i { height: 10px; border-radius: 2px; }
+.viz-scale-step--empty i { box-shadow: inset 0 0 0 1px var(--color-border); }
+.viz-scale-title { align-self: center; margin-right: var(--space-2); font-size: 11px; }
 
 /* marks — fills from the theme's chart tokens */
 .viz-fill--firm        { fill: var(--firm-firm);        background: var(--firm-firm); }
