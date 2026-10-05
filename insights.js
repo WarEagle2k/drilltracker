@@ -17,6 +17,7 @@ const HEAT_QUARTERS = 12;
 const SCATTER_FROM = new Date(2022, 0, 1);
 
 let vizTips = [];            // tooltip content for the marks of the current render
+let tipSource = null;        // 'pointer' or 'focus': what opened the tooltip
 
 /* ============================================
    CALCULATIONS (pure; tested in scripts/test-insights.js)
@@ -195,8 +196,9 @@ function tipEl() {
 }
 
 /* content: { title, rows: [{ value, label, swatch? }], note? } */
-function showTip(content, clientX, clientY) {
+function showTip(content, clientX, clientY, source) {
   const el = tipEl();
+  tipSource = source || 'pointer';
   el.textContent = '';
   const h = document.createElement('div');
   h.className = 'viz-tip-title';
@@ -234,22 +236,38 @@ function showTip(content, clientX, clientY) {
   el.style.top = Math.max(8, y) + 'px';
 }
 
-function hideTip() { const el = document.getElementById('vizTip'); if (el) el.hidden = true; }
+/* hideTip('focus') only closes a tooltip that focus opened: a tap opens one and moves focus in the same gesture */
+function hideTip(source) {
+  const el = document.getElementById('vizTip');
+  if (!el || (source && source !== tipSource)) return;
+  el.hidden = true;
+  document.querySelectorAll('.viz-crosshair, .viz-focus-ring').forEach(m => m.setAttribute('visibility', 'hidden'));
+}
+
+/* A touch pointer "leaves" as the finger lifts; its tooltip stays until the next tap or a scroll */
+function leaveTip(e) { if (e.pointerType !== 'touch') hideTip(); }
 
 function wireTips(host) {
-  host.addEventListener('pointermove', function (e) {
+  function at(e) {
     const m = e.target.closest('[data-tip]');
     if (m) showTip(vizTips[+m.dataset.tip], e.clientX, e.clientY);
     else if (!e.target.closest('.viz-live')) hideTip();
-  });
-  host.addEventListener('pointerleave', hideTip);
-  host.addEventListener('focusin', function (e) {
-    const m = e.target.closest('[data-tip]');
-    if (!m) return;
+  }
+  host.addEventListener('pointermove', at);
+  host.addEventListener('pointerdown', at);
+  host.addEventListener('pointerleave', leaveTip);
+  function atFocus(el) {
+    const m = el && el.closest && el.closest('[data-tip]');
+    if (!m || !host.contains(m)) return false;
     const r = m.getBoundingClientRect();
-    showTip(vizTips[+m.dataset.tip], r.left + r.width / 2, r.top);
-  });
-  host.addEventListener('focusout', hideTip);
+    showTip(vizTips[+m.dataset.tip], r.left + r.width / 2, r.top, 'focus');
+    return true;
+  }
+  // a scroll strands a pointer tooltip, but a focused mark's tooltip follows its mark (Tab scrolls it into view)
+  host.addEventListener('scroll', function () { if (tipSource !== 'focus' || !atFocus(document.activeElement)) hideTip(); }, { passive: true });
+  document.addEventListener('pointerdown', function (e) { if (!host.contains(e.target)) hideTip(); });
+  host.addEventListener('focusin', function (e) { atFocus(e.target); });
+  host.addEventListener('focusout', function () { hideTip('focus'); });
 }
 
 /* ============================================
@@ -308,7 +326,7 @@ function headline(rigs) {
     '<div class="viz-tile"><div class="viz-tile-label">Firm work remaining</div>' +
       '<div class="viz-tile-value">' + fmtYears(ry) + ' <span class="viz-unit">rig-years</span></div>' +
       '<div class="viz-tile-sub">after ' + DATA_AS_OF_LABEL + ', contracts with a published end</div></div>' +
-    '<div class="viz-tile"><div class="viz-tile-label">Floater rates, next vs now</div>' +
+    '<div class="viz-tile"><div class="viz-tile-label">Forward floater rate</div>' +
       '<div class="viz-tile-value">' + (fr.fwd ? fmtK(fr.fwd) : '—') +
         (delta != null ? ' <span class="viz-delta">' + (delta >= 0 ? '▲ ' : '▼ ') + Math.abs(Math.round(delta * 100)) + '%</span>' : '') + '</div>' +
       '<div class="viz-tile-sub">' + (fr.fwd ? 'median of ' + plural(fr.fwdN, 'disclosed rate') + ' starting later, vs ' + fmtK(fr.now) + ' running now (' + fr.nowN + ')' : 'no disclosed future floater rates in this selection') + '</div></div>' +
@@ -320,7 +338,7 @@ function headline(rigs) {
    ============================================ */
 function drawCoverage(id, rigs) {
   const data = coverageByMonth(rigs);
-  const W = widthOf(id), H = 250, M = { l: 36, r: 16, t: 22, b: 26 };
+  const W = widthOf(id), H = 250, M = { l: 36, r: 16, t: 24, b: 26 };
   const x = scale(0, COVERAGE_MONTHS, M.l, W - M.r);
   const n = rigs.length;
   const yMax = Math.max(1, n);
@@ -335,9 +353,12 @@ function drawCoverage(id, rigs) {
     edges += '<path class="viz-band-edge" d="M' + top.join('L') + '"/>';
   });
 
-  const yt = ticks(yMax, 4).map(v =>
+  // nice ticks below the total, then the total itself: the gap under that line is the rigs not booked
+  const yt = ticks(yMax, 4).filter(v => y(v) - y(yMax) > 20).map(v =>
     '<line class="viz-grid" x1="' + M.l + '" x2="' + (W - M.r) + '" y1="' + y(v) + '" y2="' + y(v) + '"/>' +
-    '<text class="viz-axis" x="' + (M.l - 6) + '" y="' + (y(v) + 3.5) + '" text-anchor="end">' + v + '</text>').join('');
+    '<text class="viz-axis" x="' + (M.l - 6) + '" y="' + (y(v) + 3.5) + '" text-anchor="end">' + v + '</text>').join('') +
+    '<line class="viz-total" x1="' + M.l + '" x2="' + (W - M.r) + '" y1="' + y(yMax) + '" y2="' + y(yMax) + '"/>' +
+    '<text class="viz-axis viz-axis--strong" x="' + (M.l - 6) + '" y="' + (y(yMax) + 3.5) + '" text-anchor="end">' + n + '</text>';
   let xt = '';
   for (let i = 0; i <= COVERAGE_MONTHS; i++) {
     const t = data[i].t;
@@ -346,40 +367,42 @@ function drawCoverage(id, rigs) {
   }
   const yr = 12, share = n ? AWARDED.reduce((s, f) => s + data[yr][f], 0) / n : 0;
   const mark = '<line class="viz-ref" x1="' + x(yr) + '" x2="' + x(yr) + '" y1="' + (M.t - 6) + '" y2="' + (H - M.b) + '"/>' +
-    '<text class="viz-annot" x="' + (x(yr) + 6) + '" y="' + (M.t + 2) + '">' + monthLabel(data[yr].t) + ': ' + fmtPct(share) + ' booked</text>';
-  const total = '<text class="viz-annot viz-annot--muted" x="' + (W - M.r) + '" y="' + (y(yMax) - 6) + '" text-anchor="end">All ' + n + ' rigs shown</text>';
+    '<text class="viz-annot" x="' + (x(yr) + 6) + '" y="' + (M.t - 10) + '">' + monthLabel(data[yr].t) + ': ' + fmtPct(share) + ' booked</text>';
 
   plotOf(id).innerHTML = '<svg class="viz-svg viz-live" width="' + W + '" height="' + H + '" tabindex="0" role="img" aria-label="' +
     escapeHtml('Rigs booked by month for the next three years. ' + monthLabel(data[yr].t) + ': ' + fmtPct(share) + ' have awarded work. Use the left and right arrow keys to read each month.') + '">' +
-    yt + bands + edges + mark + total + xt +
+    yt + bands + edges + mark + xt +
     '<line class="viz-crosshair" x1="0" x2="0" y1="' + M.t + '" y2="' + (H - M.b) + '" visibility="hidden"/>' +
     '<rect class="viz-hit" x="' + M.l + '" y="' + M.t + '" width="' + (W - M.l - M.r) + '" height="' + (H - M.t - M.b) + '"/></svg>';
 
   const svg = plotOf(id).querySelector('svg'), cross = svg.querySelector('.viz-crosshair');
   let idx = 12;
-  function read(i, cx, cy) {
+  function read(i, cx, cy, source) {
     idx = Math.max(0, Math.min(COVERAGE_MONTHS, i));
     cross.setAttribute('x1', x(idx)); cross.setAttribute('x2', x(idx)); cross.setAttribute('visibility', 'visible');
     const d = data[idx];
     showTip({ title: idx === 0 ? 'Now (' + DATA_AS_OF_LABEL + ')' : monthLabel(d.t),
       rows: FIRM_ORDER.map(f => ({ value: String(d[f]), label: FIRMNESS[f], swatch: 'var(--firm-' + f + ')' }))
         .concat([{ value: String(d.open), label: 'Not booked' }]),
-      note: fmtPct(AWARDED.reduce((s, f) => s + d[f], 0) / Math.max(1, n)) + ' of rigs have awarded work' }, cx, cy);
+      note: fmtPct(AWARDED.reduce((s, f) => s + d[f], 0) / Math.max(1, n)) + ' of rigs have awarded work' }, cx, cy, source);
   }
-  svg.addEventListener('pointermove', function (e) {
+  function readPointer(e) {
     const r = svg.getBoundingClientRect();
     read(Math.round((e.clientX - r.left - M.l) / ((W - M.l - M.r) / COVERAGE_MONTHS)), e.clientX, e.clientY);
-  });
-  svg.addEventListener('pointerleave', function () { cross.setAttribute('visibility', 'hidden'); hideTip(); });
+  }
+  svg.addEventListener('pointermove', readPointer);
+  svg.addEventListener('pointerdown', readPointer);
+  svg.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'touch') { cross.setAttribute('visibility', 'hidden'); hideTip(); } });
   svg.addEventListener('keydown', function (e) {
     if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight' && e.key !== 'Home' && e.key !== 'End') return;
     e.preventDefault();
     const i = e.key === 'Home' ? 0 : e.key === 'End' ? COVERAGE_MONTHS : idx + (e.key === 'ArrowRight' ? 1 : -1);
     const r = svg.getBoundingClientRect();
-    read(i, r.left + x(Math.max(0, Math.min(COVERAGE_MONTHS, i))), r.top + M.t);
+    read(i, r.left + x(Math.max(0, Math.min(COVERAGE_MONTHS, i))), r.top + M.t, 'focus');
   });
-  svg.addEventListener('focus', function () { const r = svg.getBoundingClientRect(); read(idx, r.left + x(idx), r.top + M.t); });
-  svg.addEventListener('blur', function () { cross.setAttribute('visibility', 'hidden'); hideTip(); });
+  // a tap focuses the chart too; only keyboard focus needs the tooltip placed for it
+  svg.addEventListener('focus', function () { if (!svg.matches(':focus-visible')) return; const r = svg.getBoundingClientRect(); read(idx, r.left + x(idx), r.top + M.t, 'focus'); });
+  svg.addEventListener('blur', function () { if (tipSource === 'focus') { cross.setAttribute('visibility', 'hidden'); hideTip('focus'); } });
 
   setTable(id, ['Month', 'Firm', 'LOI', 'Conditional', 'Option', 'Not booked', 'Awarded share'],
     data.map(d => [monthLabel(d.t), d.firm, d.loi, d.conditional, d.option, d.open, fmtPct(AWARDED.reduce((s, f) => s + d[f], 0) / Math.max(1, n))]));
@@ -392,7 +415,7 @@ function drawRollOff(id, rigs) {
   const ro = rollOff(rigs), b = ro.buckets;
   const W = widthOf(id), H = 230, M = { l: 8, r: 8, t: 20, b: 34 };
   const band = (W - M.l - M.r) / b.length, bw = Math.min(24, band * 0.62);
-  const max = Math.max(1, ...b.map(k => k.rigs.length));
+  const max = Math.max(4, ...b.map(k => k.rigs.length));
   const y = scale(0, max, H - M.b, M.t);
   let marks = '';
   b.forEach(function (k, i) {
@@ -440,7 +463,7 @@ function drawRates(id, rigs) {
     const px = x(new Date(yr, 0, 1).getTime());
     if (px <= W - M.r - 10) xt += '<text class="viz-axis" x="' + px + '" y="' + (H - 8) + '" text-anchor="middle">' + yr + '</text>';
   }
-  const now = '<line class="viz-ref" x1="' + x(AS_OF.getTime()) + '" x2="' + x(AS_OF.getTime()) + '" y1="' + M.t + '" y2="' + (H - M.b) + '"/>' +
+  const now = '<line class="viz-ref" x1="' + x(AS_OF.getTime()) + '" x2="' + x(AS_OF.getTime()) + '" y1="' + (M.t + 12) + '" y2="' + (H - M.b) + '"/>' +
     '<text class="viz-annot viz-annot--muted" x="' + (x(AS_OF.getTime()) - 5) + '" y="' + (H - M.b - 6) + '" text-anchor="end">Now</text>';
   const placed = pts.map(p => Object.assign({}, p, { px: x(p.t.getTime()), py: y(p.rate) }));
   // later points on top; the highest rate gets a direct label
@@ -451,7 +474,7 @@ function drawRates(id, rigs) {
   // label above the cloud, joined to its point by a leader line
   const ly = M.t + 6;
   const lbl = '<line class="viz-ref" x1="' + top.px + '" x2="' + top.px + '" y1="' + (ly + 4) + '" y2="' + (top.py - 7) + '"/>' +
-    '<text class="viz-annot" x="' + Math.min(top.px + 4, W - M.r) + '" y="' + ly + '" text-anchor="end">' +
+    '<text class="viz-annot viz-top-label" x="' + Math.min(top.px + 4, W - M.r) + '" y="' + ly + '" text-anchor="end">' +
     escapeHtml(W < 480 ? 'Top firm: ' + top.rig.name + ' · ' + fmtK(top.rate)
       : 'Highest firm rate: ' + top.rig.name + ' · ' + fmtK(top.rate) + ' from ' + top.x.k.start) + '</text>';
   plotOf(id).innerHTML = '<svg class="viz-svg viz-live" width="' + W + '" height="' + H + '" role="img" aria-label="' +
@@ -459,9 +482,15 @@ function drawRates(id, rigs) {
     grid + now + dots + lbl + xt + '<circle class="viz-focus-ring" r="9" visibility="hidden"/>' +
     '<rect class="viz-hit" x="' + M.l + '" y="' + M.t + '" width="' + (W - M.l - M.r) + '" height="' + (H - M.t - M.b) + '"/></svg>';
 
-  // nearest-point hover: the pointer only has to be closest, not dead-centre
+  // the label hangs left of its point; if that runs past the axis, it hangs right instead
   const svg = plotOf(id).querySelector('svg'), ring = svg.querySelector('.viz-focus-ring');
-  svg.addEventListener('pointermove', function (e) {
+  const topLabel = svg.querySelector('.viz-top-label');
+  if (topLabel.getBBox().x < M.l + 4) {
+    topLabel.setAttribute('text-anchor', 'start');
+    topLabel.setAttribute('x', Math.max(M.l + 4, Math.min(top.px - 4, W - M.r - topLabel.getBBox().width)));
+  }
+  // nearest-point hover: the pointer only has to be closest, not dead-centre
+  function readPoint(e) {
     const r = svg.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
     let best = null, bd = 28 * 28;
     placed.forEach(p => { const d = (p.px - mx) * (p.px - mx) + (p.py - my) * (p.py - my); if (d < bd) { bd = d; best = p; } });
@@ -470,8 +499,10 @@ function drawRates(id, rigs) {
     showTip({ title: best.rig.name, rows: [{ value: fmtRate(best.rate) + '/day', label: best.type, swatch: 'var(--type-' + TYPE_KEY[best.type] + ')' }],
       note: (best.x.k.customer || 'Undisclosed customer') + ' · ' + best.x.k.start + ' – ' + (best.x.k.end || 'undisclosed') +
         (best.x.k.firmness !== 'firm' ? ' · ' + FIRMNESS[best.x.k.firmness] : '') }, e.clientX, e.clientY);
-  });
-  svg.addEventListener('pointerleave', function () { ring.setAttribute('visibility', 'hidden'); hideTip(); });
+  }
+  svg.addEventListener('pointermove', readPoint);
+  svg.addEventListener('pointerdown', readPoint);
+  svg.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'touch') { ring.setAttribute('visibility', 'hidden'); hideTip(); } });
   const older = all.length - pts.length;
   document.querySelector('#' + id + ' .viz-foot').textContent = older ? plural(older, 'rate period') + ' starting before 2022 not shown; they are in the table.' : '';
   setTable(id, ['Rig', 'Type', 'Customer', 'Start', 'End', 'Day rate', 'Terms'],
@@ -486,16 +517,19 @@ function drawRunway(id, rigs) {
   const W = widthOf(id), narrow = W < 560, LW = narrow ? 116 : 168, CH = 24, GAP = 2, TOP = 22;
   const cw = (W - LW) / rw.quarters.length;
   const H = TOP + rw.rows.length * (CH + GAP);
+  // label every quarter, every other one or one a year: whichever leaves room for the text
+  const labelW = narrow ? 40 : 52, every = [1, 2, 4].find(k => cw * k >= labelW) || 4;
   let head = '';
   rw.quarters.forEach(function (q, i) {
-    if (narrow && i % 2) return;
+    if (i % every) return;
     head += '<text class="viz-axis" x="' + (LW + cw * i + cw / 2) + '" y="14" text-anchor="middle">' + (narrow ? q.label.replace(' 20', " '") : q.label) + '</text>';
   });
   let body = '';
   rw.rows.forEach(function (row, j) {
     const yy = TOP + j * (CH + GAP);
     body += '<circle cx="6" cy="' + (yy + CH / 2) + '" r="4" fill="' + getContractorColor(row.contractor) + '"/>' +
-      '<text class="viz-label" x="16" y="' + (yy + CH / 2 + 4) + '">' + escapeHtml(row.contractor) + ' <tspan class="viz-label-n">' + row.n + '</tspan></text>';
+      '<text class="viz-label" x="16" y="' + (yy + CH / 2 + 4) + '"><title>' + escapeHtml(row.contractor + ', ' + plural(row.n, 'rig')) + '</title>' +
+        '<tspan class="viz-label-name">' + escapeHtml(row.contractor) + '</tspan> <tspan class="viz-label-n">' + row.n + '</tspan></text>';
     row.cells.forEach(function (c, i) {
       const bin = c.booked === 0 ? 0 : Math.max(1, Math.ceil(c.share * 5));
       body += '<rect class="viz-cell viz-seq-' + bin + '" x="' + (LW + cw * i + GAP / 2) + '" y="' + yy + '" width="' + (cw - GAP) + '" height="' + CH + '" rx="2"' +
@@ -505,6 +539,11 @@ function drawRunway(id, rigs) {
   });
   plotOf(id).innerHTML = '<svg class="viz-svg" width="' + W + '" height="' + H + '" role="img" aria-label="' +
     escapeHtml('Share of each contractor\'s rigs with awarded work, by quarter. Values are in the table view.') + '">' + head + body + '</svg>';
+  // shorten any name that would run into the first column; the full name is in its title
+  plotOf(id).querySelectorAll('.viz-label').forEach(function (t) {
+    const name = t.querySelector('.viz-label-name'), full = name.textContent;
+    for (let k = full.length - 1; k > 3 && t.getComputedTextLength() > LW - 22; k--) name.textContent = full.slice(0, k).trim() + '…';
+  });
   setTable(id, ['Contractor', 'Rigs'].concat(rw.quarters.map(q => q.label)),
     rw.rows.map(r => [r.contractor, r.n].concat(r.cells.map(c => fmtPct(c.share)))));
 }
@@ -513,10 +552,11 @@ function drawRunway(id, rigs) {
    5. CUSTOMER EXPOSURE — rig-years of awarded work, one series
    ============================================ */
 function drawCustomers(id, rigs) {
-  const list = customerExposure(rigs).slice(0, 10);
+  const all = customerExposure(rigs), unknown = all.find(c => c.label === 'Undisclosed');
+  const list = all.filter(c => c !== unknown).slice(0, 10).concat(unknown ? [unknown] : []);
   const W = widthOf(id), LW = 128, RH = 26, H = Math.max(40, list.length * RH + 4), VW = 64;
   if (!list.length) { plotOf(id).innerHTML = '<p class="viz-empty">No awarded work with a published end in this selection.</p>'; setTable(id, ['Customer'], []); return; }
-  const x = scale(0, list[0].value, LW, W - VW);
+  const x = scale(0, Math.max(...list.map(c => c.value)), LW, W - VW);
   const marks = list.map(function (c, i) {
     const yy = i * RH + 4, w = Math.max(2, x(c.value) - LW);
     return '<g class="viz-mark" tabindex="0"' + tip({ title: c.label, rows: [{ value: fmtYears(c.value), label: 'rig-years of awarded work' }],
@@ -527,7 +567,7 @@ function drawCustomers(id, rigs) {
       '<text class="viz-value" x="' + (LW + w + 6) + '" y="' + (yy + 14) + '">' + fmtYears(c.value) + '</text></g>';
   }).join('');
   plotOf(id).innerHTML = '<svg class="viz-svg" width="' + W + '" height="' + H + '" role="group" aria-label="Rig-years of awarded work by customer">' + marks + '</svg>';
-  setTable(id, ['Customer', 'Rig-years'], customerExposure(rigs).map(c => [c.label, fmtYears(c.value)]));
+  setTable(id, ['Customer', 'Rig-years'], all.map(c => [c.label, fmtYears(c.value)]));
 }
 
 /* ============================================
@@ -539,17 +579,30 @@ function countBy(rigs, getter) {
   return Object.keys(m).map(k => ({ label: k, value: m[k] })).sort((a, b) => b.value - a.value);
 }
 
-function mixList(title, entries) {
+function mixList(title, entries, groupId) {
   const max = Math.max(1, ...entries.map(e => e.value));
+  const on = getCheckedValues(groupId);
   return '<div class="viz-mix"><h4 class="viz-mix-title">' + escapeHtml(title) + '</h4>' + entries.map(e =>
-    '<div class="viz-mix-row"><span class="viz-mix-label">' + escapeHtml(e.label) + '</span>' +
+    '<button type="button" class="viz-mix-row" data-mix-group="' + groupId + '" data-mix-value="' + escapeHtml(e.label) + '" aria-pressed="' + on.includes(e.label) + '"' +
+      ' aria-label="' + escapeHtml(e.label + ', ' + plural(e.value, 'rig') + (on.includes(e.label) ? '. Remove this filter' : '. Show only these')) + '">' +
+    '<span class="viz-mix-label">' + escapeHtml(e.label) + '</span>' +
     '<span class="viz-mix-track"><span class="viz-mix-fill" style="width:' + (e.value / max * 100) + '%"></span></span>' +
-    '<span class="viz-mix-value">' + e.value + '</span></div>').join('') + '</div>';
+    '<span class="viz-mix-value">' + e.value + '</span></button>').join('') + '</div>';
+}
+
+/* Toggle the matching sidebar checkbox, then put focus back on the same row in the new render */
+function toggleMixFilter(groupId, value) {
+  const cb = [...document.getElementById(groupId).querySelectorAll('input')].find(c => c.value === value);
+  if (!cb) return;
+  cb.checked = !cb.checked;
+  applyFilters();
+  const again = [...document.querySelectorAll('.viz-mix-row')].find(b => b.dataset.mixGroup === groupId && b.dataset.mixValue === value);
+  if (again) again.focus();
 }
 
 function drawMix(id, rigs) {
   const st = countBy(rigs, r => r.derived.status), ty = countBy(rigs, r => r.type), rg = countBy(rigs, r => r.region);
-  plotOf(id).innerHTML = '<div class="viz-mix-grid">' + mixList('Status', st) + mixList('Type', ty) + mixList('Region', rg) + '</div>';
+  plotOf(id).innerHTML = '<div class="viz-mix-grid">' + mixList('Status', st, 'statusFilters') + mixList('Type', ty, 'typeFilters') + mixList('Region', rg, 'regionFilters') + '</div>';
   setTable(id, ['Group', 'Value', 'Rigs'], [].concat(
     st.map(e => ['Status', e.label, e.value]), ty.map(e => ['Type', e.label, e.value]), rg.map(e => ['Region', e.label, e.value])));
 }
@@ -567,12 +620,17 @@ function drawTimeline(id, rigs) {
   const ends = rows.flatMap(x => x.segs.filter(s => s.k.firmness !== 'option').map(s => s.e ? s.e.getTime() : 0));
   const maxT = Math.max(addMonths(AS_OF, 12).getTime(), ...ends);
   const pos = t => Math.max(0, Math.min(100, ((t - minT) / (maxT - minT)) * 100));
-  const tickHtml = [];
+  const tickHtml = [], axisHtml = [];
   for (let y = new Date(minT).getFullYear(); y <= new Date(maxT).getFullYear(); y++) {
     const t = new Date(y, 0, 1).getTime();
-    if (t >= minT && t <= maxT) tickHtml.push('<div class="gantt-tick" style="left:' + pos(t) + '%"><span>' + y + '</span></div>');
+    if (t >= minT && t <= maxT) {
+      tickHtml.push('<div class="gantt-tick" style="left:' + pos(t) + '%"></div>');
+      axisHtml.push('<span class="gantt-year" style="left:' + pos(t) + '%">' + y + '</span>');
+    }
   }
-  host.innerHTML = '<div class="gantt" id="ganttChart"><div class="gantt-grid">' + tickHtml.join('') +
+  host.innerHTML = '<div class="gantt" id="ganttChart"><div class="gantt-axis" aria-hidden="true"><div class="gantt-axis-track">' + axisHtml.join('') +
+    '<span class="gantt-now-label" style="left:' + pos(AS_OF) + '%">Now</span></div></div>' +
+    '<div class="gantt-body"><div class="gantt-grid">' + tickHtml.join('') +
     '<div class="gantt-now" style="left:' + pos(AS_OF) + '%"></div></div>' + rows.map(function (x) {
       const d = x.r.derived;
       const bars = x.segs.map(function (s) {
@@ -586,8 +644,14 @@ function drawTimeline(id, rigs) {
           swatch: 'var(--firm-' + s.k.firmness + ')' })), note: d.status + ' · booked to ' + d.bookedToLabel + ' · click for details' }) +
         ' aria-label="' + escapeHtml(label + '. Show details.') + '" data-rig-id="' + escapeHtml(x.r.id) + '">' +
         '<div class="gantt-name">' + escapeHtml(x.r.name) + '</div><div class="gantt-track">' + bars + '</div></div>';
-    }).join('') + '</div>';
+    }).join('') + '</div></div>';
   const g = host.querySelector('#ganttChart');
+  // drop a year label the Now marker would sit on
+  const nowBox = g.querySelector('.gantt-now-label').getBoundingClientRect();
+  g.querySelectorAll('.gantt-year').forEach(function (yl) {
+    const r = yl.getBoundingClientRect();
+    if (r.right > nowBox.left - 2 && r.left < nowBox.right + 2) yl.style.visibility = 'hidden';
+  });
   g.addEventListener('click', e => { const row = e.target.closest('.gantt-row'); if (row) { hideTip(); openDetail(RIG_BY_ID[row.dataset.rigId], row); } });
   g.addEventListener('keydown', e => {
     const row = e.target.closest('.gantt-row');
@@ -629,10 +693,10 @@ function renderInsights() {
     card('vizRunway', 'Contractor runway', 'Share of each contractor\'s rigs with awarded work, by quarter (options excluded)', { wide: true, legend: scaleLegend }) +
     '<div class="viz-grid-2">' +
       card('vizCustomers', 'Who the work is for', 'Rig-years of awarded work after ' + DATA_AS_OF_LABEL + ', top 10 customers') +
-      card('vizMix', 'Fleet mix', 'Rigs shown by status, type and region') +
+      card('vizMix', 'Fleet mix', 'Rigs shown by status, type and region · select a row to filter by it') +
     '</div>' +
     card('vizTimeline', 'Contract timeline', plural(rigs.filter(r => r.derived.contracts.some(x => x.s)).length, 'rig') +
-      ' · sorted by booked-to date · red line = ' + DATA_AS_OF_LABEL + ' · click a row for details', { wide: true, legend: timelineLegend });
+      ' · sorted by booked-to date · select a row for details', { wide: true, legend: timelineLegend });
 
   drawCoverage('vizCoverage', rigs);
   drawRollOff('vizRollOff', rigs);
@@ -646,6 +710,8 @@ function renderInsights() {
     host.dataset.wired = '1';
     wireTips(host);
     host.addEventListener('click', function (e) {
+      const mix = e.target.closest('.viz-mix-row');
+      if (mix) return toggleMixFilter(mix.dataset.mixGroup, mix.dataset.mixValue);
       const b = e.target.closest('[data-viz-toggle]');
       if (!b) return;
       const c = document.getElementById(b.dataset.vizToggle), on = b.getAttribute('aria-pressed') !== 'true';

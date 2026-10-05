@@ -1095,9 +1095,12 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 .viz-grid { stroke: var(--viz-grid); stroke-width: 1; }
 .viz-baseline { stroke: var(--color-border); stroke-width: 1; }
 .viz-ref { stroke: var(--color-text-faint); stroke-width: 1; }
+.viz-total { stroke: var(--color-text-faint); stroke-width: 1; stroke-dasharray: 3 3; }
+.viz-live { touch-action: pan-y; } /* a sideways drag reads the chart; an up/down drag still scrolls */
 .viz-crosshair { stroke: var(--color-text); stroke-width: 1; pointer-events: none; }
 .viz-hit { fill: transparent; }
 .viz-axis { fill: var(--color-text-faint); font-size: 10px; font-family: var(--font-body); font-variant-numeric: tabular-nums; }
+.viz-axis--strong { fill: var(--color-text-muted); font-weight: 600; }
 .viz-label { fill: var(--color-text-muted); font-size: 11px; font-family: var(--font-body); }
 .viz-label-n { fill: var(--color-text-faint); font-size: 10px; }
 .viz-value { fill: var(--color-text); font-size: 11px; font-weight: 600; font-family: var(--font-body); }
@@ -1112,7 +1115,14 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 /* fleet mix lists */
 .viz-mix-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
 .viz-mix-title { font-size: 11px; font-weight: 600; color: var(--color-text-muted); margin-bottom: var(--space-2); }
-.viz-mix-row { display: grid; grid-template-columns: minmax(0, 1fr) 24px; grid-template-rows: auto 6px; column-gap: 6px; margin-bottom: 8px; font-size: 11px; }
+.viz-mix-row {
+  display: grid; grid-template-columns: minmax(0, 1fr) 24px; grid-template-rows: auto 6px; column-gap: 6px; row-gap: 2px;
+  width: 100%; margin: 0 0 2px; padding: 3px 4px 5px; border-radius: var(--radius-sm); font: inherit; font-size: 11px; text-align: left; cursor: pointer;
+}
+.viz-mix-row:hover { background: var(--color-surface-offset); }
+.viz-mix-row:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 0; }
+.viz-mix-row[aria-pressed="true"] { background: var(--color-primary-highlight); }
+.viz-mix-row[aria-pressed="true"] .viz-mix-label { color: var(--color-text); font-weight: 600; }
 .viz-mix-label { color: var(--color-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .viz-mix-value { grid-row: 1; grid-column: 2; text-align: right; color: var(--color-text); font-weight: 600; font-variant-numeric: tabular-nums; }
 .viz-mix-track { grid-column: 1 / -1; background: var(--seq-0); border-radius: var(--radius-full); overflow: hidden; }
@@ -1151,10 +1161,15 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 .viz-tip-note { margin-top: 4px; color: var(--color-text-faint); line-height: 1.4; }
 
 /* contract timeline */
-.gantt { position: relative; padding-top: 22px; }
-.gantt-grid { position: absolute; inset: 22px 0 0 130px; pointer-events: none; }
+.gantt { position: relative; }
+/* the year axis sticks to the top of the scroll area (past its padding) while the rows pass under it */
+.gantt-axis { position: sticky; top: calc(-1 * var(--space-5)); z-index: 2; height: 22px; padding-left: 130px; background: var(--color-surface); border-bottom: 1px solid var(--color-divider); }
+.gantt-axis-track { position: relative; height: 100%; }
+.gantt-year { position: absolute; bottom: 5px; padding-left: 3px; border-left: 1px dashed var(--color-divider); font-size: 9px; line-height: 1; color: var(--color-text-faint); font-family: var(--font-mono); }
+.gantt-now-label { position: absolute; bottom: 4px; transform: translateX(-50%); padding: 1px 4px; border-radius: var(--radius-sm); background: var(--color-error); color: var(--color-surface); font-size: 9px; font-weight: 600; line-height: 1.2; }
+.gantt-body { position: relative; }
+.gantt-grid { position: absolute; inset: 0 0 0 130px; pointer-events: none; }
 .gantt-tick { position: absolute; top: 0; bottom: 0; border-left: 1px dashed var(--color-divider); }
-.gantt-tick span { position: absolute; top: -18px; left: 3px; font-size: 9px; color: var(--color-text-faint); font-family: var(--font-mono); }
 .gantt-now { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--color-error); }
 .gantt-row { display: grid; grid-template-columns: 130px 1fr; align-items: center; height: 20px; cursor: pointer; }
 .gantt-row:hover, .gantt-row:focus-visible { background: var(--color-primary-highlight); }
@@ -1242,6 +1257,7 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 
 
   .gantt-grid { left: 92px; }
+  .gantt-axis { padding-left: 92px; }
   .gantt-row { grid-template-columns: 92px 1fr; }
 }
 
