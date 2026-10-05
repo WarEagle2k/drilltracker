@@ -1259,7 +1259,6 @@ function firmTag(firmness) {
 
 function contractsTable(rig) {
   const d = rig.derived;
-  if (!d.contracts.length) return '<div class="contract-none">No current or announced contracts</div>';
   const rows = d.contracts.map(function (x) {
     const past = x.e && x.e < AS_OF;
     const cls = x === d.current ? ' class="is-current"' : past ? ' class="is-past"' : '';
@@ -1296,20 +1295,36 @@ function runwayBlock(rig) {
   }).join('');
   const nowAt = pos(AS_OF.getTime());
 
+  // year boundaries, thinned so the labels never crowd
+  const y0 = new Date(t0).getFullYear() + 1, y1 = new Date(t1).getFullYear();
+  const every = [1, 2, 5].find(n => (y1 - y0) / n < 6) || 10;
+  let ticks = '', labels = '', shown = 0;
+  for (let y = y0; y <= y1; y++) {
+    const at = pos(new Date(y, 0, 1).getTime());
+    ticks += '<span class="runway-tick" style="left:' + at + '%"></span>';
+    if (at > 5 && at < 95 && shown++ % every === 0) labels += '<span style="left:' + at + '%">' + y + '</span>';
+  }
+  if (!labels) labels = '<span class="runway-end">' + monthLabel(new Date(t0)) + '</span><span class="runway-end">' + escapeHtml(last.k.end || 'open') + '</span>';
+
   let status = '';
   if (d.shown) {
     const ci = contractInfo(d.shown.k.start, d.shown.k.end);
     if (!ci.has) status = d.current ? 'Current contract has no published end' : 'Next contract from ' + d.shown.k.start;
     else if (!d.current) status = ci.start <= AS_OF ? 'Next contract due to start' : 'Next contract s' + ci.remaining.slice(1);
-    else status = ci.remaining + ' on the current contract';
+    else {
+      // the current contract may be one of several back to back: say how far the booked work runs
+      const after = d.bookedOpen ? 'follow-on work has no published end'
+        : d.bookedTo && d.bookedTo - ci.end > 31 * DAY_MS ? 'booked to ' + d.bookedToLabel
+        : 'no awarded work after';
+      status = ci.remaining + ' on this contract · ' + after;
+    }
   }
   const kinds = Object.keys(FIRMNESS).filter(f => ahead.some(x => x.k.firmness === f));
   return '<h3 class="detail-section-title">Contract timeline</h3>' +
     '<div class="runway">' +
-      '<div class="runway-track" aria-hidden="true">' + segs +
-        (nowAt > 0 ? '<span class="runway-now" style="left:' + nowAt + '%"></span>' : '') + '</div>' +
-      '<div class="runway-labels"><span>' + escapeHtml(ahead[0].k.start || '') + '</span>' +
-        '<span>' + escapeHtml(last.k.end || 'open') + '</span></div>' +
+      '<div class="runway-track" aria-hidden="true">' + segs + ticks +
+        '<span class="runway-now" style="left:' + nowAt + '%"></span></div>' +
+      '<div class="runway-labels" aria-hidden="true">' + labels + '</div>' +
       '<div class="runway-status">' + escapeHtml(status) + '</div>' +
       '<div class="runway-key" aria-hidden="true">' + kinds.map(f => '<span><i class="gantt-bar gantt-bar--' + f + '"></i>' + escapeHtml(FIRMNESS[f]) + '</span>').join('') +
         '<span><i class="runway-now-key"></i>Today</span></div>' +
@@ -1349,13 +1364,21 @@ function openDetail(rig, opener, opts) {
   document.getElementById('detailMapBtn').hidden = currentView === 'map';
   const d = rig.derived;
 
-  document.getElementById('detailName').textContent = rig.name;
+  const nameEl = document.getElementById('detailName'), aka = rig.name.match(/^(.*?) \((ex .+)\)$/);
+  nameEl.textContent = aka ? aka[1] : rig.name;
+  if (aka) nameEl.insertAdjacentHTML('beforeend', ' <span class="detail-aka">' + escapeHtml(aka[2]) + '</span>');
   document.getElementById('detailContractor').textContent = rig.contractor + (rig.owner ? ' · owned by ' + rig.owner : '');
 
-  const rateLabel = d.current ? 'Current day rate' : d.next ? 'Next contract day rate' : null;
-  const dayRateBlock = d.dayRate != null
-    ? '<div class="dayrate-label">' + rateLabel + '</div><div class="dayrate-highlight">$' + d.dayRate.toLocaleString('en-US') + '<span class="dayrate-unit">/day</span></div>'
-    : '<div class="dayrate-undisclosed">' + (d.shown ? 'Day rate undisclosed' : 'No current or upcoming contract') + '</div>';
+  // with nothing current or ahead, the last contract that ended still says something
+  const lastEnded = d.shown ? null : d.contracts.filter(x => x.e && x.e < AS_OF).pop() || null;
+  const dayRateBlock = d.shown
+    ? '<div class="dayrate-label">' + (d.current ? 'Current day rate' : 'Next contract day rate') + '</div>' +
+      (d.dayRate != null
+        ? '<div class="dayrate-highlight">$' + d.dayRate.toLocaleString('en-US') + '<span class="dayrate-unit">/day</span></div>'
+        : '<div class="dayrate-highlight dayrate-highlight--none">Undisclosed</div>')
+    : '<div class="dayrate-undisclosed">' + (lastEnded && lastEnded.k.end ? 'No contract since ' + escapeHtml(lastEnded.k.end) : 'No current or upcoming contract') + '</div>';
+  const customerField = d.shown ? field(d.current ? 'Customer' : 'Next customer', d.customer, false, true)
+    : lastEnded ? field('Last customer', lastEnded.k.customer || 'Undisclosed', false, true) : '';
 
   // the source line often names its own date already
   const asOfLabel = rig.asOf ? fmtIsoDate(rig.asOf) : null;
@@ -1376,16 +1399,15 @@ function openDetail(rig, opener, opts) {
     '</div>' +
     dayRateBlock +
     '<dl class="detail-grid">' +
-      field(d.current || !d.next ? 'Customer' : 'Next customer', d.customer || 'None', true) +
-      field('Location', (rig.country ? rig.country + ' · ' : '') + rig.region, true) +
-      field('Water Depth', rig.waterDepth_ft.toLocaleString('en-US') + ' ft') +
+      customerField + field('Booked to', d.bookedToLabel, !customerField) +
+      field('Location', (rig.country ? rig.country + ' · ' : '') + rig.region, true, true) +
+      field('Class', classLabel(rig), false, true) +
+      field('Build year', rig.buildYear) +
+      field('Water depth', rig.waterDepth_ft.toLocaleString('en-US') + ' ft') +
       field('Hookload', rig.hookload_tons.toLocaleString('en-US') + ' t') +
-      field('Build Year', rig.buildYear) +
-      field('Booked To', d.bookedToLabel) +
-      field('Class', classLabel(rig), true) +
     '</dl>' +
     runwayBlock(rig) +
-    '<h3 class="detail-section-title">All contracts</h3>' + contractsTable(rig) +
+    (d.contracts.length ? '<h3 class="detail-section-title">All contracts</h3>' + contractsTable(rig) : '') +
     (rig.note ? '<h3 class="detail-section-title">Notes</h3><div class="backlog-note">' + escapeHtml(rig.note) + '</div>' : '') +
     '<dl class="detail-meta">' +
       '<dt>Source</dt><dd>' + source + '</dd>' +
@@ -1416,10 +1438,11 @@ function revealBesidePanel(rig) {
   map.setView(centre, z, { animate: !prefersReduced });
 }
 
-function field(label, value, wide) {
+/* Names and places read as text; figures and dates keep the mono face */
+function field(label, value, wide, text) {
   return '<div class="detail-field' + (wide ? ' detail-field-wide' : '') + '">' +
     '<dt class="detail-field-label">' + escapeHtml(label) + '</dt>' +
-    '<dd class="detail-field-value' + (wide ? ' detail-field-value--text' : '') + '">' + escapeHtml(value) + '</dd></div>';
+    '<dd class="detail-field-value' + (text ? ' detail-field-value--text' : '') + '">' + escapeHtml(value) + '</dd></div>';
 }
 
 /* Closing returns focus to whatever opened the panel if it is still on screen (a list
