@@ -135,6 +135,10 @@ Use `null` for anything missing. The validator rejects placeholder strings such 
    node scripts/test-insights.js
    ```
    `validate.js` fails on errors; `--strict` also fails on warnings. `test-dates.js` tests the date and contract logic with a fixed data date, so it does not change with a refresh. The same checks run on every pull request and push to `main` (`.github/workflows/test.yml`).
-3. Open the page and spot-check a few rigs.
+3. Stamp the asset versions, so browsers fetch the new files instead of cached ones (CI fails if you forget):
+   ```
+   node scripts/stamp-assets.js
+   ```
+4. Open the page and spot-check a few rigs.
 
 The research toolkit that produces the refresh (`data-updates/`) is kept out of the repository.

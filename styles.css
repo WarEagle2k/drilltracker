@@ -664,9 +664,9 @@ a:hover { color: var(--color-primary-hover); }
   display: block; width: 100%; height: 100%;
   -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
 }
-.rig-icon--drillship { -webkit-mask-image: url(icons/drillship.png); mask-image: url(icons/drillship.png); }
-.rig-icon--semisub   { -webkit-mask-image: url(icons/semisub.png);   mask-image: url(icons/semisub.png); }
-.rig-icon--jackup    { -webkit-mask-image: url(icons/jackup.png);    mask-image: url(icons/jackup.png); }
+.rig-icon--drillship { -webkit-mask-image: url(icons/drillship.png?v=577efb6c); mask-image: url(icons/drillship.png?v=577efb6c); }
+.rig-icon--semisub   { -webkit-mask-image: url(icons/semisub.png?v=da18ef60);   mask-image: url(icons/semisub.png?v=da18ef60); }
+.rig-icon--jackup    { -webkit-mask-image: url(icons/jackup.png?v=e30c52b5);    mask-image: url(icons/jackup.png?v=e30c52b5); }
 .rig-marker--icon {
   border: none; border-radius: 0; box-shadow: none; background: none; transform-origin: 50% 100%;
   filter: drop-shadow(0 0.75px 0.5px var(--map-icon-shadow)); /* tight, so the edge stays crisp */
