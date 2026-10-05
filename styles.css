@@ -503,7 +503,8 @@ a:hover { color: var(--color-primary-hover); }
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
-.filter-color-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.filter-color-dot { display: none; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.show-contractor-colors .filter-color-dot { display: block; }
 .filter-checkbox-text { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .filter-opt-count {
   font-family: var(--font-mono); font-size: 10px; color: var(--color-text-faint);
@@ -548,12 +549,36 @@ a:hover { color: var(--color-primary-hover); }
   padding: 2px 10px; border-radius: var(--radius-full); background: var(--color-primary); color: var(--color-text-inverse); font-weight: 600;
 }
 
-/* collapsible filter group (Country): closed by default, opened when it is filtering */
-.filter-collapsible > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: var(--space-2); }
-.filter-collapsible > summary::-webkit-details-marker { display: none; }
-.filter-collapsible > summary::before { content: '▸'; font-size: 13px; line-height: 1; transition: transform var(--transition-fast); }
-.filter-collapsible[open] > summary::before { transform: rotate(90deg); }
-.filter-summary-note { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 500; font-family: var(--font-mono); font-size: 10px; }
+/* each group folds away; its heading shows how many options are ticked, with a Clear */
+.filter-section-head { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-1); }
+.filter-section-toggle {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 4px 0; text-align: left; color: var(--color-text-faint);
+}
+.filter-section-toggle .filter-section-title { margin: 0; }
+.filter-section-toggle::before {
+  content: ''; width: 6px; height: 6px; flex-shrink: 0; margin: 0 2px 0 1px; border: solid currentColor; border-width: 0 1.5px 1.5px 0;
+  transform: rotate(45deg) translate(-1px, -1px); transition: transform var(--transition-fast);
+}
+.filter-section-toggle[aria-expanded="false"]::before { transform: rotate(-45deg); }
+.filter-section-toggle:hover, .filter-section-toggle:hover .filter-section-title { color: var(--color-text-muted); }
+.filter-group:has(.filter-options[hidden]) { margin-bottom: var(--space-1); } /* folded groups sit close together */
+.filter-summary-note { color: var(--color-primary); font-size: 10px; font-weight: 600; font-family: var(--font-mono); white-space: nowrap; }
+.filter-group-clear { font-size: 11px; color: var(--color-text-muted); text-decoration: underline; padding: 2px 0; }
+.filter-group-clear:hover { color: var(--color-primary); }
+.filter-group-clear[hidden] { display: none; }
+.filter-options[hidden] { display: none; }
+
+/* "/" focuses the search; the hint shows on devices with a keyboard, until you type */
+.search-key {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%); pointer-events: none;
+  min-width: 18px; padding: 1px 5px; border: 1px solid var(--color-border); border-radius: 4px;
+  font: 600 10px/1.4 var(--font-mono); color: var(--color-text-faint); text-align: center;
+}
+.search-input:focus ~ .search-key, .search-input:not(:placeholder-shown) ~ .search-key { display: none; }
+@media (hover: none) { .search-key { display: none; } }
+
+/* on phones the sidebar overlays the map; this closes it and says what you will see */
+.filter-footer { display: none; }
 
 /* backdrop behind the overlaying sidebar on small screens */
 .sidebar-backdrop { display: none; }
@@ -1292,6 +1317,13 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
   }
   .filter-sidebar.collapsed { transform: translateX(-100%); width: 280px; margin-left: 0; }
   .filter-checkbox { min-height: 38px; }
+  .filter-section-toggle, .filter-group-clear { min-height: 36px; }
+  .filter-footer { display: block; flex-shrink: 0; padding: var(--space-3) var(--space-4); border-top: 1px solid var(--color-border); background: var(--color-surface); }
+  .filter-done {
+    width: 100%; min-height: 42px; border-radius: var(--radius-md); background: var(--color-primary); color: var(--color-text-inverse);
+    font-weight: 600; font-size: var(--text-sm);
+  }
+  .filter-done:hover { background: var(--color-primary-hover); }
   .sidebar-backdrop {
     display: block; position: absolute; inset: 0; z-index: 650;
     background: rgba(0, 0, 0, 0.45); border: none; padding: 0; cursor: default;

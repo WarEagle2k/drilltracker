@@ -54,7 +54,7 @@ Selecting a rig opens its details: status, day rate, specs, a contract timeline 
 
 ## Filtering
 
-Filters start empty, and an empty group doesn't filter. Ticking options narrows the rigs shown. Options within a group combine with OR (Brazil or Guyana); groups combine with AND (and Drillship). The number beside each option is how many rigs it has within your other choices. Options that would show nothing are greyed out, so only the search can produce an empty result. Active filters appear as removable chips above the list, and as a summary over the map.
+Filters start empty, and an empty group doesn't filter. Ticking options narrows the rigs shown. Options within a group combine with OR (Brazil or Guyana); groups combine with AND (and Drillship). The number beside each option is how many rigs it has within your other choices. Options that would show nothing are greyed out, so only the search can produce an empty result. Active filters appear as removable chips above the list, and as a summary over the map. Each group folds away (the browser remembers which), says how many of its options are ticked, and has its own Clear; Country starts folded. The contractor colour dots show while the map is coloured by contractor. On a phone, the filters open over the map and a Show button closes them.
 
 ## Insights
 
