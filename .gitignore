@@ -2,3 +2,6 @@
 
 # Local-only data-refresh toolkit (kept off the public repo)
 data-updates/
+
+# axe-core for scripts/test-a11y.js (installed with --no-save)
+node_modules/

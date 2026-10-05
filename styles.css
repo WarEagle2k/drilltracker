@@ -67,7 +67,7 @@ html {
 
   /* status (activity on the data date) */
   --status-working:     #34d399;
-  --status-committed:   #818cf8;
+  --status-committed:   #939df9;
   --status-available:   #94a3b8;
   --status-unconfirmed: #fbbf24;
 
@@ -101,8 +101,6 @@ html {
   --map-label:      #8494b0;
   --map-label-sea:  #4f6a94;
   --map-icon-shadow: rgba(0, 0, 0, 0.6);
-  --cluster:        212, 145, 10;
-  --cluster-text:   #0a1628;
   --overlay:        rgba(10, 22, 40, 0.55);
 }
 
@@ -117,12 +115,13 @@ html {
 
   --color-text:           #0f172a;
   --color-text-muted:     #475569;
-  --color-text-faint:     #647184;
+  --color-text-faint:     #5b6779;
   --color-text-inverse:   #ffffff;
 
-  --color-primary:        #b87a08;
-  --color-primary-hover:  #a06b06;
-  --color-primary-highlight: rgba(184, 122, 8, 0.1);
+  /* amber deep enough for small text and for white text on it (5.3:1 on white) */
+  --color-primary:        #946105;
+  --color-primary-hover:  #7d5204;
+  --color-primary-highlight: rgba(148, 97, 5, 0.1);
 
   --color-warning:        #d97706;
   --color-error:          #dc2626;
@@ -130,10 +129,10 @@ html {
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
   --shadow-xl: 0 20px 50px rgba(0,0,0,0.16);
 
-  --status-working:     #047857;
+  --status-working:     #036c4f;
   --status-committed:   #4338ca;
   --status-available:   #475569;
-  --status-unconfirmed: #b45309;
+  --status-unconfirmed: #9a4a0b;
 
   --firm-firm:        #184f95;
   --firm-loi:         #2a78d6;
@@ -162,8 +161,6 @@ html {
   --map-label:      #5b6779;
   --map-label-sea:  #7f97b5;
   --map-icon-shadow: rgba(10, 22, 40, 0.5);
-  --cluster:        184, 122, 8;
-  --cluster-text:   #ffffff;
   --overlay:        rgba(238, 240, 245, 0.6);
 }
 
@@ -964,6 +961,7 @@ a:hover { color: var(--color-primary-hover); }
 .contracts-table.show-earlier-rows tr.is-earlier { display: table-row; }
 .show-earlier { margin: 0 0 var(--space-1); padding: var(--space-1) 0; font-size: var(--text-xs); color: var(--color-text-muted); text-decoration: underline; text-underline-offset: 3px; }
 .show-earlier:hover { color: var(--color-text); }
+.contracts-table tr.is-current .contract-note { color: var(--color-text-muted); }
 .contract-note { color: var(--color-text-faint); font-size: 11px; line-height: 1.35; margin-top: 2px; }
 .firm-tag {
   display: inline-block; padding: 1px 6px; border-radius: var(--radius-sm); font-size: 10px; font-weight: 600;
@@ -1414,7 +1412,8 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
 }
 
 @media (max-width: 560px) {
-  .view-toggle button span { display: none; } /* icons only where the labels no longer fit */
+  /* icons only where the labels no longer fit; the labels stay for screen readers */
+  .view-toggle button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
 }
 
 @media (max-width: 480px) {
