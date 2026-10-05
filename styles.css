@@ -743,6 +743,20 @@ a:hover { color: var(--color-primary-hover); }
 }
 .detail-map-btn:hover { color: var(--color-text); border-color: var(--color-primary); }
 .detail-map-btn[hidden] { display: none; }
+
+/* step through the list without closing the panel */
+.detail-footer {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); flex-shrink: 0;
+  padding: var(--space-2) var(--space-3); border-top: 1px solid var(--color-border); background: var(--color-surface);
+}
+.detail-footer[hidden] { display: none; }
+.detail-step {
+  display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 var(--space-2); border-radius: var(--radius-md);
+  font-size: var(--text-xs); color: var(--color-text-muted);
+}
+.detail-step:hover:not(:disabled) { background: var(--color-surface-2); color: var(--color-text); }
+.detail-step:disabled { opacity: 0.4; cursor: default; }
+.detail-pos { font-size: 11px; color: var(--color-text-faint); font-variant-numeric: tabular-nums; }
 .detail-rig-name { font-size: var(--text-lg); font-weight: 700; line-height: 1.2; margin-bottom: var(--space-1); }
 .detail-contractor { font-size: var(--text-sm); color: var(--color-text-muted); }
 
@@ -817,30 +831,16 @@ a:hover { color: var(--color-primary-hover); }
 .dayrate-unit { font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 500; }
 .dayrate-undisclosed { font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3); }
 
-.contract-bar-wrapper { margin-bottom: var(--space-4); }
-.contract-bar {
-  position: relative;
-  height: 8px;
-  background: var(--color-surface-2);
-  border-radius: var(--radius-full);
-  overflow: hidden;
-  margin-bottom: var(--space-1);
-}
-.contract-bar-fill {
-  height: 100%;
-  border-radius: var(--radius-full);
-  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
-  transition: width 400ms ease;
-}
-.contract-now { position: absolute; top: -3px; bottom: -3px; left: 50%; width: 2px; background: var(--color-text); transform: translateX(-1px); }
-.contract-bar-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--color-text-faint);
-  font-family: var(--font-mono);
-}
-.contract-remaining { color: var(--color-primary); }
+/* contract timeline: current and upcoming contracts on one strip (bars share the Insights timeline styles) */
+.runway { margin-bottom: var(--space-4); }
+.runway-track { position: relative; height: 20px; border-radius: var(--radius-sm); background: var(--color-surface-2); }
+.runway-now { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--color-text); border-radius: 1px; }
+.runway-labels { display: flex; justify-content: space-between; margin-top: 4px; font-size: 11px; color: var(--color-text-faint); font-family: var(--font-mono); }
+.runway-status { margin-top: 2px; font-size: var(--text-xs); color: var(--color-text); font-weight: 600; }
+.runway-key { display: flex; flex-wrap: wrap; gap: 2px var(--space-3); margin-top: var(--space-2); font-size: 10px; color: var(--color-text-muted); }
+.runway-key span { display: inline-flex; align-items: center; gap: 5px; }
+.runway-key .gantt-bar { position: static; display: inline-block; width: 14px; height: 8px; box-shadow: none; }
+.runway-now-key { display: inline-block; width: 2px; height: 10px; background: var(--color-text); }
 .contract-none { font-size: var(--text-xs); color: var(--color-text-muted); padding: var(--space-2) 0; }
 
 /* all contracts for one rig */
@@ -851,6 +851,8 @@ a:hover { color: var(--color-primary-hover); }
 }
 .contracts-table td { padding: var(--space-2) var(--space-2) var(--space-2) 0; border-bottom: 1px solid var(--color-divider); vertical-align: top; }
 .contracts-table .mono-cell { font-family: var(--font-mono); white-space: nowrap; }
+.contracts-table .period-cell { white-space: normal; }
+.contracts-table .period-cell span { white-space: nowrap; } /* wraps at the dash, never inside a date */
 .contracts-table tr.is-current td { background: var(--color-primary-highlight); }
 .contracts-table tr.is-current td:first-child { box-shadow: inset 3px 0 0 var(--color-primary); padding-left: var(--space-2); }
 .contracts-table tr.is-past td { color: var(--color-text-faint); }
