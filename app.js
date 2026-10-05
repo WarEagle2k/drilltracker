@@ -491,6 +491,7 @@ function initTheme() {
     try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
     syncTheme(theme);
     if (basemapLayer) basemapLayer.setStyle(basemapStyle());
+    if (flightBasemap) flightBasemap.setStyle(basemapStyle());
   });
 }
 
@@ -547,14 +548,21 @@ function basemapStyle() {
            color: css.getPropertyValue('--map-border').trim(), weight: 0.6, opacity: 1 };
 }
 
-function makeBasemapLayer() {
+/* simplify: a tolerance in degrees, for the lighter copy used in flight */
+function makeBasemapLayer(simplify) {
+  const ring = function (r) {
+    const pts = decodeRing(r);
+    if (!simplify) return pts;
+    const s = L.LineUtil.simplify(pts.map(p => L.point(p[0], p[1])), simplify).map(p => [p.x, p.y]);
+    return s.length >= 4 ? s : pts;
+  };
   const features = BASEMAP.countries.map(function (c) {
     return { type: 'Feature', properties: {},
-             geometry: { type: 'MultiPolygon', coordinates: c.g.map(r => [decodeRing(r)]) } };
+             geometry: { type: 'MultiPolygon', coordinates: c.g.map(r => [ring(r)]) } };
   });
   return L.geoJSON(features, {
     interactive: false,
-    renderer: L.canvas({ padding: 0.25 }),
+    renderer: L.canvas({ padding: simplify ? 0 : 0.25 }),
     smoothFactor: 2, // simplify outlines to ~2px at the current zoom while drawing
     style: basemapStyle
   });
@@ -675,6 +683,8 @@ function initMap() {
   if (typeof BASEMAP !== 'undefined') {
     map.attributionControl.addAttribution('Map data: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>');
     basemapLayer = makeBasemapLayer().addTo(map);
+    // build the lighter in-flight copy while idle, so the first glide doesn't stall at take-off
+    (window.requestIdleCallback || setTimeout)(function () { if (!flightBasemap) flightBasemap = makeBasemapLayer(0.1); });
   }
 
   smoothWheelZoom(map);
@@ -689,20 +699,15 @@ function initMap() {
   syncIconMode();
   updateMapLabels();
 
-  // A selected cluster glides to its rigs (with the same margins as "Zoom to the rigs shown")
-  // instead of jumping: Leaflet only animates zooms of up to 4 levels, and world view to a
-  // basin is more. Always at least one level in, so the cluster splits. No motion if the
-  // viewer has asked for less.
+  // A selected cluster glides to its rigs. It stops a little short of a tight fit, so rigs
+  // spread across a basin keep some context, but always far enough in that it splits
+  // (the plugin clusters at the rounded zoom).
   if (L.MarkerCluster) {
     L.MarkerCluster.prototype.zoomToBounds = function () {
-      const bounds = this.getBounds(), pad = mapPadding();
-      const zoom = Math.min(MAP_MAX_ZOOM, Math.max(map.getZoom() + 1,
-        map.getBoundsZoom(bounds, false, L.point(pad.paddingTopLeft).add(pad.paddingBottomRight))));
-      const centre = map.unproject(map.project(bounds.getCenter(), zoom)
-        .add(L.point(pad.paddingBottomRight).subtract(pad.paddingTopLeft).divideBy(2)), zoom);
-      if (prefersReduced) { map.setView(centre, zoom, { animate: false }); return; }
-      keepBasemapSharp();
-      map.flyTo(centre, zoom, { duration: 0.9, easeLinearity: 0.35 });
+      let node = this;
+      while (node._childClusters.length === 1 && !node._markers.length) node = node._childClusters[0];
+      const splits = node._zoom + 1 - 0.45;
+      glideToBounds(this.getBounds(), function (fit) { return Math.max(splits, fit - 0.6); });
     };
   }
   markerLayer = L.markerClusterGroup ? L.markerClusterGroup({
@@ -746,7 +751,56 @@ function keepBasemapSharp() {
 function fitToRigs(animate) {
   if (!map || !filteredRigs.length) return;
   const bounds = L.latLngBounds(filteredRigs.map(r => [r.lat, r.lng]));
-  map.fitBounds(bounds, Object.assign(mapPadding(), { maxZoom: 6, animate: animate && !prefersReduced }));
+  if (animate) glideToBounds(bounds, fit => Math.min(fit, 6));
+  else map.fitBounds(bounds, Object.assign(mapPadding(), { maxZoom: 6, animate: false }));
+}
+
+/* Glides: every zoom the app makes (a cluster, "Zoom to the rigs shown", Show on map) flies
+   there rather than jumping, since Leaflet only animates zooms of up to four levels. No
+   motion if the viewer has asked for less. */
+function glideToBounds(bounds, pickZoom, done) {
+  const pad = mapPadding();
+  const fit = map.getBoundsZoom(bounds, false, L.point(pad.paddingTopLeft).add(pad.paddingBottomRight));
+  const zoom = Math.min(MAP_MAX_ZOOM, pickZoom(fit));
+  // centre the bounds in the part of the map the padding leaves clear
+  const centre = map.unproject(map.project(bounds.getCenter(), zoom)
+    .add(L.point(pad.paddingBottomRight).subtract(pad.paddingTopLeft).divideBy(2)), zoom);
+  glideTo(centre, zoom, done);
+}
+
+function glideTo(centre, zoom, done) {
+  if (prefersReduced) { map.setView(centre, zoom, { animate: false }); if (done) done(); return; }
+  startFlightBasemap();
+  if (done) map.once('moveend', done);
+  map.flyTo(centre, zoom, { duration: 1.1 });
+}
+
+/* In flight the detailed basemap could only be stretched (blocky) or redrawn each frame
+   (~5-13 ms, enough to drop frames). Instead, a simplified copy (a fifth of the points,
+   ~2-6 ms) stands in and is redrawn as it goes; the detailed one returns on landing. */
+let flightBasemap = null, inFlight = false;
+function startFlightBasemap() {
+  if (!basemapLayer || inFlight) return; // a glide begun mid-flight lands with the first
+  inFlight = true;
+  if (!flightBasemap) flightBasemap = makeBasemapLayer(0.1);
+  const main = basemapLayer.options.renderer._container;
+  flightBasemap.addTo(map);
+  if (main) main.style.visibility = 'hidden';
+  const renderer = flightBasemap.options.renderer;
+  let last = 0;
+  const redraw = function () {
+    const now = performance.now();
+    if (now - last < 40) return;
+    last = now;
+    renderer._reset(); // Leaflet's own full redraw at the current view
+  };
+  map.on('zoom', redraw);
+  map.once('moveend', function () {
+    inFlight = false;
+    map.off('zoom', redraw);
+    map.removeLayer(flightBasemap);
+    if (main) main.style.visibility = '';
+  });
 }
 
 /* Room to keep markers clear of the zoom controls, the filter pill and the map key (open,
@@ -1793,13 +1847,12 @@ function focusRig(rigId) {
   setView('map');
   if (!map) { openDetail(rig); return; }
   map.invalidateSize();
-  map.setView([rig.lat, rig.lng], 7, { animate: !prefersReduced });
-  setTimeout(function () {
+  glideTo(L.latLng(rig.lat, rig.lng), 7, function () {
     const marker = markersById[rig.id];
     // Nearby rigs can still be clustered at this zoom: zoom/spiderfy until the marker is visible
     if (marker && !marker.getElement() && markerLayer.zoomToShowLayer) markerLayer.zoomToShowLayer(marker, function () { openDetail(rig); });
     else openDetail(rig);
-  }, prefersReduced ? 0 : 350);
+  });
 }
 
 /* ============================================
