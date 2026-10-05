@@ -1,0 +1,29 @@
+# Runs the data checks and tests on every pull request and on pushes to main.
+name: Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check the scripts parse
+        run: for f in app.js insights.js rigs.js basemap.js theme-init.js; do node --check "$f"; done
+      - name: Validate rig data
+        run: node scripts/validate.js
+      - name: Date logic
+        run: node scripts/test-dates.js
+      - name: Filters
+        run: node scripts/test-filters.js
+      - name: Insights calculations
+        run: node scripts/test-insights.js
