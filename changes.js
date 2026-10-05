@@ -87,6 +87,16 @@ const CHANGES = {
     "rig-108": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Aker BP, booked to End 2028"}]},
     "rig-109": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Vår Energi, booked to Q4 2027"}]},
     "rig-110": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Vår Energi, booked to Early 2028"}]},
-    "rig-111": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to 2028"}]}
+    "rig-111": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to 2028"}]},
+    "rig-112": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Dec 2030"}]},
+    "rig-113": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Mar 2029"}]},
+    "rig-114": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Apr 2028"}]},
+    "rig-115": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Dec 2030"}]},
+    "rig-116": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Dec 2028"}]},
+    "rig-117": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Brava Energia, booked to Apr 2027"}]},
+    "rig-118": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Petrobras from Jan 2027, booked to Q3 2029"}]},
+    "rig-119": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Petrobras from Jan 2027, booked to Q1 2031"}]},
+    "rig-120": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Eni, booked to Dec 2026"}]},
+    "rig-121": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Q2 2029"}]}
   }
 };
