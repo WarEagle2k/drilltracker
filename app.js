@@ -821,7 +821,7 @@ function clusterIcon(cluster) {
   const kids = cluster.getAllChildMarkers(), n = kids.length;
   const counts = {};
   kids.forEach(function (m) { const r = RIG_BY_ID[m.options.rigId]; if (r) { const c = rigCategory(r); counts[c] = (counts[c] || 0) + 1; } });
-  const order = colorMode === 'contractor' ? Object.keys(counts).sort() : Object.keys(AVAILABILITY).filter(k => counts[k]);
+  const order = colorMode === 'contractor' ? Object.keys(counts).sort((a, b) => a.localeCompare(b)) : Object.keys(AVAILABILITY).filter(k => counts[k]);
   let at = 0;
   const stops = order.map(function (c) {
     const from = at; at += counts[c] / n * 100;
@@ -1224,20 +1224,26 @@ function buildLegend() {
   document.getElementById('filterSidebar').classList.toggle('show-contractor-colors', colorMode === 'contractor');
   const counts = {};
   filteredRigs.forEach(r => { const c = rigCategory(r); counts[c] = (counts[c] || 0) + 1; });
-  const keys = colorMode === 'contractor' ? Object.keys(counts).sort() : Object.keys(AVAILABILITY);
+  const keys = colorMode === 'contractor' ? Object.keys(counts).sort((a, b) => a.localeCompare(b)) : Object.keys(AVAILABILITY);
   const rows = keys.map(c =>
     '<div class="legend-row' + (counts[c] ? '' : ' legend-row--zero') + '"><span class="legend-dot" style="background:' + categoryColor(c) + '"></span>' +
     '<span class="legend-label">' + escapeHtml(colorMode === 'contractor' ? c : AVAILABILITY[c]) + '</span>' +
     '<span class="legend-count">' + (counts[c] || 0) + '</span></div>').join('');
+  let at = 0;
+  const stops = keys.filter(c => counts[c]).map(function (c) {
+    const from = at; at += counts[c] / filteredRigs.length * 100;
+    return categoryColor(c) + ' ' + from.toFixed(2) + '% ' + at.toFixed(2) + '%';
+  });
+  document.getElementById('legendCluster').style.background = stops.length ? 'conic-gradient(' + stops.join(', ') + ')' : '';
   document.querySelector('#mapLegend .legend-body').innerHTML = filteredRigs.length ? rows :
     '<div class="legend-row legend-empty">No rigs shown</div>';
+  const lb = document.querySelector('#mapLegend .legend-body');
+  lb.classList.toggle('is-scrollable', lb.scrollHeight > lb.clientHeight + 1);
 }
 
 function toggleLegend() {
   const collapsed = document.getElementById('mapLegend').classList.toggle('collapsed');
-  const btn = document.querySelector('.legend-toggle');
-  btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-  btn.setAttribute('aria-label', collapsed ? 'Expand the map key' : 'Collapse the map key');
+  document.querySelector('.legend-toggle').setAttribute('aria-expanded', collapsed ? 'false' : 'true');
 }
 
 /* ============================================
