@@ -257,7 +257,7 @@ const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').mat
 /* Each filter group: its container, URL key and how to read the value from a rig */
 const FILTER_GROUPS = [
   { id: 'contractorFilters', key: 'contractor', get: r => r.contractor, color: true },
-  { id: 'typeFilters',       key: 'type',       get: r => r.type },
+  { id: 'typeFilters',       key: 'type',       get: r => r.type, order: ['Drillship', 'Semisubmersible', 'Jackup'] },
   { id: 'regionFilters',     key: 'region',     get: r => r.region, order: REGIONS },
   { id: 'countryFilters',    key: 'country',    get: r => r.country || NO_COUNTRY },
   { id: 'statusFilters',     key: 'status',     get: r => r.derived.status, order: Object.keys(STATUSES) }
@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
   initTheme();
   initMap();
   buildFilters();
+  wireFilterSections();
   renderFooter();
   renderStaleBanner();
   wireActions();
@@ -339,6 +340,7 @@ function wireActions() {
       case 'clear-search': clearSearch(); break;
       case 'reset-filters': resetFilters(); break;
       case 'remove-filter': removeFilter(el.dataset.group, el.dataset.value); break;
+      case 'clear-group': clearGroup(el.dataset.group); break;
       case 'remove-search': clearSearch(); break;
       case 'toggle-legend': toggleLegend(); break;
       case 'color-mode': setColorMode(el.dataset.mode); break;
@@ -961,7 +963,7 @@ function applyFilters() {
   updateKPIs(filteredRigs);
   updateFilterCount(filteredRigs.length);
   renderActiveFilters(selections);
-  updateCountrySummary(selections);
+  updateGroupHeads(selections);
   buildLegend();
   renderEmptyState(filteredRigs.length === 0, search);
   if (currentView === 'list') renderListView();
@@ -1004,14 +1006,50 @@ function resetFilters() {
   applyFilters();
 }
 
-function updateCountrySummary(selections) {
-  const n = selections.country.length;
-  document.getElementById('countrySummary').textContent = n ? n + ' selected' : '';
-  if (n) document.getElementById('countrySection').open = true;
+/* Each group's heading says how many of its options are ticked and offers a Clear. A
+   collapsed group opens when it gains a selection from elsewhere (a chip, a shared link). */
+const groupTicked = {};
+function updateGroupHeads(selections) {
+  FILTER_GROUPS.forEach(function (g) {
+    const n = selections[g.key].length, section = document.getElementById(g.id).closest('.filter-group');
+    section.querySelector('.filter-summary-note').textContent = n ? n + ' selected' : '';
+    section.querySelector('.filter-group-clear').hidden = !n;
+    if (n && !groupTicked[g.key]) setGroupOpen(section, true);
+    groupTicked[g.key] = n;
+  });
+}
+
+const SECTIONS_KEY = 'drilltracker-closed-filters';
+function setGroupOpen(section, open, remember) {
+  section.querySelector('.filter-section-toggle').setAttribute('aria-expanded', open ? 'true' : 'false');
+  section.querySelector('.filter-options').hidden = !open;
+  if (!remember) return;
+  const closed = [...document.querySelectorAll('.filter-group')].filter(s => s.querySelector('.filter-options').hidden).map(s => s.dataset.group);
+  try { localStorage.setItem(SECTIONS_KEY, JSON.stringify(closed)); } catch (e) {}
+}
+
+/* Open or closed is remembered per browser; Country starts closed */
+function wireFilterSections() {
+  let closed = null;
+  try { closed = JSON.parse(localStorage.getItem(SECTIONS_KEY)); } catch (e) {}
+  if (Array.isArray(closed)) document.querySelectorAll('.filter-group').forEach(s => setGroupOpen(s, !closed.includes(s.dataset.group)));
+  document.querySelector('.filter-body').addEventListener('click', function (e) {
+    const t = e.target.closest('.filter-section-toggle');
+    if (t) setGroupOpen(t.closest('.filter-group'), t.getAttribute('aria-expanded') !== 'true', true);
+  });
+}
+
+function clearGroup(groupId) {
+  document.getElementById(groupId).querySelectorAll('input:checked').forEach(cb => { cb.checked = false; });
+  applyFilters();
+  // the Clear button hides itself; keep focus in the group
+  document.getElementById(groupId).closest('.filter-group').querySelector('.filter-section-toggle').focus();
 }
 
 function updateFilterCount(count) {
-  document.getElementById('filterCount').textContent = count + ' of ' + RIG_DATA.length + ' rigs';
+  const total = RIG_DATA.length;
+  document.getElementById('filterCount').textContent = count === total ? 'All ' + total + ' rigs' : count + ' of ' + total + ' rigs';
+  document.getElementById('filterDone').textContent = count ? 'Show ' + plural(count, 'rig') : 'No rigs match';
 }
 
 /* With facets the only way to reach zero is the search, so say so */
@@ -1148,6 +1186,8 @@ function animateValue(id, target, fmt) {
    MAP LEGEND
    ============================================ */
 function buildLegend() {
+  // the sidebar's contractor dots are a key to the map, so they show only while it is coloured by contractor
+  document.getElementById('filterSidebar').classList.toggle('show-contractor-colors', colorMode === 'contractor');
   const counts = {};
   filteredRigs.forEach(r => { const c = rigCategory(r); counts[c] = (counts[c] || 0) + 1; });
   const keys = colorMode === 'contractor' ? Object.keys(counts).sort() : Object.keys(AVAILABILITY);

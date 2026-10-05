@@ -160,6 +160,7 @@
           <div class="search-wrapper">
             <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input type="text" class="search-input" id="searchInput" placeholder="Search rigs, customers…" aria-label="Search rigs by name, contractor, owner, customer, location, type, status, or notes">
+            <kbd class="search-key" aria-hidden="true" title="Press / to search">/</kbd>
             <button type="button" class="search-clear" id="searchClear" data-action="clear-search" aria-label="Clear search" hidden>
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
@@ -171,28 +172,56 @@
         </div>
         <p class="filter-hint">Tick options to narrow the rigs shown. Each number is how many rigs that option has within your other choices.</p>
 
-        <div class="filter-section" role="group" aria-labelledby="fsStatus">
-          <h3 class="filter-section-title" id="fsStatus">Status</h3>
-          <div id="statusFilters"></div>
+        <div class="filter-section filter-group" data-group="status">
+          <div class="filter-section-head">
+            <button type="button" class="filter-section-toggle" aria-expanded="true" aria-controls="statusFilters">
+              <span class="filter-section-title">Status</span><span class="filter-summary-note" aria-live="polite"></span>
+            </button>
+            <button type="button" class="filter-group-clear" data-action="clear-group" data-group="statusFilters" aria-label="Clear status filters" hidden>Clear</button>
+          </div>
+          <div id="statusFilters" class="filter-options" role="group" aria-label="Status"></div>
         </div>
-        <div class="filter-section" role="group" aria-labelledby="fsContractor">
-          <h3 class="filter-section-title" id="fsContractor">Contractor</h3>
-          <div id="contractorFilters"></div>
+        <div class="filter-section filter-group" data-group="contractor">
+          <div class="filter-section-head">
+            <button type="button" class="filter-section-toggle" aria-expanded="true" aria-controls="contractorFilters">
+              <span class="filter-section-title">Contractor</span><span class="filter-summary-note" aria-live="polite"></span>
+            </button>
+            <button type="button" class="filter-group-clear" data-action="clear-group" data-group="contractorFilters" aria-label="Clear contractor filters" hidden>Clear</button>
+          </div>
+          <div id="contractorFilters" class="filter-options" role="group" aria-label="Contractor"></div>
         </div>
-        <div class="filter-section" role="group" aria-labelledby="fsType">
-          <h3 class="filter-section-title" id="fsType">Rig Type</h3>
-          <div id="typeFilters"></div>
+        <div class="filter-section filter-group" data-group="type">
+          <div class="filter-section-head">
+            <button type="button" class="filter-section-toggle" aria-expanded="true" aria-controls="typeFilters">
+              <span class="filter-section-title">Rig type</span><span class="filter-summary-note" aria-live="polite"></span>
+            </button>
+            <button type="button" class="filter-group-clear" data-action="clear-group" data-group="typeFilters" aria-label="Clear rig type filters" hidden>Clear</button>
+          </div>
+          <div id="typeFilters" class="filter-options" role="group" aria-label="Rig type"></div>
         </div>
-        <div class="filter-section" role="group" aria-labelledby="fsRegion">
-          <h3 class="filter-section-title" id="fsRegion">Region</h3>
-          <div id="regionFilters"></div>
+        <div class="filter-section filter-group" data-group="region">
+          <div class="filter-section-head">
+            <button type="button" class="filter-section-toggle" aria-expanded="true" aria-controls="regionFilters">
+              <span class="filter-section-title">Region</span><span class="filter-summary-note" aria-live="polite"></span>
+            </button>
+            <button type="button" class="filter-group-clear" data-action="clear-group" data-group="regionFilters" aria-label="Clear region filters" hidden>Clear</button>
+          </div>
+          <div id="regionFilters" class="filter-options" role="group" aria-label="Region"></div>
         </div>
-        <details class="filter-section filter-collapsible" id="countrySection">
-          <summary class="filter-section-title">Country <span class="filter-summary-note" id="countrySummary"></span></summary>
-          <div id="countryFilters" role="group" aria-label="Country"></div>
-        </details>
+        <div class="filter-section filter-group" data-group="country">
+          <div class="filter-section-head">
+            <button type="button" class="filter-section-toggle" aria-expanded="false" aria-controls="countryFilters">
+              <span class="filter-section-title">Country</span><span class="filter-summary-note" aria-live="polite"></span>
+            </button>
+            <button type="button" class="filter-group-clear" data-action="clear-group" data-group="countryFilters" aria-label="Clear country filters" hidden>Clear</button>
+          </div>
+          <div id="countryFilters" class="filter-options" role="group" aria-label="Country" hidden></div>
+        </div>
 
 
+      </div>
+      <div class="filter-footer">
+        <button type="button" class="filter-done" data-action="toggle-sidebar" id="filterDone">Show rigs</button>
       </div>
     </aside>
 
