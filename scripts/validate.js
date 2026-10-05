@@ -46,7 +46,7 @@ app.RIG_DATA.forEach(function (rig) {
   if (typeof rig.lng !== 'number' || Math.abs(rig.lng) > 180) err(rig, 'lng out of range');
 
   // known values; commas would break the comma-separated filter lists in the URL
-  if (!(rig.contractor in app.CONTRACTOR_COLORS)) err(rig, 'contractor "' + rig.contractor + '" has no colour in CONTRACTOR_COLORS (app.js)');
+  if (!(rig.contractor in app.CONTRACTOR_COLORS) && !app.OTHER_CONTRACTORS.includes(rig.contractor)) err(rig, 'contractor "' + rig.contractor + '" is in neither CONTRACTOR_COLORS nor OTHER_CONTRACTORS (app.js)');
   if (!(rig.type in app.TYPE_SIZES)) err(rig, 'unknown rig type "' + rig.type + '"');
   if (!app.REGIONS.includes(rig.region)) err(rig, 'unknown region "' + rig.region + '"; regions are ' + app.REGIONS.join(', '));
   if (!(rig.position in app.POSITIONS)) err(rig, 'unknown position "' + rig.position + '"');
@@ -57,7 +57,8 @@ app.RIG_DATA.forEach(function (rig) {
   // class: floaters carry a generation, jackups a class
   if (rig.type === 'Jackup' && rig.generation) err(rig, 'jackups use jackupClass, not generation');
   if (rig.type !== 'Jackup' && rig.jackupClass) err(rig, 'floaters use generation, not jackupClass');
-  if (rig.type !== 'Jackup' && !rig.generation) warn(rig, 'floater has no generation');
+  // older units sit below the 6th-8th generation classes; a newer floater without one is a gap
+  if (rig.type !== 'Jackup' && !rig.generation && rig.buildYear >= 2008) warn(rig, 'floater built ' + rig.buildYear + ' has no generation');
 
   // sources
   if (rig.asOf !== null && !/^\d{4}-\d{2}(-\d{2})?$/.test(rig.asOf)) err(rig, 'asOf must be YYYY-MM or YYYY-MM-DD');

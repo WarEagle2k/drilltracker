@@ -5,11 +5,12 @@
    CONSTANTS
    ============================================ */
 /* Contractor colours: desaturated, navy-harmonized categorical ramp
-   (kept clear of the brand amber reserved for clusters) */
+   (kept clear of the brand amber reserved for clusters). Past a dozen, colours stop being
+   told apart, so contractors with only a few rigs share one "Other" colour on the map;
+   the filters, list and details still name them. */
 const CONTRACTOR_COLORS = {
   'Transocean':        '#4a9d9c',
   'Seadrill':          '#6b8cc7',
-  'Sonadrill':         '#5f6fb0',
   'Noble Corporation': '#8aa872',
   'Valaris':           '#c77b8b',
   'Odfjell Drilling':  '#9b8bc4',
@@ -18,8 +19,12 @@ const CONTRACTOR_COLORS = {
   'Stena Drilling':    '#6fa8b0',
   'COSL':              '#b5926a',
   'Constellation':     '#a59b80',
-  'Ventura Offshore':  '#7fa38f'
+  'Ventura Offshore':  '#7fa38f',
+  'Foresea':           '#a65ea0'
 };
+const OTHER_CONTRACTORS = ['Sonadrill', 'Dolphin Drilling', 'Vantage Drilling', 'Etesco'];
+const OTHER_CONTRACTOR_LABEL = 'Other contractors';
+const OTHER_CONTRACTOR_COLOR = '#6e6c69';
 const FALLBACK_COLOR = '#8896a8';
 
 /* Status is about activity on DATA_AS_OF and is derived from the contracts;
@@ -217,7 +222,17 @@ RIG_DATA.forEach(function (rig) { RIG_BY_ID[rig.id] = rig; });
    LABELS & COLOURS
    ============================================ */
 function getContractorColor(contractor) {
-  return CONTRACTOR_COLORS[contractor] || FALLBACK_COLOR;
+  return CONTRACTOR_COLORS[contractor] || (contractor === OTHER_CONTRACTOR_LABEL || OTHER_CONTRACTORS.includes(contractor) ? OTHER_CONTRACTOR_COLOR : FALLBACK_COLOR);
+}
+
+/* The map's colour group for a contractor: its own, or the shared "Other" */
+function contractorGroup(contractor) {
+  return contractor in CONTRACTOR_COLORS ? contractor : OTHER_CONTRACTOR_LABEL;
+}
+
+/* Contractor groups in key order: alphabetical, with "Other" last */
+function contractorOrder(keys) {
+  return keys.sort((a, b) => (a === OTHER_CONTRACTOR_LABEL) - (b === OTHER_CONTRACTOR_LABEL) || a.localeCompare(b));
 }
 
 function statusSlug(status) { return STATUSES[status] || 'available'; }
@@ -842,7 +857,7 @@ function availabilityOf(rig) {
 }
 
 function rigCategory(rig) {
-  return colorMode === 'contractor' ? rig.contractor : availabilityOf(rig);
+  return colorMode === 'contractor' ? contractorGroup(rig.contractor) : availabilityOf(rig);
 }
 
 function categoryColor(cat) {
@@ -937,7 +952,7 @@ function clusterIcon(cluster) {
   const kids = cluster.getAllChildMarkers(), n = kids.length;
   const counts = {};
   kids.forEach(function (m) { const r = RIG_BY_ID[m.options.rigId]; if (r) { const c = rigCategory(r); counts[c] = (counts[c] || 0) + 1; } });
-  const order = colorMode === 'contractor' ? Object.keys(counts).sort((a, b) => a.localeCompare(b)) : Object.keys(AVAILABILITY).filter(k => counts[k]);
+  const order = colorMode === 'contractor' ? contractorOrder(Object.keys(counts)) : Object.keys(AVAILABILITY).filter(k => counts[k]);
   let at = 0;
   const stops = order.map(function (c) {
     const from = at; at += counts[c] / n * 100;
@@ -1343,7 +1358,7 @@ function buildLegend() {
   document.querySelector('.main-content').classList.toggle('show-contractor-colors', colorMode === 'contractor');
   const counts = {};
   filteredRigs.forEach(r => { const c = rigCategory(r); counts[c] = (counts[c] || 0) + 1; });
-  const keys = colorMode === 'contractor' ? Object.keys(counts).sort((a, b) => a.localeCompare(b)) : Object.keys(AVAILABILITY);
+  const keys = colorMode === 'contractor' ? contractorOrder(Object.keys(counts)) : Object.keys(AVAILABILITY);
   const rows = keys.map(c =>
     '<div class="legend-row' + (counts[c] ? '' : ' legend-row--zero') + '"><span class="legend-dot" style="background:' + categoryColor(c) + '"></span>' +
     '<span class="legend-label">' + escapeHtml(colorMode === 'contractor' ? c : AVAILABILITY[c]) + '</span>' +
