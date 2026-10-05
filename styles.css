@@ -104,9 +104,9 @@ html {
   --seq-5: #70cdc7;
   --viz-deemph: #545252;
 
-  /* map availability: ordinal orange (validated --ordinal on the dark sea), grey for the rest */
+  /* map availability: Coral for open now, a muted yellow for free within 9 months (22 apart, CVD-checked on the dark sea), grey for the rest */
   --avail-open:   #E15D48;
-  --avail-near:   #A3412F;
+  --avail-near:   #E3B505;
   --avail-booked: #5E6366;
   --viz-grid: #353434;
 
@@ -1039,7 +1039,7 @@ a:hover { color: var(--color-primary-hover); }
 .list-key { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 4px var(--space-4); }
 .list-key-item { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .list-key strong { color: var(--color-text); font-variant-numeric: tabular-nums; }
-/* the same two oranges as the map's availability colouring */
+/* the same two colours as the map's availability colouring */
 .list-key-mark { width: 3px; height: 14px; border-radius: 2px; }
 .list-key-mark--open { background: var(--avail-open); }
 .list-key-mark--near { background: var(--avail-near); }

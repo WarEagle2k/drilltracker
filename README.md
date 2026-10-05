@@ -36,12 +36,12 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 
 **Booked to** follows the rig's awarded contracts (not options) from the data date, or from its first commitment, and treats gaps of up to 140 days as continuous (fleet status reports show mobilization and contract preparation of up to about 135 days between contracts). "Open now" means nothing is booked; "Undisclosed" means the latest contract has no published end.
 
-**Coming free**: open now, unconfirmed, or booked for less than 9 months. On the map these are the orange markers; in the list, rows with an orange edge (darker for open now), with the same counts as the map key.
+**Coming free**: open now, unconfirmed, or booked for less than 9 months. On the map these are the Brick and Coral markers (Coral and yellow in the dark theme); in the list, rows with an edge in the same colours, with the same counts as the map key.
 
 **KPIs**
 
 - *Contracted Share*: Working + Committed rigs ÷ rigs shown.
-- *Coming Free*: rigs open now, or whose booked work ends within 9 months, plus unconfirmed rigs: the orange markers on the map.
+- *Coming Free*: rigs open now, or whose booked work ends within 9 months, plus unconfirmed rigs: the open-now and free-within-9-months markers on the map.
 - *Booked Runway*: the median time until each rig's booked work runs out (awarded work, followed across short gaps). Open rigs and rigs whose booked work has no published end are left out.
 - *Avg Floater Rate* (in thousands of dollars a day): mean disclosed day rate of the drillships and semisubmersibles shown, using the current contract (or the next one for rigs not yet working). Jackups are excluded. Insights compares the median floater rate running now with the median of rates starting later. When fewer than five rates are disclosed, the count is highlighted.
 - *Disclosed Backlog*: for firm contracts with a disclosed rate, days remaining after the data date × day rate, including follow-on contracts and rate steps. Options, LOIs and conditional awards are excluded, as is any rig without a disclosed rate.
@@ -73,7 +73,7 @@ Every chart follows the filters and has a table view of the same numbers. Hover,
 
 Colours follow the CSI brand: a Charcoal header bar with CSI Yellow, Slate for links and selected states in the light theme, and a charcoal dark theme where CSI Yellow does that job. CSI Yellow is never used as text on white (1.5:1); it appears as a fill under Charcoal text or on Charcoal. The CSS variables at the top of `styles.css` hold every colour.
 
-Chart and map colours follow the job they do. Availability on the map is Brick (open now) and Coral (free within 9 months), with grey for the rest. Contract firmness is an ordered scale from Slate to Steel Blue. Rig type uses three categorical colours (blue, Coral, teal) plus a marker shape each. The heatmap uses five steps of Deep Teal. All were checked for colour-vision deficiency and contrast against both themes, and the accessibility check below covers the page in both.
+Chart and map colours follow the job they do. Availability on the map is Brick (open now) and Coral (free within 9 months), with grey for the rest; the dark theme uses Coral and a muted yellow, since no brand red is lighter than Coral. Contract firmness is an ordered scale from Slate to Steel Blue. Rig type uses three categorical colours (blue, Coral, teal) plus a marker shape each. The heatmap uses five steps of Deep Teal. All were checked for colour-vision deficiency and contrast against both themes, and the accessibility check below covers the page in both.
 
 ## Changes since the last refresh
 

@@ -53,7 +53,7 @@ const RIG_ICONS = {
 };
 const NO_COUNTRY = 'Not disclosed';
 
-/* Map colour modes. Availability is ordinal emphasis (one orange hue, two steps, grey
+/* Map colour modes. Availability is ordinal emphasis (two warm steps from the brand palette, grey
    for the rest; validated on both map surfaces); contractor is the brand set. */
 const AVAILABILITY = {
   open:   'Open now',
@@ -412,7 +412,7 @@ function closeKpiHelp(refocus) {
 function wireKpiHelp() {
   document.getElementById('kpiFreeHelp').textContent =
     'Rigs open now, or whose booked work ends within ' + NEAR_TERM_MONTHS + ' months (by ' + monthLabel(addMonths(AS_OF, NEAR_TERM_MONTHS)) + '), ' +
-    'and unconfirmed rigs. They are the orange markers on the map.';
+    'and unconfirmed rigs. They are the open-now and free-within-9-months markers on the map.';
   document.getElementById('kpiRunwayHelp').textContent =
     'Median time until each rig\'s booked work runs out, following awarded work (not options) across short gaps between contracts. ' +
     'Open rigs and rigs whose booked work has no published end are left out.';
@@ -1185,7 +1185,7 @@ function updateKPIs(rigs) {
   const backlogRigs = rigs.filter(r => r.derived.backlog > 0);
   const backlog = backlogRigs.reduce((s, r) => s + r.derived.backlog, 0);
 
-  // coming free: the orange markers on the map (open now, or booked work ending within NEAR_TERM_MONTHS)
+  // coming free: the open-now and free-soon markers on the map (open now, or booked work ending within NEAR_TERM_MONTHS)
   const open = rigs.filter(r => r.derived.available).length;
   const free = rigs.filter(r => r.derived.nearTerm).length;
   // booked runway: median months of booked work left, for rigs whose booked work has a published end
