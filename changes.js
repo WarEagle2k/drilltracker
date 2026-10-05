@@ -38,8 +38,8 @@ const CHANGES = {
     "rig-052": {"group":"other","lines":[{"kind":"other","text":"Now working for Petrobras (was Shell)"}]},
     "rig-053": {"group":"other","lines":[{"kind":"other","text":"Started work for ExxonMobil"}]},
     "rig-054": {"group":"more","lines":[{"kind":"more","text":"Booked to: Nov 2026 (was Oct 2026)"}]},
-    "rig-056": {"group":"other","lines":[{"kind":"other","text":"Booked to: 2028 (was Jun 2028)"}]},
-    "rig-057": {"group":"more","lines":[{"kind":"more","text":"Booked to: Mid-2030 (was Jan 2028)"},{"kind":"other","text":"Next customer: an undisclosed customer (was Eni)"}]},
+    "rig-056": {"group":"more","lines":[{"kind":"more","text":"Booked to: Sep 2028 (was Jun 2028)"}]},
+    "rig-057": {"group":"more","lines":[{"kind":"more","text":"Booked to: Mar 2030 (was Jan 2028)"},{"kind":"other","text":"Next customer: an undisclosed customer (was Eni)"}]},
     "rig-059": {"group":"more","lines":[{"kind":"more","text":"Booked to: End 2028 (was End 2027)"}]},
     "rig-060": {"group":"other","lines":[{"kind":"other","text":"Started work for Equinor"}]},
     "rig-061": {"group":"less","lines":[{"kind":"less","text":"Booked to: Q2 2027 (was Mid-2027)"},{"kind":"other","text":"Now working for Adura (was Equinor)"}]},
@@ -57,6 +57,13 @@ const CHANGES = {
     "rig-077": {"group":"more","lines":[{"kind":"more","text":"Booked to: Aug 2027 (was Feb 2027)"}]},
     "rig-078": {"group":"more","lines":[{"kind":"more","text":"Booked to: Apr 2027 (was Jul 2026)"},{"kind":"other","text":"Now working for PVEP (was TLJOC)"}]},
     "rig-080": {"group":"other","lines":[{"kind":"other","text":"Booked to: Q2 2029 (was 2029)"}]},
-    "rig-083": {"group":"other","lines":[{"kind":"other","text":"Booked to: Mar 2028 (was 2028)"}]}
+    "rig-083": {"group":"other","lines":[{"kind":"other","text":"Booked to: Mar 2028 (was 2028)"}]},
+    "rig-084": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Occidental, booked to Dec 2028"}]},
+    "rig-085": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for an undisclosed customer from Nov 2026, booked to Dec 2029"}]},
+    "rig-086": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Equinor, booked to Jan 2028"}]},
+    "rig-087": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for CNR International, booked to May 2027"}]},
+    "rig-088": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for bp, booked to Apr 2027"}]},
+    "rig-089": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Shell, booked to Jul 2028"}]},
+    "rig-090": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Oct 2030"}]}
   }
 };

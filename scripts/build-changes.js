@@ -132,7 +132,12 @@ function contractChanges(o, n, asOf) {
 const out = {}, warnings = [];
 B.RIG_DATA.forEach(function (n) {
   const o = oldRigs[n.id], d = n.derived;
-  if (!o) { out[n.id] = { group: 'added', lines: [{ kind: 'more', text: 'Added to the tracker' }] }; return; }
+  if (!o) {
+    // a rig new to the tracker, not necessarily new work: say where it stands
+    const now = d.current ? 'working for ' + who(d.current.k.customer) : d.next ? 'next for ' + who(d.next.k.customer) + ' from ' + d.next.k.start : d.status.toLowerCase();
+    out[n.id] = { group: 'added', lines: [{ kind: 'other', text: 'Added to the tracker: ' + now + (d.available ? '' : ', booked to ' + bookedLabel(d)) }] };
+    return;
+  }
   const od = o.derived, lines = [];
   let ra = reach(od), rb = reach(d);
   if (od.bookedToLabel !== d.bookedToLabel || ra !== rb) {
