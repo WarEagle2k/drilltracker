@@ -52,7 +52,7 @@ Markers are coloured by **availability** by default: open now, free within 9 mon
 
 ## Rig details
 
-Selecting a rig opens its details: status, day rate, customer and booked-to date, location, specs, a contract timeline and every recorded contract with its source. The timeline puts the current and upcoming contracts on one strip against today, marked by year, so follow-on work and gaps show; a contract with no published end fades out. Beneath it, a line says how long the current contract has left and how far the booked work runs. A rig with nothing current or ahead shows when its last contract ended and for whom. If the rig changed since the previous refresh, a box under the day rate says how. Ended contracts stay in the contracts table, greyed; beyond the latest two they fold away. From the list, Previous and Next step through the rigs in the list's order without closing the panel.
+Selecting a rig opens its details: the rig type's silhouette in its map colour, status, day rate, customer and booked-to date, location, specs, a contract timeline and every recorded contract with its source. The timeline puts the current and upcoming contracts on one strip against today, marked by year and looking back at most six months, so follow-on work and gaps show; a contract with no published end fades out. Beneath it, a line says how long the current contract has left and how far the booked work runs. A rig with nothing current or ahead shows when its last contract ended and for whom. If the rig changed since the previous refresh, a box under the day rate says how. Ended contracts stay in the contracts table, greyed; beyond the latest two they fold away. From the list, Previous and Next step through the rigs in the list's order without closing the panel.
 
 ## Filtering
 
@@ -107,6 +107,7 @@ A filter lists the values shown, comma-separated; a filter that isn't in the lin
 | `theme-init.js` | Applies the saved theme before first paint. |
 | `basemap.js` | World outline from Natural Earth (public domain), built by `scripts/build-basemap.js`. |
 | `icons/` | Rig-type silhouettes for the zoomed-in map: alpha masks built by `scripts/build-icons.py` from `icons/src/` (generated with GPT Image via Higgsfield). |
+| `vendor/` | Leaflet 1.9.4 and Leaflet.markercluster 1.5.3, served from the site rather than a CDN, with their licences. The version is in the path, so a new version is a new folder. |
 | `og-image.png` | The 1200×630 card shown when the link is shared. It includes a screenshot, so its figures are a snapshot. |
 
 There is no build step. Serve the folder with any static server, or open `index.html` directly.

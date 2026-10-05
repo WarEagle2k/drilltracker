@@ -914,6 +914,10 @@ a:hover { color: var(--color-primary-hover); }
   margin: var(--space-2) 0;
 }
 
+.detail-hero { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.detail-hero > div { min-width: 0; }
+/* the rig type's silhouette, in its map colour */
+.detail-icon { flex-shrink: 0; margin-bottom: var(--space-2); }
 .dayrate-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-faint); }
 .dayrate-highlight {
   font-family: var(--font-mono);
@@ -930,6 +934,7 @@ a:hover { color: var(--color-primary-hover); }
 /* contract timeline: current and upcoming contracts on one strip (bars share the Insights timeline styles) */
 .runway { margin-bottom: var(--space-4); }
 .runway-track { position: relative; height: 20px; border-radius: var(--radius-sm); background: var(--color-surface-2); }
+.runway-track .runway-bar--cut { border-top-left-radius: 0; border-bottom-left-radius: 0; }
 .runway-tick { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--color-surface); opacity: 0.8; }
 .runway-now { position: absolute; z-index: 1; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--color-text); border-radius: 1px; }
 .runway-labels { position: relative; height: 15px; margin-top: 4px; font-size: 11px; color: var(--color-text-faint); font-family: var(--font-mono); }

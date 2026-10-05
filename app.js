@@ -859,6 +859,8 @@ function setColorMode(mode) {
   });
   createMarkers(filteredRigs);
   buildLegend();
+  const icon = document.getElementById('detailIcon');
+  if (icon && RIG_BY_ID[selectedRigId]) icon.style.background = categoryColor(rigCategory(RIG_BY_ID[selectedRigId]));
   writeHash();
 }
 
@@ -1356,16 +1358,17 @@ function runwayBlock(rig) {
   const ahead = d.contracts.filter(x => x.s && (!x.e || x.e >= AS_OF));
   if (!ahead.length) return '';
   const endOf = x => x.e || addMonths(x.s, 6);
-  const t0 = Math.min(AS_OF.getTime(), ...ahead.map(x => x.s.getTime()));
+  // a contract that began long ago would squeeze what's ahead, so look back six months at most
+  const t0 = Math.max(addMonths(AS_OF, -6).getTime(), Math.min(AS_OF.getTime(), ...ahead.map(x => x.s.getTime())));
   const t1 = Math.max(addMonths(AS_OF, 3).getTime(), ...ahead.map(x => endOf(x).getTime()));
   const pos = t => Math.round((t - t0) / (t1 - t0) * 1000) / 10;
   const last = ahead.reduce((a, b) => (endOf(b) >= endOf(a) ? b : a));
   // options first, so awarded work draws on top where they overlap
   const segs = ahead.slice().sort((a, b) => (b.k.firmness === 'option') - (a.k.firmness === 'option')).map(function (x) {
-    const l = pos(x.s.getTime()), w = Math.max(1, pos(endOf(x).getTime()) - l);
+    const l = Math.max(0, pos(x.s.getTime())), w = Math.max(1, pos(endOf(x).getTime()) - l);
     const label = (x.k.customer || 'Undisclosed') + ' · ' + (x.k.start || '?') + ' – ' + (x.k.end || 'end undisclosed') +
       (x.k.dayRate != null ? ' · ' + fmtRateShort(x.k.dayRate) + '/day' : '') + ' · ' + FIRMNESS[x.k.firmness];
-    return '<span class="gantt-bar gantt-bar--' + escapeHtml(x.k.firmness) + (x.e ? '' : ' gantt-bar--open') +
+    return '<span class="gantt-bar gantt-bar--' + escapeHtml(x.k.firmness) + (x.e ? '' : ' gantt-bar--open') + (x.s.getTime() < t0 ? ' runway-bar--cut' : '') +
 '" style="left:' + l + '%;width:' + w + '%" title="' + escapeHtml(label) + '"></span>';
   }).join('');
   const nowAt = pos(AS_OF.getTime());
@@ -1452,6 +1455,11 @@ function openDetail(rig, opener, opts) {
         ? '<div class="dayrate-highlight">$' + d.dayRate.toLocaleString('en-US') + '<span class="dayrate-unit">/day</span></div>'
         : '<div class="dayrate-highlight dayrate-highlight--none">Undisclosed</div>')
     : '<div class="dayrate-undisclosed">' + (lastEnded && lastEnded.k.end ? 'No contract since ' + escapeHtml(lastEnded.k.end) : 'No current or upcoming contract') + '</div>';
+  const shape = RIG_ICONS[rig.type];
+  const hero = '<div class="detail-hero"><div>' + dayRateBlock + '</div>' + (shape
+    ? '<span class="detail-icon" style="width:' + Math.round(shape.w * 1.4) + 'px;height:' + Math.round(shape.h * 1.4) + 'px" aria-hidden="true">' +
+      '<span class="rig-icon rig-icon--' + shape.file + '" id="detailIcon" style="background:' + categoryColor(rigCategory(rig)) + '"></span></span>'
+    : '') + '</div>';
   const customerField = d.shown ? field(d.current ? 'Customer' : 'Next customer', d.customer, false, true)
     : lastEnded ? field('Last customer', lastEnded.k.customer || 'Undisclosed', false, true) : '';
 
@@ -1472,7 +1480,7 @@ function openDetail(rig, opener, opts) {
       '<span class="badge badge-status badge-' + statusSlug(d.status) + '">' + escapeHtml(d.status) + '</span>' +
       (d.firmness ? '<span class="badge badge-neutral">' + escapeHtml(FIRMNESS[d.firmness]) + ' contract</span>' : '') +
     '</div>' +
-    dayRateBlock +
+    hero +
     (rigChanges(rig.id) ? '<div class="detail-changes"><h3 class="detail-section-title">Since ' + escapeHtml(CHANGES.sinceLabel) + '</h3>' + changeLines(rigChanges(rig.id)) + '</div>' : '') +
     '<dl class="detail-grid">' +
       customerField + field('Booked to', d.bookedToLabel, !customerField) +
