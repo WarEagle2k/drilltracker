@@ -100,6 +100,7 @@ A filter lists the values shown, comma-separated; a filter that isn't in the lin
 | `theme-init.js` | Applies the saved theme before first paint. |
 | `basemap.js` | World outline from Natural Earth (public domain), built by `scripts/build-basemap.js`. |
 | `icons/` | Rig-type silhouettes for the zoomed-in map: alpha masks built by `scripts/build-icons.py` from `icons/src/` (generated with GPT Image via Higgsfield). |
+| `vendor/` | Leaflet 1.9.4 and Leaflet.markercluster 1.5.3, served from the site rather than a CDN, with their licences. The version is in the path, so a new version is a new folder. |
 | `og-image.png` | The 1200×630 card shown when the link is shared. It includes a screenshot, so its figures are a snapshot. |
 
 There is no build step. Serve the folder with any static server, or open `index.html` directly.
