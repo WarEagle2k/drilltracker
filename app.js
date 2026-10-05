@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
   fitToRigs(false);
   openRigFromHash(hashRig);
   // On small screens the sidebar overlays the map, so start with it closed
-  if (window.matchMedia('(max-width: 768px)').matches) {
+  if (window.matchMedia('(max-width: 768px), (max-height: 500px)').matches) {
     toggleSidebar();
     toggleLegend(); // the legend would cover much of a phone-sized map
   }
@@ -368,6 +368,9 @@ function wireActions() {
     }
   });
 }
+
+let lastPointer = 'mouse';
+document.addEventListener('pointerdown', function (e) { lastPointer = e.pointerType; }, true);
 
 function wireGlobalKeys() {
   document.addEventListener('keydown', function (e) {
@@ -686,6 +689,11 @@ function initMap() {
   syncIconMode();
   updateMapLabels();
 
+  // a tapped cluster zooms to its rigs with the same margins, not edge to edge
+  if (L.MarkerCluster) {
+    const zoomToBounds = L.MarkerCluster.prototype.zoomToBounds;
+    L.MarkerCluster.prototype.zoomToBounds = function (opts) { return zoomToBounds.call(this, opts || mapPadding()); };
+  }
   markerLayer = L.markerClusterGroup ? L.markerClusterGroup({
     maxClusterRadius: 50,
     spiderfyOnMaxZoom: true,
@@ -711,12 +719,17 @@ function initMap() {
 function fitToRigs(animate) {
   if (!map || !filteredRigs.length) return;
   const bounds = L.latLngBounds(filteredRigs.map(r => [r.lat, r.lng]));
-  // keep markers clear of the zoom controls, the filter pill and the map key
+  map.fitBounds(bounds, Object.assign(mapPadding(), { maxZoom: 6, animate: animate && !prefersReduced }));
+}
+
+/* Room to keep markers clear of the zoom controls, the filter pill and the map key (open,
+   or folded to its button at the bottom right) */
+function mapPadding() {
   const legend = document.getElementById('mapLegend');
-  const legendW = legend && !legend.hidden && !legend.classList.contains('collapsed') && map.getSize().x > 600 ? legend.offsetWidth + 24 : 0;
+  const open = legend && !legend.hidden && !legend.classList.contains('collapsed');
+  const legendW = open && map.getSize().x > 600 ? legend.offsetWidth + 24 : 0;
   const pill = !document.getElementById('filterPill').hidden;
-  map.fitBounds(bounds, { paddingTopLeft: [64, pill ? 72 : 32], paddingBottomRight: [Math.max(32, legendW), 32],
-                          maxZoom: 6, animate: animate && !prefersReduced });
+  return { paddingTopLeft: [64, pill ? 72 : 32], paddingBottomRight: [Math.max(32, legendW), open ? 32 : 60] };
 }
 
 const FitControl = window.L ? L.Control.extend({
@@ -771,7 +784,8 @@ function createMarkers(rigs) {
   rigs.forEach(function (rig) {
     const marker = L.marker([rig.lat, rig.lng], { icon: rigIcon(rig, iconMode), keyboard: true, rigId: rig.id });
     marker.bindTooltip(markerTip(rig), { direction: 'top', offset: tipOffset(rig, iconMode), className: 'rig-tip', opacity: 1 });
-    marker.on('click', function () { openDetail(rig); });
+    // on a phone the tap that opens the details also raises the hover summary: drop it
+    marker.on('click', function () { marker.closeTooltip(); openDetail(rig); });
     marker.on('add', function () { labelMarker(marker, rig); });
     markersById[rig.id] = marker;
     batch.push(marker);
@@ -1553,6 +1567,8 @@ function closeDetail(restoreFocus) {
   const marker = markersById[id];
   const el = marker && marker.getElement();
   (el || map.getContainer()).focus();
+  // focus opens the marker's summary for keyboard users; after a tap it would just sit on the map
+  if (marker && lastPointer === 'touch') marker.closeTooltip();
 }
 
 function highlightSelectedRow() {
