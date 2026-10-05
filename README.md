@@ -41,7 +41,9 @@ A contract dated only to a month or quarter ("Oct 2026", "Q4 2026") counts as st
 **KPIs**
 
 - *Contracted Share*: Working + Committed rigs ÷ rigs shown.
-- *Avg Floater Rate*: mean disclosed day rate of the drillships and semisubmersibles shown, using the current contract (or the next one for rigs not yet working). Jackups are excluded. Insights compares the median floater rate running now with the median of rates starting later. When fewer than five rates are disclosed, the count is highlighted.
+- *Coming Free*: rigs open now, or whose booked work ends within 9 months, plus unconfirmed rigs: the orange markers on the map.
+- *Booked Runway*: the median time until each rig's booked work runs out (awarded work, followed across short gaps). Open rigs and rigs whose booked work has no published end are left out.
+- *Avg Floater Rate* (in thousands of dollars a day): mean disclosed day rate of the drillships and semisubmersibles shown, using the current contract (or the next one for rigs not yet working). Jackups are excluded. Insights compares the median floater rate running now with the median of rates starting later. When fewer than five rates are disclosed, the count is highlighted.
 - *Disclosed Backlog*: for firm contracts with a disclosed rate, days remaining after the data date × day rate, including follow-on contracts and rate steps. Options, LOIs and conditional awards are excluded, as is any rig without a disclosed rate.
 
 ## Map

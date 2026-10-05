@@ -25,12 +25,6 @@ let tipSource = null;        // 'pointer' or 'focus': what opened the tooltip
 function monthStart(d, add) { return new Date(d.getFullYear(), d.getMonth() + (add || 0), 1); }
 function quarterStart(d, add) { return new Date(d.getFullYear(), Math.floor(d.getMonth() / 3) * 3 + 3 * (add || 0), 1); }
 function quarterLabel(d) { return 'Q' + (Math.floor(d.getMonth() / 3) + 1) + ' ' + d.getFullYear(); }
-function monthLabel(d) { return MONTHS[d.getMonth()] + ' ' + d.getFullYear(); }
-function median(xs) {
-  if (!xs.length) return null;
-  const a = xs.slice().sort((p, q) => p - q), m = a.length >> 1;
-  return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
-}
 
 /* Does contract x cover date t? An open-ended contract counts for OPEN_END_MONTHS. */
 function covers(x, t) {

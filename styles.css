@@ -343,6 +343,8 @@ a:hover { color: var(--color-primary-hover); }
 }
 .kpi-label-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .kpi-content { min-width: 0; }
+.kpi-unit { margin-left: 2px; font-size: 0.6em; font-weight: 500; color: var(--color-text-faint); }
+.kpi-unit[hidden] { display: none; }
 .kpi-note { margin-top: 1px; font-weight: 500; color: var(--color-text-faint); font-size: 11px; line-height: 1.2; }
 .kpi-note:empty { display: none; }
 .kpi-note--warn { color: var(--color-warning); font-weight: 700; }
