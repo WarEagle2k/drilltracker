@@ -15,6 +15,16 @@ html {
 }
 
 :root {
+  /* brand (CSI): yellow never as text on white (1.5:1); on Charcoal it is 7:1 */
+  --brand-yellow:   #FDCD07;
+  --brand-charcoal: #403F3F;
+  --header-bg:      #403F3F;
+  --header-border:  #2E2D2D;
+  --header-text:    #FFFFFF;
+  --header-muted:   #DBD9DA;
+  --header-hover:   #4F4D4D;
+  --header-toggle:  #4A4949;
+  --header-toggle-border: #5A5858;
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
 
@@ -43,21 +53,26 @@ html {
 
 /* DARK MODE (default) */
 :root, [data-theme="dark"] {
-  --color-bg:             #0a1628;
-  --color-surface:        #111d33;
-  --color-surface-2:      #182440;
-  --color-surface-offset: #1e2d4d;
-  --color-divider:        #243554;
-  --color-border:         #2d4066;
+  --header-bg:      #141313;
+  --header-border:  #2E2D2D;
+  --header-hover:   #2E2D2D;
+  --header-toggle:  #272626;
+  --header-toggle-border: #3A3939;
+  --color-bg:             #1E1D1D;
+  --color-surface:        #272626;
+  --color-surface-2:      #302F2F;
+  --color-surface-offset: #3A3939;
+  --color-divider:        #403F3F;
+  --color-border:         #545252;
 
-  --color-text:           #e8ecf4;
-  --color-text-muted:     #8899b4;
-  --color-text-faint:     #7d8ca8;
-  --color-text-inverse:   #0a1628;
+  --color-text:           #F2F1F1;
+  --color-text-muted:     #BDBABB;
+  --color-text-faint:     #A3A0A1;
+  --color-text-inverse:   #1E1D1D;
 
-  --color-primary:        #d4910a;
-  --color-primary-hover:  #e8a41e;
-  --color-primary-highlight: rgba(212, 145, 10, 0.12);
+  --color-primary:        #FDCD07;
+  --color-primary-hover:  #FCE169;
+  --color-primary-highlight: rgba(253, 205, 7, 0.12);
 
   --color-warning:        #fbbf24;
   --color-error:          #f87171;
@@ -66,62 +81,67 @@ html {
   --shadow-xl: 0 20px 50px rgba(0,0,0,0.6);
 
   /* status (activity on the data date) */
-  --status-working:     #34d399;
-  --status-committed:   #939df9;
+  --status-working:     #5FC3B9;
+  --status-committed:   #9CC0DC;
   --status-available:   #94a3b8;
-  --status-unconfirmed: #fbbf24;
+  --status-unconfirmed: #F2846F;
 
   /* contract firmness: ordinal, one blue ramp, firm = most prominent (validated --ordinal on #111d33) */
-  --firm-firm:        #9ec5f4;
-  --firm-loi:         #6da7ec;
-  --firm-conditional: #3987e5;
-  --firm-option:      #256abf;
+  --firm-firm:        #A9C8E0;
+  --firm-loi:         #79A6C9;
+  --firm-conditional: #4A7FA5;
+  --firm-option:      #2F5B78;
 
   /* charts: rig type (categorical slots 1-3, validated all-pairs), heatmap ramp (5 ordinal teal steps, validated; teal so it doesn't read as the firmness blues), de-emphasis */
-  --type-drillship: #3987e5;
-  --type-semisub:   #d95926;
-  --type-jackup:    #199e70;
-  --seq-0: #1b2945;
+  --type-drillship: #3E86D6;
+  --type-semisub:   #DE5A45;
+  --type-jackup:    #1C9F84;
+  --seq-0: #302F2F;
   --seq-1: #0a625e;
   --seq-2: #077e79;
   --seq-3: #079a94;
   --seq-4: #32b6af;
   --seq-5: #70cdc7;
-  --viz-deemph: #3a4b6b;
+  --viz-deemph: #545252;
 
   /* map availability: ordinal orange (validated --ordinal on the dark sea), grey for the rest */
-  --avail-open:   #fb923c;
-  --avail-near:   #c2410c;
-  --avail-booked: #4a5a78;
-  --viz-grid: #22314f;
+  --avail-open:   #F2846F;
+  --avail-near:   #B5452F;
+  --avail-booked: #5E6366;
+  --viz-grid: #353434;
 
-  --map-sea:        #0a1628;
-  --map-land:       #1a2942;
-  --map-border:     #33466b;
-  --map-label:      #8494b0;
-  --map-label-sea:  #4f6a94;
+  --map-sea:        #1B1F21;
+  --map-land:       #2C2B2B;
+  --map-border:     #4A4848;
+  --map-label:      #A3A0A1;
+  --map-label-sea:  #6E8189;
   --map-icon-shadow: rgba(0, 0, 0, 0.6);
-  --overlay:        rgba(10, 22, 40, 0.55);
+  --overlay:        rgba(30, 29, 29, 0.55);
 }
 
 /* LIGHT MODE */
 [data-theme="light"] {
-  --color-bg:             #eef0f5;
-  --color-surface:        #ffffff;
-  --color-surface-2:      #f5f6f9;
-  --color-surface-offset: #e8eaf0;
-  --color-divider:        #d0d5df;
-  --color-border:         #bcc3d0;
+  --header-bg:      #403F3F;
+  --header-border:  #2E2D2D;
+  --header-hover:   #4F4D4D;
+  --header-toggle:  #4A4949;
+  --header-toggle-border: #5A5858;
+  --color-bg:             #F3F2F2;
+  --color-surface:        #FFFFFF;
+  --color-surface-2:      #F7F6F6;
+  --color-surface-offset: #ECEAEB;
+  --color-divider:        #DBD9DA;
+  --color-border:         #C9C6C7;
 
-  --color-text:           #0f172a;
-  --color-text-muted:     #475569;
-  --color-text-faint:     #5b6779;
+  --color-text:           #262525;
+  --color-text-muted:     #4F4D4D;
+  --color-text-faint:     #646161;
   --color-text-inverse:   #ffffff;
 
-  /* amber deep enough for small text and for white text on it (5.3:1 on white) */
-  --color-primary:        #946105;
-  --color-primary-hover:  #7d5204;
-  --color-primary-highlight: rgba(148, 97, 5, 0.1);
+  /* brand: Slate does the work in content (9.3:1 on white); CSI Yellow only as a fill or on Charcoal */
+  --color-primary:        #264B5D;
+  --color-primary-hover:  #1B3846;
+  --color-primary-highlight: rgba(253, 205, 7, 0.22);
 
   --color-warning:        #d97706;
   --color-error:          #dc2626;
@@ -129,39 +149,39 @@ html {
   --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
   --shadow-xl: 0 20px 50px rgba(0,0,0,0.16);
 
-  --status-working:     #036c4f;
-  --status-committed:   #4338ca;
-  --status-available:   #475569;
-  --status-unconfirmed: #9a4a0b;
+  --status-working:     #185F66;
+  --status-committed:   #264B5D;
+  --status-available:   #555353;
+  --status-unconfirmed: #84382C;
 
-  --firm-firm:        #184f95;
-  --firm-loi:         #2a78d6;
-  --firm-conditional: #5598e7;
-  --firm-option:      #86b6ef;
+  --firm-firm:        #264B5D;
+  --firm-loi:         #3A6886;
+  --firm-conditional: #4A7FA5;
+  --firm-option:      #7FA3C0;
 
-  --type-drillship: #2a78d6;
-  --type-semisub:   #eb6834;
-  --type-jackup:    #1baf7a;
-  --seq-0: #eef1f6;
-  --seq-1: #66c4be;
-  --seq-2: #28a6a0;
-  --seq-3: #038883;
-  --seq-4: #056965;
-  --seq-5: #004a47;
-  --viz-deemph: #c5ccd8;
+  --type-drillship: #2A6CB0;
+  --type-semisub:   #E15D48;
+  --type-jackup:    #1FA595;
+  --seq-0: #F1F0F0;
+  --seq-1: #7FB8BC;
+  --seq-2: #4C9499;
+  --seq-3: #2A777D;
+  --seq-4: #185F66;
+  --seq-5: #0E4247;
+  --viz-deemph: #CFCCCD;
 
-  --avail-open:   #9a3412;
-  --avail-near:   #ea7a3c;
-  --avail-booked: #a7b2c3;
-  --viz-grid: #e6e9ef;
+  --avail-open:   #84382C;
+  --avail-near:   #E15D48;
+  --avail-booked: #B4BEC3;
+  --viz-grid: #E9E7E8;
 
-  --map-sea:        #d9e3ee;
-  --map-land:       #f8f9fb;
-  --map-border:     #b9c2d0;
-  --map-label:      #5b6779;
-  --map-label-sea:  #7f97b5;
+  --map-sea:        #DCE3E6;
+  --map-land:       #FAFAF9;
+  --map-border:     #BCC0C1;
+  --map-label:      #5A5F61;
+  --map-label-sea:  #6F8791;
   --map-icon-shadow: rgba(10, 22, 40, 0.5);
-  --overlay:        rgba(238, 240, 245, 0.6);
+  --overlay:        rgba(243, 242, 242, 0.6);
 }
 
 html, body { height: 100%; overflow: hidden; }
@@ -223,8 +243,9 @@ a:hover { color: var(--color-primary-hover); }
   align-items: center;
   justify-content: space-between;
   padding: var(--space-2) var(--space-4);
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: var(--header-bg); /* the brand bar: Charcoal in both themes */
+  border-bottom: 1px solid var(--header-border);
+  color: var(--header-text);
   z-index: 1000;
   min-height: 48px;
   flex-shrink: 0;
@@ -239,9 +260,9 @@ a:hover { color: var(--color-primary-hover); }
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
-  color: var(--color-text);
+  color: var(--header-text);
 }
-.logo-text span { color: var(--color-primary); }
+.logo-text span { color: var(--brand-yellow); }
 
 .view-toggle {
   display: flex;
@@ -280,10 +301,18 @@ a:hover { color: var(--color-primary-hover); }
 /* how many filters are on, so they're not forgotten while the sidebar is closed */
 .filter-badge {
   position: absolute; top: 2px; right: 0; min-width: 16px; height: 16px; padding: 0 4px; border-radius: var(--radius-full);
-  background: var(--color-primary); color: var(--color-text-inverse); font: 700 10px/16px var(--font-mono); text-align: center;
-  box-shadow: 0 0 0 2px var(--color-surface);
+  background: var(--brand-yellow); color: var(--brand-charcoal); font: 700 10px/16px var(--font-mono); text-align: center;
+  box-shadow: 0 0 0 2px var(--header-bg);
 }
 .filter-badge[hidden] { display: none; }
+/* on the Charcoal bar: light icons, yellow for what is selected or focused */
+.header .icon-btn { color: var(--header-muted); }
+.header .icon-btn:hover { background: var(--header-hover); color: var(--header-text); }
+.header .view-toggle { background: var(--header-toggle); border-color: var(--header-toggle-border); }
+.header .view-toggle button { color: var(--header-muted); }
+.header .view-toggle button:not(.active):hover { background: var(--header-hover); color: var(--header-text); }
+.header .view-toggle button.active { background: var(--brand-yellow); color: var(--brand-charcoal); }
+.header :focus-visible { outline-color: var(--brand-yellow); }
 /* export says what it does where there is room */
 .export-btn { width: auto; gap: 6px; padding: 0 10px; }
 .export-label { font-size: var(--text-xs); font-weight: 600; }

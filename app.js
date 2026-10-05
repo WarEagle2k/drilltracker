@@ -481,7 +481,7 @@ function initTheme() {
     toggle.setAttribute('aria-label', theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme');
     toggle.innerHTML = THEME_ICONS[theme];
     const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) meta.setAttribute('content', theme === 'dark' ? '#0a1628' : '#eef0f5');
+    if (meta) meta.setAttribute('content', theme === 'dark' ? '#141313' : '#403F3F'); // the header bar
   }
 
   syncTheme(currentTheme());
