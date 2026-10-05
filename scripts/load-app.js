@@ -1,6 +1,7 @@
 /* Loads rigs.js, app.js and insights.js into a sandbox, as the page does, so Node can check
    the real data and run the real functions (no copies to drift).
-   Pass { asOf: 'YYYY-MM-DD' } to replace DATA_AS_OF, so tests do not depend on the data date. */
+   Pass { asOf: 'YYYY-MM-DD' } to replace DATA_AS_OF, so tests do not depend on the data date,
+   or { rigs: '<source>' } to load other data in place of rigs.js (an earlier snapshot). */
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
@@ -21,7 +22,7 @@ function loadApp(opts) {
     console: console
   });
   ['rigs.js', 'app.js', 'insights.js'].forEach(function (file) {
-    let code = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    let code = file === 'rigs.js' && opts && opts.rigs ? opts.rigs : fs.readFileSync(path.join(ROOT, file), 'utf8');
     if (file === 'rigs.js' && opts && opts.asOf) {
       code = code.replace(/const DATA_AS_OF = '[^']*';/, "const DATA_AS_OF = '" + opts.asOf + "';");
     }

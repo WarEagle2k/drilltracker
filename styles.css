@@ -197,7 +197,9 @@ a:hover { color: var(--color-primary-hover); }
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    /* none rather than a near-zero duration: even 0.01ms of a visibility transition leaves the
+       details panel hidden at the moment it opens, so it could not take focus */
+    transition: none !important;
   }
 }
 
@@ -958,6 +960,10 @@ a:hover { color: var(--color-primary-hover); }
 .contracts-table tr.is-current td { background: var(--color-primary-highlight); }
 .contracts-table tr.is-current td:first-child { box-shadow: inset 3px 0 0 var(--color-primary); padding-left: var(--space-2); }
 .contracts-table tr.is-past td { color: var(--color-text-faint); }
+.contracts-table tr.is-earlier { display: none; }
+.contracts-table.show-earlier-rows tr.is-earlier { display: table-row; }
+.show-earlier { margin: 0 0 var(--space-1); padding: var(--space-1) 0; font-size: var(--text-xs); color: var(--color-text-muted); text-decoration: underline; text-underline-offset: 3px; }
+.show-earlier:hover { color: var(--color-text); }
 .contract-note { color: var(--color-text-faint); font-size: 11px; line-height: 1.35; margin-top: 2px; }
 .firm-tag {
   display: inline-block; padding: 1px 6px; border-radius: var(--radius-sm); font-size: 10px; font-weight: 600;
@@ -1423,4 +1429,53 @@ abbr.cell-muted { text-decoration: none; cursor: help; }
   /* the wordmark collided with the view toggle; hide it visually but keep the heading */
   .logo-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
   .header-right { gap: var(--space-1); }
+}
+
+/* ============================================
+   CHANGES SINCE THE LAST REFRESH
+   ============================================ */
+.changes-btn { position: relative; }
+.changes-btn .filter-badge { position: static; box-shadow: none; }
+.changes-btn[hidden] { display: none; }
+.changes-dialog {
+  width: min(640px, calc(100vw - 32px)); max-height: min(80vh, 760px); margin: auto; padding: 0;
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  background: var(--color-surface); color: var(--color-text); box-shadow: var(--shadow-xl);
+}
+.changes-dialog[open] { display: flex; flex-direction: column; }
+.changes-dialog::backdrop { background: rgb(0 0 0 / 0.45); }
+.changes-head {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--space-3);
+  padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); border-bottom: 1px solid var(--color-border);
+}
+.changes-head h2 { font-size: var(--text-lg); font-weight: 700; line-height: 1.2; }
+.changes-body { overflow-y: auto; overscroll-behavior: contain; padding: var(--space-3) var(--space-4) var(--space-4); }
+.changes-intro { font-size: var(--text-xs); color: var(--color-text-muted); line-height: 1.5; margin-bottom: var(--space-2); }
+.changes-group h3 {
+  font-size: 11px; font-weight: 400; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-text-faint);
+  margin: var(--space-4) 0 0; padding-bottom: var(--space-1); border-bottom: 1px solid var(--color-border);
+}
+.changes-group h3 span { font-family: var(--font-mono); margin-left: 4px; }
+.changes-rig { padding: var(--space-2) 0; border-bottom: 1px solid var(--color-divider); }
+.changes-rig-name { font-size: var(--text-sm); font-weight: 600; color: var(--color-text); text-align: left; }
+button.changes-rig-name { text-decoration: underline; text-decoration-color: var(--color-border); text-underline-offset: 3px; }
+button.changes-rig-name:hover { text-decoration-color: currentColor; }
+.changes-rig-sub { font-size: var(--text-xs); color: var(--color-text-faint); margin-left: var(--space-2); }
+
+/* one rig's changes, here and in the details pane: up for more work, down for less */
+.change-lines { list-style: none; margin: 2px 0 0; padding: 0; font-size: var(--text-xs); color: var(--color-text-muted); line-height: 1.45; }
+.change-lines li { position: relative; padding-left: 15px; }
+.change-lines li::before { position: absolute; left: 0; content: '•'; color: var(--color-text-faint); }
+.change-lines .change--more::before { content: '↑'; color: var(--status-working); }
+.change-lines .change--less::before { content: '↓'; color: var(--avail-open); }
+.detail-changes {
+  margin-bottom: var(--space-3); padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-2); border-radius: var(--radius-md);
+}
+.detail-changes .detail-section-title { margin: 0 0 2px; }
+.detail-changes .change-lines { color: var(--color-text); }
+
+@media (max-width: 768px) {
+  .changes-btn .filter-badge { position: absolute; top: 2px; right: 0; box-shadow: 0 0 0 2px var(--color-surface); }
+  .changes-dialog { width: calc(100vw - 16px); max-height: 88vh; }
 }
