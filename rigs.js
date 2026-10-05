@@ -2151,7 +2151,7 @@ const RIG_DATA = [
       { customer: "Occidental", start: "Jun 2024", end: "Jun 2026", dayRate: null, firmness: "firm", note: "MPD at an additional rate" },
       { customer: "Occidental", start: "Jun 2026", end: "Dec 2028", dayRate: null, firmness: "firm", note: "940-day extension; two 1-year options" }
     ],
-    note: "Occidental (Anadarko) in the US Gulf of America since Jun 2024; drilled the Bandit discovery (Green Canyon 680, near Constitution; spud Sep 2025, announced Apr 2026). A 940-day extension to Dec 2028 was signed together with a 914-day contract for VALARIS DS-18, adding about $760M of backlog combined, each with two 1-year options. About 35 days out of service for maintenance expected in Q4 2026. Day rate undisclosed (Aug 5, 2026 FSR)."
+    note: "Occidental (Anadarko) in the US Gulf of America since Jun 2024; drilled the Bandit discovery (Green Canyon 680, near Constitution; spud Sep 2025, announced Apr 2026). A 940-day extension to Dec 2028 was signed together with a 914-day contract for VALARIS DS-18, adding about $760M of backlog combined, each with two 1-year options. About 35 days out of service for maintenance expected in Q4 2026. Day rate undisclosed (Aug 5, 2026 FSR). Valaris also runs the drilling rigs on BP's Thunder Horse semisubmersible platform and Mad Dog spar in the US Gulf (Jan 2024 to Jan 2027); as BP-owned platform rigs they aren't tracked."
   },
   {
     id: "rig-085",
