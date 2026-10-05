@@ -78,6 +78,15 @@ const CHANGES = {
     "rig-099": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to Dec 2030"}]},
     "rig-100": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for TotalEnergies from Dec 2026, booked to Q4 2029"}]},
     "rig-101": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Woodside from Q2 2027, booked to Q1 2028"}]},
-    "rig-102": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for TAQA, booked to Jun 2028"}]}
+    "rig-102": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for TAQA, booked to Jun 2028"}]},
+    "rig-103": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: available"}]},
+    "rig-104": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for an undisclosed customer, booked to End 2026"}]},
+    "rig-105": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Suncor from Q1 2027, booked to Q2 2028"}]},
+    "rig-106": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: next for Eni from Q4 2026, booked to Mid 2027"}]},
+    "rig-107": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Eni, booked to End 2026"}]},
+    "rig-108": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Aker BP, booked to End 2028"}]},
+    "rig-109": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Vår Energi, booked to Q4 2027"}]},
+    "rig-110": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Vår Energi, booked to Early 2028"}]},
+    "rig-111": {"group":"added","lines":[{"kind":"other","text":"Added to the tracker: working for Petrobras, booked to 2028"}]}
   }
 };
