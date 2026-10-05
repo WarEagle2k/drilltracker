@@ -689,10 +689,21 @@ function initMap() {
   syncIconMode();
   updateMapLabels();
 
-  // a tapped cluster zooms to its rigs with the same margins, not edge to edge
+  // A selected cluster glides to its rigs (with the same margins as "Zoom to the rigs shown")
+  // instead of jumping: Leaflet only animates zooms of up to 4 levels, and world view to a
+  // basin is more. Always at least one level in, so the cluster splits. No motion if the
+  // viewer has asked for less.
   if (L.MarkerCluster) {
-    const zoomToBounds = L.MarkerCluster.prototype.zoomToBounds;
-    L.MarkerCluster.prototype.zoomToBounds = function (opts) { return zoomToBounds.call(this, opts || mapPadding()); };
+    L.MarkerCluster.prototype.zoomToBounds = function () {
+      const bounds = this.getBounds(), pad = mapPadding();
+      const zoom = Math.min(MAP_MAX_ZOOM, Math.max(map.getZoom() + 1,
+        map.getBoundsZoom(bounds, false, L.point(pad.paddingTopLeft).add(pad.paddingBottomRight))));
+      const centre = map.unproject(map.project(bounds.getCenter(), zoom)
+        .add(L.point(pad.paddingBottomRight).subtract(pad.paddingTopLeft).divideBy(2)), zoom);
+      if (prefersReduced) { map.setView(centre, zoom, { animate: false }); return; }
+      keepBasemapSharp();
+      map.flyTo(centre, zoom, { duration: 0.9, easeLinearity: 0.35 });
+    };
   }
   markerLayer = L.markerClusterGroup ? L.markerClusterGroup({
     maxClusterRadius: 50,
@@ -713,6 +724,22 @@ function initMap() {
     e.preventDefault();
     openDetail(RIG_BY_ID[node.dataset.rigId]);
   });
+}
+
+/* During a flight the canvas basemap is only stretched, so the coast turns blocky until it
+   lands; redraw it a few times a second on the way (each redraw takes ~6-13 ms) */
+function keepBasemapSharp() {
+  const renderer = basemapLayer && basemapLayer.options.renderer;
+  if (!renderer) return;
+  let last = 0;
+  const redraw = function () {
+    const now = performance.now();
+    if (now - last < 80) return;
+    last = now;
+    renderer._reset(); // Leaflet's own full redraw at the current view (what a view reset does)
+  };
+  map.on('zoom', redraw);
+  map.once('moveend', () => map.off('zoom', redraw));
 }
 
 /* Zoom to the rigs currently shown; the default world view leaves some regions off-screen */
