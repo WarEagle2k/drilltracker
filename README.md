@@ -52,7 +52,7 @@ Markers are coloured by **availability** by default: open now, free within 9 mon
 
 ## Rig details
 
-Selecting a rig opens its details: status, day rate, specs, a contract timeline and every recorded contract with its source. The timeline puts the current and upcoming contracts on one strip against today, so follow-on work and gaps show; a contract with no published end fades out. From the list, Previous and Next step through the rigs in the list's order without closing the panel.
+Selecting a rig opens its details: status, day rate, customer and booked-to date, location, specs, a contract timeline and every recorded contract with its source. The timeline puts the current and upcoming contracts on one strip against today, marked by year, so follow-on work and gaps show; a contract with no published end fades out. Beneath it, a line says how long the current contract has left and how far the booked work runs. A rig with nothing current or ahead shows when its last contract ended and for whom. From the list, Previous and Next step through the rigs in the list's order without closing the panel.
 
 ## Filtering
 
