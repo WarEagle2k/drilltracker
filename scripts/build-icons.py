@@ -19,7 +19,7 @@ for name, h in HEIGHTS.items():
     a = Image.open(os.path.join(ROOT, 'icons', 'src', name + '.png')).split()[-1]
     a = a.point(lambda v: 255 if v > 110 else 0)   # a hard silhouette, no soft fringe
     a = a.crop(a.getbbox())
-    a = a.filter(ImageFilter.MaxFilter(5))         # thicken hairlines (crane wires, lattice) so they survive the downscale
+    a = a.filter(ImageFilter.MaxFilter(3))         # thicken hairlines slightly so crane wires survive the downscale; more closes the derrick lattice
     target = h * SCALE
     a = a.resize((round(a.size[0] * target / a.size[1]), target), Image.LANCZOS)
     out = Image.new('LA', a.size, (255, 0)); out.putalpha(a)

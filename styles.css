@@ -100,7 +100,7 @@ html {
   --map-border:     #33466b;
   --map-label:      #8494b0;
   --map-label-sea:  #4f6a94;
-  --map-icon-halo:  rgba(232, 236, 244, 0.55);
+  --map-icon-shadow: rgba(0, 0, 0, 0.6);
   --cluster:        212, 145, 10;
   --cluster-text:   #0a1628;
   --overlay:        rgba(10, 22, 40, 0.55);
@@ -161,7 +161,7 @@ html {
   --map-border:     #b9c2d0;
   --map-label:      #5b6779;
   --map-label-sea:  #7f97b5;
-  --map-icon-halo:  rgba(10, 22, 40, 0.45);
+  --map-icon-shadow: rgba(10, 22, 40, 0.5);
   --cluster:        184, 122, 8;
   --cluster-text:   #ffffff;
   --overlay:        rgba(238, 240, 245, 0.6);
@@ -633,7 +633,8 @@ a:hover { color: var(--color-primary-hover); }
 }
 
 /* zoomed in: a silhouette of the rig type, coloured through a mask so every colour mode and theme
-   shares one file per type. The halo keeps grey rigs readable on the sea; the anchor is the waterline. */
+   shares one file per type. A small dark shadow lifts it off the sea; a light halo would fill the
+   1px gaps in the derrick lattice and make it look solid. The anchor is the waterline. */
 .rig-icon {
   display: block; width: 100%; height: 100%;
   -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat;
@@ -643,7 +644,7 @@ a:hover { color: var(--color-primary-hover); }
 .rig-icon--jackup    { -webkit-mask-image: url(icons/jackup.png);    mask-image: url(icons/jackup.png); }
 .rig-marker--icon {
   border: none; border-radius: 0; box-shadow: none; background: none; transform-origin: 50% 100%;
-  filter: drop-shadow(0 0 0.6px var(--map-icon-halo)) drop-shadow(0 0 0.6px var(--map-icon-halo)) drop-shadow(0 1px 2px rgba(0,0,0,0.35));
+  filter: drop-shadow(0 0.75px 0.5px var(--map-icon-shadow)); /* tight, so the edge stays crisp */
   transition: transform 150ms ease, filter 150ms ease;
 }
 .rig-marker--icon::before { inset: -4px; border-radius: var(--radius-sm); }
