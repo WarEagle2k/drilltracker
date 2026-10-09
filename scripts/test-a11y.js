@@ -70,7 +70,8 @@ async function withChrome(fn) {
   const proc = spawn(CHROME, ['--headless=new', '--no-sandbox', '--disable-gpu', '--remote-debugging-port=' + port,
     '--user-data-dir=' + dir, '--window-size=1440,900', 'about:blank'], { stdio: 'ignore' });
   let target;
-  for (let i = 0; i < 100 && !target; i++) {
+  // wait up to 30 s: a busy CI runner can take more than 10 s to start Chrome
+  for (let i = 0; i < 300 && !target; i++) {
     await sleep(100);
     try { target = (await (await fetch('http://127.0.0.1:' + port + '/json')).json()).find(t => t.type === 'page'); } catch (e) {}
   }
