@@ -39,14 +39,14 @@ const TOUR_STEPS = [
     // a folded key would leave nothing to point at, so open it for this stop
     enter: () => { if (document.getElementById('mapLegend').classList.contains('collapsed')) { toggleLegend(); tourOpenedLegend = true; } },
     title: 'Map key',
-    body: () => 'Colour the rigs by availability (open now, free within 9 months, or booked) or by contractor. ' +
-      'The key counts the rigs shown and folds away when you need the space.'
+    body: () => 'Colour the rigs by availability (open now, free within 9 months, or booked) or by contractor: ' +
+      'the eight largest contractors each have a colour and the rest share a grey. The key counts the rigs shown and folds away.'
   },
   {
     targets: ['.view-toggle'], place: 'bottom',
     title: 'List and Insights',
     body: () => 'List shows the same rigs as a sortable table. Insights charts the market: who comes free when, ' +
-      'day rates running now against those starting later, and each contractor\'s booked runway.'
+      'day rates by start date, each contractor\'s booked runway, the biggest customers and every contract on a timeline.'
   },
   {
     targets: ['#changesBtn'], place: 'bottom',
