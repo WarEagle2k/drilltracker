@@ -30,7 +30,7 @@
 <link rel="stylesheet" href="vendor/leaflet-1.9.4/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" />
 <link rel="stylesheet" href="vendor/leaflet.markercluster-1.5.3/MarkerCluster.css" integrity="sha384-pmjIAcz2bAn0xukfxADbZIb3t8oRT9Sv0rvO+BR5Csr6Dhqq+nZs59P0pPKQJkEV" />
 <link rel="stylesheet" href="vendor/leaflet.markercluster-1.5.3/MarkerCluster.Default.css" integrity="sha384-wgw+aLYNQ7dlhK47ZPK7FRACiq7ROZwgFNg0m04avm4CaXS+Z9Y7nMu8yNjBKYC+" />
-<link rel="stylesheet" href="styles.css?v=e5f6c99e">
+<link rel="stylesheet" href="styles.css?v=6ec3acc6">
 </head>
 <body>
 
@@ -78,6 +78,9 @@
       <button type="button" class="icon-btn export-btn" id="exportBtn" data-action="export-csv" aria-label="Export the rigs shown to CSV" title="Export the rigs shown to CSV">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         <span class="export-label">CSV</span>
+      </button>
+      <button type="button" class="icon-btn" id="tourBtn" aria-label="Take the tour" title="Take the tour">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </button>
       <button type="button" class="icon-btn" data-theme-toggle aria-label="Switch to light theme"></button>
     </div>
@@ -364,7 +367,8 @@
     <span class="footer-data" id="footerAsOf"></span>
     <span class="footer-scope" id="footerScope"></span>
     <span class="footer-legal">Compiled from public disclosures; not investment advice ·
-      <a href="https://github.com/WarEagle2k/drilltracker#readme" target="_blank" rel="noopener">About &amp; method</a></span>
+      <a href="https://github.com/WarEagle2k/drilltracker#readme" target="_blank" rel="noopener">About &amp; method</a><span class="footer-tour"> ·
+      <button type="button" class="footer-tour-btn" id="tourFooterBtn">Take the tour</button></span></span>
   </footer>
 </div>
 
@@ -378,12 +382,40 @@
   <div class="changes-body" id="changesBody"></div>
 </dialog>
 
+<dialog class="tour-dialog" id="tourDialog" aria-labelledby="tourTitle" aria-describedby="tourBody">
+  <div class="tour-spot" id="tourSpot" aria-hidden="true"></div>
+  <svg class="tour-pointer" id="tourPointer" width="30" height="34" viewBox="0 0 30 34" aria-hidden="true" focusable="false" hidden>
+    <circle class="tour-pointer-ripple" cx="4" cy="4" r="10"/>
+    <path d="M4 4 L4 27 L10.5 21 L15 31 L19.5 29 L15 19.5 L24 19.5 Z" class="tour-pointer-arrow"/>
+  </svg>
+  <div class="tour-card" id="tourCard">
+    <div class="tour-card-head">
+      <div class="tour-dots" id="tourDots" aria-hidden="true"></div>
+      <span class="sr-only" id="tourProgress"></span>
+      <button type="button" class="icon-btn tour-close" id="tourClose" aria-label="Close the tour">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <h2 class="tour-title" id="tourTitle"></h2>
+    <p class="tour-body" id="tourBody"></p>
+    <div class="tour-actions">
+      <label class="tour-dontshow"><input type="checkbox" id="tourDontShow" checked> Don't show this again</label>
+      <div class="tour-buttons">
+        <button type="button" class="tour-btn" id="tourBack">Back</button>
+        <button type="button" class="tour-btn tour-btn--primary" id="tourNext">Next</button>
+      </div>
+    </div>
+    <button type="button" class="tour-skip" id="tourSkip">Skip the tour</button>
+  </div>
+</dialog>
+
 <script src="vendor/leaflet-1.9.4/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH"></script>
 <script src="vendor/leaflet.markercluster-1.5.3/leaflet.markercluster.js" integrity="sha384-eXVCORTRlv4FUUgS/xmOyr66XBVraen8ATNLMESp92FKXLAMiKkerixTiBvXriZr"></script>
 <script src="basemap.js?v=5385baf5"></script>
 <script src="rigs.js?v=7ed151f7"></script>
 <script src="changes.js?v=9ea95638"></script>
-<script src="app.js?v=8ad1f338"></script>
+<script src="app.js?v=eb55dce0"></script>
 <script src="insights.js?v=829bb401"></script>
+<script src="tour.js?v=c7b34232"></script>
 </body>
 </html>

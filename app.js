@@ -395,7 +395,7 @@ function wireGlobalKeys() {
       if (selectedRigId) closeDetail(true);
       else if (sidebarOpen && window.matchMedia('(max-width: 768px)').matches) toggleSidebar();
     }
-    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey) {
+    if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.altKey && !document.querySelector('dialog[open]')) {
       const el = document.activeElement;
       const typing = el && (el.tagName === 'TEXTAREA' || el.isContentEditable ||
         (el.tagName === 'INPUT' && !/^(checkbox|radio|button|submit|reset)$/i.test(el.type)));

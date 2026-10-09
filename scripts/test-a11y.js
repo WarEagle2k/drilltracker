@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Accessibility check: serves the site, opens it in headless Chrome in each state that matters
-   (views, both themes, the details pane, dialogs, phone layouts) and runs axe-core on each.
+   (views, both themes, the details pane, dialogs, the intro tour, phone layouts) and runs axe-core on each.
    Fails on any WCAG 2.2 A/AA or best-practice violation.
 
      npm install --no-save axe-core@4.13.0   once (CI does this; node_modules is ignored)
@@ -45,8 +45,13 @@ const STATES = [
   { name: 'phone: map', hash: '#view=map', phone: true },
   { name: 'phone: filters open', hash: '#view=map', phone: true, run: 'toggleSidebar()' },
   { name: 'phone: map key open', hash: '#view=map', phone: true, run: 'toggleLegend()' },
-  { name: 'phone: list, dark', hash: '#view=list', phone: true, theme: 'dark' }
+  { name: 'phone: list, dark', hash: '#view=list', phone: true, theme: 'dark' },
+  { name: 'tour: welcome', hash: '#view=map', tour: true },
+  { name: 'tour: filters step, dark', hash: '#view=map', theme: 'dark', run: "startTour(); document.getElementById('tourNext').click(); document.getElementById('tourNext').click()" },
+  { name: 'tour: map key step', hash: '#view=map', run: "startTour(); for (let i = 0; i < 4; i++) document.getElementById('tourNext').click()" },
+  { name: 'phone: tour', hash: '#view=map', phone: true, tour: true }
 ];
+const TOUR_VERSION = fs.readFileSync(path.join(ROOT, 'tour.js'), 'utf8').match(/TOUR_VERSION = '([^']+)'/)[1];
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
 
 /* A static file server for the site */
@@ -104,6 +109,8 @@ async function main() {
       await send('Page.navigate', { url: base + '?a11y' });
       await sleep(300);
       await evaluate("localStorage.setItem('drilltracker-theme', '" + (st.theme || 'light') + "')");
+      // the intro tour opens by itself on a first visit; only the tour states want that
+      await evaluate(st.tour ? "localStorage.removeItem('drilltracker-tour')" : "localStorage.setItem('drilltracker-tour', '" + TOUR_VERSION + "')");
       errors.length = 0;
       await send('Page.navigate', { url: base + '?a11y=' + Date.now() + st.hash });
       for (let i = 0; i < 50; i++) {
@@ -112,6 +119,7 @@ async function main() {
       }
       await sleep(600);
       if (st.run) { await evaluate(st.run); await sleep(500); }
+      if (st.tour) await sleep(900); // it opens 600 ms after load
       await evaluate(AXE + ';0');
       const result = JSON.parse(await evaluate(
         "(async () => [" +
