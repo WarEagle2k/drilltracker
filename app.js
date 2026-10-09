@@ -4,27 +4,23 @@
 /* ============================================
    CONSTANTS
    ============================================ */
-/* Contractor colours: desaturated, navy-harmonized categorical ramp
-   (kept clear of the brand amber reserved for clusters). Past a dozen, colours stop being
-   told apart, so contractors with only a few rigs share one "Other" colour on the map;
-   the filters, list and details still name them. */
+/* Contractor colours, one per contractor with six or more rigs. Past about eight, colours on a
+   map stop being told apart, so the rest share one "Other" grey; the filters, list and details
+   still name them. The colours are theme tokens in styles.css (--contractor-*), checked with a
+   palette validator: every pair is distinct to normal and colour-blind vision. */
 const CONTRACTOR_COLORS = {
-  'Transocean':        '#4a9d9c',
-  'Seadrill':          '#6b8cc7',
-  'Noble Corporation': '#8aa872',
-  'Valaris':           '#c77b8b',
-  'Odfjell Drilling':  '#9b8bc4',
-  'Borr Drilling':     '#7a8a9e',
-  'Saipem':            '#c08552',
-  'Stena Drilling':    '#6fa8b0',
-  'COSL':              '#b5926a',
-  'Constellation':     '#a59b80',
-  'Ventura Offshore':  '#7fa38f',
-  'Foresea':           '#a65ea0'
+  'Transocean':        'var(--contractor-transocean)',
+  'Seadrill':          'var(--contractor-seadrill)',
+  'Noble Corporation': 'var(--contractor-noble)',
+  'Valaris':           'var(--contractor-valaris)',
+  'Odfjell Drilling':  'var(--contractor-odfjell)',
+  'Borr Drilling':     'var(--contractor-borr)',
+  'Stena Drilling':    'var(--contractor-stena)',
+  'Constellation':     'var(--contractor-constellation)'
 };
-const OTHER_CONTRACTORS = ['Sonadrill', 'Dolphin Drilling', 'Vantage Drilling', 'Etesco'];
+const OTHER_CONTRACTORS = ['Saipem', 'COSL', 'Ventura Offshore', 'Foresea', 'Sonadrill', 'Dolphin Drilling', 'Vantage Drilling', 'Etesco'];
 const OTHER_CONTRACTOR_LABEL = 'Other contractors';
-const OTHER_CONTRACTOR_COLOR = '#6e6c69';
+const OTHER_CONTRACTOR_COLOR = 'var(--contractor-other)';
 const FALLBACK_COLOR = '#8896a8';
 
 /* Status is about activity on DATA_AS_OF and is derived from the contracts;

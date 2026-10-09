@@ -523,7 +523,7 @@ function drawRunway(id, rigs) {
   let body = '';
   rw.rows.forEach(function (row, j) {
     const yy = TOP + j * (CH + GAP);
-    body += '<circle cx="6" cy="' + (yy + CH / 2) + '" r="4" fill="' + getContractorColor(row.contractor) + '"/>' +
+    body += '<circle cx="6" cy="' + (yy + CH / 2) + '" r="4" style="fill:' + getContractorColor(row.contractor) + '"/>' +
       '<text class="viz-label" x="16" y="' + (yy + CH / 2 + 4) + '"><title>' + escapeHtml(row.contractor + ', ' + plural(row.n, 'rig')) + '</title>' +
         '<tspan class="viz-label-name">' + escapeHtml(row.contractor) + '</tspan> <tspan class="viz-label-n">' + row.n + '</tspan></text>';
     row.cells.forEach(function (c, i) {
