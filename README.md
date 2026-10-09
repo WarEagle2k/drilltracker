@@ -6,7 +6,7 @@ Live site: https://wareagle2k.github.io/drilltracker/
 
 ## What it covers
 
-- **A curated set, not complete fleets.** The rigs are chosen by hand from the major offshore contractors. Most are contracted floaters; cold-stacked rigs are not tracked. Counts such as "Contracted Share" describe this set, not the market.
+- **A curated set, not complete fleets.** The rigs are chosen by hand from the major offshore contractors. Most are contracted floaters; cold-stacked rigs are not tracked, and nor are platform rigs that contractors run on operators' own installations (for example Valaris's management of BP's Thunder Horse and Mad Dog rigs in the US Gulf), since they don't move between fields or customers. Counts such as "Contracted Share" describe this set, not the market.
 - **Public sources only.** Contractor fleet status reports, company releases and results, operator and regulator announcements, trade press, and AIS position reports. Each rig records its latest source and that source's date.
 - **A snapshot.** `DATA_AS_OF` in `rigs.js` is the date the data was last checked. The app computes every status, "time left", booked-to date and backlog figure as of that date, not the viewer's clock. If the data is more than 45 days old, a banner says so.
 - **Positions are approximate** unless marked otherwise. Most rigs are placed in their operating area. A marker with a white centre dot is a reported position (AIS or a named field).
