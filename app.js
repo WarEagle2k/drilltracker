@@ -704,6 +704,16 @@ function initMap() {
 
   smoothWheelZoom(map);
 
+  // a fit asked for while the map had no size runs as soon as it has one
+  if (window.ResizeObserver) {
+    new ResizeObserver(function () {
+      if (!fitWhenSized || !map.getContainer().clientWidth) return;
+      fitWhenSized = false;
+      map.invalidateSize(false);
+      fitToRigs(false);
+    }).observe(map.getContainer());
+  }
+
   // labels sit above the land but below the rig markers
   map.createPane('labels').style.zIndex = 450;
   map.getPane('labels').style.pointerEvents = 'none';
@@ -762,9 +772,13 @@ function keepBasemapSharp() {
   map.once('moveend', () => map.off('zoom', redraw));
 }
 
-/* Zoom to the rigs currently shown; the default world view leaves some regions off-screen */
+/* Zoom to the rigs currently shown; the default world view leaves some regions off-screen.
+   A map with no size yet (the page opened in a hidden tab or pane) can't be fitted, so the
+   fit waits until the map is laid out (see initMap). */
+let fitWhenSized = false;
 function fitToRigs(animate) {
   if (!map || !filteredRigs.length) return;
+  if (!map.getContainer().clientWidth) { fitWhenSized = true; return; }
   const bounds = L.latLngBounds(filteredRigs.map(r => [r.lat, r.lng]));
   if (animate) glideToBounds(bounds, fit => Math.min(fit, 6));
   else map.fitBounds(bounds, Object.assign(mapPadding(), { maxZoom: 6, animate: false }));
