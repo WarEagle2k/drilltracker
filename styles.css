@@ -110,6 +110,18 @@ html {
   --avail-booked: #5E6366;
   --viz-grid: #353434;
 
+  /* map colour by contractor: lighter steps of the light theme's hues, each at least 3:1 on the dark map;
+     closest pair 16.5 apart (OKLab x100), 9.0 under colour-blind simulation */
+  --contractor-transocean:     #4cc4ed;
+  --contractor-seadrill:       #1c6ef0;
+  --contractor-noble:          #b0c031;
+  --contractor-valaris:        #f490ba;
+  --contractor-odfjell:        #c23caf;
+  --contractor-borr:           #a984fb;
+  --contractor-stena:          #248f15;
+  --contractor-constellation:  #f44652;
+  --contractor-other:          #8f8d89;
+
   --map-sea:        #1B1F21;
   --map-land:       #2C2B2B;
   --map-border:     #4A4848;
@@ -174,6 +186,17 @@ html {
   --avail-near:   #E15D48;
   --avail-booked: #B4BEC3;
   --viz-grid: #E9E7E8;
+
+  /* map colour by contractor: closest pair 15.5 apart (OKLab x100), 8.3 under colour-blind simulation */
+  --contractor-transocean:     #0593bf;
+  --contractor-seadrill:       #2653c1;
+  --contractor-noble:          #66a70c;
+  --contractor-valaris:        #c55e8c;
+  --contractor-odfjell:        #8c2c95;
+  --contractor-borr:           #907bf8;
+  --contractor-stena:          #1a7551;
+  --contractor-constellation:  #b93000;
+  --contractor-other:          #a3a19c;
 
   --map-sea:        #DCE3E6;
   --map-land:       #FAFAF9;
@@ -760,7 +783,7 @@ a:hover { color: var(--color-primary-hover); }
 .map-legend.collapsed .legend-collapsible { display: none; }
 .map-legend.collapsed { width: auto; }
 .map-legend.collapsed .legend-chevron { transform: translateY(1px) rotate(-135deg); }
-/* tall enough for every contractor colour (a dozen and Other) on a laptop; scrolls (with a fade) only on short screens */
+/* tall enough for every contractor colour (eight and Other) on a laptop; scrolls (with a fade) only on short screens */
 .legend-body { padding: 0 var(--space-3) var(--space-1); max-height: min(45vh, 312px); overflow-y: auto; }
 .legend-body.is-scrollable { -webkit-mask-image: linear-gradient(#000 calc(100% - 14px), transparent); mask-image: linear-gradient(#000 calc(100% - 14px), transparent); }
 .legend-body:not(:hover):not(:focus-within) { scrollbar-width: none; }
