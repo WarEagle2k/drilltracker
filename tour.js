@@ -36,6 +36,8 @@ const TOUR_STEPS = [
   },
   {
     targets: ['#mapLegend'], place: 'left',
+    // a folded key would leave nothing to point at, so open it for this stop
+    enter: () => { if (document.getElementById('mapLegend').classList.contains('collapsed')) { toggleLegend(); tourOpenedLegend = true; } },
     title: 'Map key',
     body: () => 'Colour the rigs by availability (open now, free within 9 months, or booked) or by contractor. ' +
       'The key counts the rigs shown and folds away when you need the space.'
@@ -65,7 +67,7 @@ const TOUR_STEPS = [
   }
 ];
 
-let tourStep = 0, tourReturnFocus = null, tourViewBefore = null, tourDetailBefore = null;
+let tourStep = 0, tourReturnFocus = null, tourViewBefore = null, tourDetailBefore = null, tourOpenedLegend = false, tourSettle = 0;
 
 function tourVisible(el) {
   if (!el || el.closest('[hidden]') || el.closest('[inert]')) return false;
@@ -112,6 +114,9 @@ function endTour() {
 }
 
 function onTourClosed() {
+  clearTimeout(tourSettle);
+  if (tourOpenedLegend && !document.getElementById('mapLegend').classList.contains('collapsed')) toggleLegend();
+  tourOpenedLegend = false;
   if (tourViewBefore && tourViewBefore !== currentView) setView(tourViewBefore);
   if (tourDetailBefore && RIG_BY_ID[tourDetailBefore] && filteredRigs.some(r => r.id === tourDetailBefore)) {
     openDetail(RIG_BY_ID[tourDetailBefore]);
@@ -138,8 +143,12 @@ function renderTourStep() {
   const next = document.getElementById('tourNext');
   next.textContent = last ? 'Done' : tourStep === 0 ? 'Show me' : 'Next';
   document.getElementById('tourSkip').hidden = last;
+  if (step.enter) step.enter();
   placeTour(step);
   next.focus();
+  // measure again once anything the step opened has finished moving
+  clearTimeout(tourSettle);
+  tourSettle = setTimeout(function () { if (document.getElementById('tourDialog').open) placeTour(step); }, 350);
 }
 
 /* Spotlight the target, park the pointer on its edge and set the card beside it,
@@ -181,9 +190,10 @@ function placeTour(step) {
   top = Math.max(pad, Math.min(top, vh - ch - pad));
   card.style.left = left + 'px';
   card.style.top = top + 'px';
-  if (r) {
-    pointer.style.transform = 'translate(' + Math.round(px) + 'px, ' + Math.round(py) + 'px)';
-    // restart the tap ripple at each stop
+  const to = r && 'translate(' + Math.round(px) + 'px, ' + Math.round(py) + 'px)';
+  if (r && to !== pointer.style.transform) {
+    pointer.style.transform = to;
+    // restart the tap ripple at each new stop
     pointer.classList.remove('tour-pointer--tap');
     void pointer.offsetWidth;
     pointer.classList.add('tour-pointer--tap');
