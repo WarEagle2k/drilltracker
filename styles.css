@@ -110,17 +110,17 @@ html {
   --avail-booked: #5E6366;
   --viz-grid: #353434;
 
-  /* map colour by contractor: lighter steps of the light theme's hues, each at least 3:1 on the dark map;
-     closest pair 16.5 apart (OKLab x100), 9.0 under colour-blind simulation */
-  --contractor-transocean:     #4cc4ed;
-  --contractor-seadrill:       #1c6ef0;
-  --contractor-noble:          #b0c031;
-  --contractor-valaris:        #f490ba;
-  --contractor-odfjell:        #c23caf;
-  --contractor-borr:           #a984fb;
-  --contractor-stena:          #248f15;
-  --contractor-constellation:  #f44652;
-  --contractor-other:          #8f8d89;
+  /* map colour by contractor: lighter steps of the light theme's hues, each at least 3:1 on the dark map; no pinks or salmons;
+     closest pair 16.5 apart (OKLab x100), 8.9 under colour-blind simulation */
+  --contractor-transocean:     #2ecdfd;
+  --contractor-seadrill:       #0d6eff;
+  --contractor-noble:          #1c945e;
+  --contractor-valaris:        #f69e24;
+  --contractor-odfjell:        #8e649f;
+  --contractor-borr:           #b782fd;
+  --contractor-stena:          #30db87;
+  --contractor-constellation:  #f14634;
+  --contractor-other:          #a3a19c;
 
   --map-sea:        #1B1F21;
   --map-land:       #2C2B2B;
@@ -187,15 +187,15 @@ html {
   --avail-booked: #B4BEC3;
   --viz-grid: #E9E7E8;
 
-  /* map colour by contractor: closest pair 15.5 apart (OKLab x100), 8.3 under colour-blind simulation */
-  --contractor-transocean:     #0593bf;
-  --contractor-seadrill:       #2653c1;
-  --contractor-noble:          #66a70c;
-  --contractor-valaris:        #c55e8c;
-  --contractor-odfjell:        #8c2c95;
-  --contractor-borr:           #907bf8;
-  --contractor-stena:          #1a7551;
-  --contractor-constellation:  #b93000;
+  /* map colour by contractor: no pinks; closest pair 15.3 apart (OKLab x100), 8.1 under colour-blind simulation, all 3:1 on the map */
+  --contractor-transocean:     #4786b8;
+  --contractor-seadrill:       #1f4fcc;
+  --contractor-noble:          #3aa460;
+  --contractor-valaris:        #da7306;
+  --contractor-odfjell:        #7f3999;
+  --contractor-borr:           #b468ee;
+  --contractor-stena:          #086f4e;
+  --contractor-constellation:  #bb0a10;
   --contractor-other:          #a3a19c;
 
   --map-sea:        #DCE3E6;
