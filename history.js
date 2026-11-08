@@ -538,7 +538,11 @@ const CONSOL = (function () {
   const at = y => lanes.filter(x => x.s <= y && x.e > y).length;
   const y0 = 1950, y1 = Math.floor(NOW);
   const series = [];
-  for (let y = y0; y <= y1; y++) series.push({ y, n: at(y + 0.5), deals: [] });
+  // each year's count is taken at its end (today, for this year), so the deals listed for a year are already counted in it
+  const yearEnd = y => Math.min(y + 1 - 1e-6, NOW);
+  for (let y = y0; y <= y1; y++) series.push({ y, n: at(yearEnd(y)), deals: [] });
+  // the exact moments the count changes, for drawing the steps where the deals happened
+  const changes = [...new Set(lanes.flatMap(x => [x.s, x.e]))].filter(t => t > y0 && t <= NOW).sort((a, b) => a - b);
   for (const x of lanes) {
     if (heads.has(x.lane) || !x.lane.terminal) continue;
     const row = series.find(r => r.y === Math.floor(x.e));
@@ -546,7 +550,7 @@ const CONSOL = (function () {
   }
   const today = at(NOW);
   const pending = EVENTS.filter(e => e.pending && e.from.filter(id => { const l = MODEL.laneOf[id]; return l && heads.has(l); }).length > 1);
-  return { series, today, pending, y0, y1 };
+  return { series, today, pending, y0, y1, at, changes, yearEnd };
 })();
 
 function renderConsolidation() {
@@ -589,12 +593,14 @@ function renderConsolidation() {
   const rug = svg('g', { class: 'hx-consol-rug', 'aria-hidden': 'true' });
   for (const r of S) if (r.y >= xmin) r.deals.forEach((e, k) => rug.append(svg('line', { x1: X(e._x), x2: X(e._x), y1: H - m.b - 1 - k * 0, y2: H - m.b - 7 })));
   s.append(rug);
-  // the line: a step each year (a company count changes at a deal, not gradually), with a light wash under it
+  // the line steps at the moment of each founding or deal (a company count changes at a deal, not gradually),
+  // with a light wash under it; the points the labels, readout and table use are each year's end
   const pts = S.filter(r => r.y >= xmin);
-  let d = '';
-  pts.forEach((r, i) => { d += (i ? `H${X(r.y)}V${Y(r.n)}` : `M${X(r.y)} ${Y(r.n)}`); });
+  const px = r => X(CONSOL.yearEnd(r.y));
+  let d = `M${X(xmin)} ${Y(CONSOL.at(xmin))}`;
+  for (const t of CONSOL.changes) if (t > xmin) d += `H${X(t)}V${Y(CONSOL.at(t))}`;
   d += `H${X(xmax)}`;
-  s.append(svg('path', { d: d + `V${Y(0)}H${X(pts[0].y)}Z`, class: 'hx-consol-area', 'aria-hidden': 'true' }));
+  s.append(svg('path', { d: d + `V${Y(0)}H${X(xmin)}Z`, class: 'hx-consol-area', 'aria-hidden': 'true' }));
   s.append(svg('path', { d, class: 'hx-consol-line', 'aria-hidden': 'true' }));
   // a pending merger between two of today's drillers: a dashed step down past today
   if (CONSOL.pending.length) {
@@ -606,7 +612,7 @@ function renderConsolidation() {
   // labels sit clear of the line: above ones in the band over the plot, below ones under the lowest point near them,
   // each with a hairline down (or up) to its dot
   const note = (r, text, above, anchor) => {
-    const x = X(r.y + 0.5), y = Y(r.n);
+    const x = px(r), y = Y(r.n);
     const lines = text.split('\n');
     const near = pts.filter(p => Math.abs(p.y - r.y) <= 4).map(p => Y(p.n));
     const ty = above ? m.t - 8 - (lines.length - 1) * 13 : Math.max(...near) + 22;
@@ -645,10 +651,10 @@ function renderConsolidation() {
   s.append(hit);
   const show = (r, clientX, clientY) => {
     cross.style.display = '';
-    const x = X(r.y + 0.5);
+    const x = px(r);
     cl.setAttribute('x1', x); cl.setAttribute('x2', x); cd.setAttribute('cx', x); cd.setAttribute('cy', Y(r.n));
     tip.textContent = '';
-    tip.append(el('strong', null, r.n + (r.n === 1 ? ' separate company' : ' separate companies')), el('span', null, String(r.y)));
+    tip.append(el('strong', null, r.n + (r.n === 1 ? ' separate company' : ' separate companies')), el('span', null, r.y === CONSOL.y1 ? 'Today' : 'End of ' + r.y));
     const names = r.deals.map(e => e.title);
     for (const n of names.slice(0, 3)) tip.append(el('span', { class: 'hx-tip-deal' }, n));
     if (names.length > 3) tip.append(el('span', { class: 'hx-tip-deal' }, '+' + (names.length - 3) + ' more'));
@@ -671,7 +677,7 @@ function renderConsolidation() {
   tb.textContent = '';
   const table = el('table', { class: 'hx-consol-tbl' });
   const thead = el('thead'), hr = el('tr');
-  for (const h of ['Year', 'Separate companies', 'Deals that ended a company\'s independence']) hr.append(el('th', { scope: 'col' }, h));
+  for (const h of ['Year', 'Separate companies at year end', 'Deals that ended a company\'s independence']) hr.append(el('th', { scope: 'col' }, h));
   thead.append(hr); table.append(thead);
   const tbody = el('tbody');
   for (const r of S) {
@@ -681,7 +687,7 @@ function renderConsolidation() {
     tbody.append(tr);
   }
   table.append(tbody);
-  tb.append(el('p', { class: 'hx-consol-note' }, 'Every five years to 2005, then every year. Counts each company that later became part of a driller on the rig map, from its founding (or first recorded event, where the founding date is unknown) until the deal that ended its independence. Spin-offs and companies that went elsewhere are not counted.'), table);
+  tb.append(el('p', { class: 'hx-consol-note' }, 'Every five years to 2005, then every year from 2010; each count is at the year\'s end (today, for this year), so a year\'s deals are already reflected in it. Counts each company that later became part of a driller on the rig map, from its founding (or first recorded event, where the founding date is unknown) until the deal that ended its independence. Spin-offs and companies that went elsewhere are not counted.'), table);
 }
 
 /* at a glance: one card per driller, its size and headline deals; each opens its family on the timeline */
@@ -1062,8 +1068,10 @@ function familyBlock(fam) {
     n.g.append(svg('text', { x: spot.anchor === 'end' ? spot.b : spot.a, y: n.y + 15, 'text-anchor': spot.anchor, class: 'hx-xref' + (n.pending ? ' is-pending' : '') }, n.text));
   }
 
-  // event markers: on the lane the event happened to; headline deals are larger
-  const placed = {}, pos = {};
+  // event markers: on the lane the event happened to; headline deals are larger. Marks on a lane are spaced so
+  // none sits on another, and each hit area reaches at most halfway to its neighbour, so every mark stays clickable.
+  const pos = {}, laneMarks = new Map();
+  const minorMarks = svg('g', { class: 'hx-events hx-events-minor' });
   for (const e of fam.events) {
     const lane = markerLane(e, visSet);
     if (!lane || e._x === null) continue;
@@ -1071,21 +1079,33 @@ function familyBlock(fam) {
     const y = yOf(lane);
     const big = LANDMARK_IDS.has(e.id) && fam.landmarks.some(c => c.e === e);
     const minor = !big && state.type === 'all' && isMinor(e);
-    const key = lane.i + ':' + Math.round(x / 9);
-    placed[key] = (placed[key] || 0) + 1;
-    if (placed[key] > 1 && !big && !(state.type === 'all' && isMinor(e))) x += (placed[key] - 1) * 9; // nudge markers that would sit on one another (small marks may share a spot)
+    const r = big ? 7 : minor ? 2.6 : 4.5;
+    const taken = laneMarks.get(lane) || [];
+    for (let guard = 0, moved = true; moved && guard < 30; guard++) {
+      moved = false;
+      for (const p of taken) if (Math.abs(x - p.x) < r + p.r + 3) { x = p.x + r + p.r + 3; moved = true; }
+    }
     pos[e.id] = { x, y };
     const g = svg('g', { class: 'hx-ev hx-ev-' + e.type + (big ? ' is-landmark' : '') + (minor ? ' is-minor' : '') + (e.pending ? ' is-pending' : '') + (eventMatches(e) ? '' : ' is-dim'),
       tabindex: '0', role: 'button', 'aria-label': eventLabel(e), 'data-ev': e.id });
-    g.append(svg('circle', { cx: x, cy: y, r: big ? 14 : 12, class: 'hx-hit' }));
-    g.append(glyph(e.type, x, y, big ? 7 : minor ? 2.6 : 4.5));
+    const hit = svg('circle', { cx: x, cy: y, r: big ? 14 : 12, class: 'hx-hit' });
+    g.append(hit, glyph(e.type, x, y, r));
+    taken.push({ x, r, hit, max: big ? 14 : minor ? 9 : 12 });
+    laneMarks.set(lane, taken);
     g.addEventListener('click', () => openPanel(e, g));
     g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openPanel(e, g); } });
     g.addEventListener('pointerenter', ev => showTip(e, ev));
     g.addEventListener('pointerleave', hideTip);
     g.addEventListener('focus', () => showTipAt(e, g));
     g.addEventListener('blur', hideTip);
-    if (big) marks.append(g); else marks.insertBefore(g, marks.firstChild);
+    // small marks draw on top of the full-size ones
+    if (big) marks.append(g); else if (minor) minorMarks.append(g); else marks.insertBefore(g, marks.firstChild);
+  }
+  for (const list of laneMarks.values()) {
+    for (const m of list) {
+      const near = Math.min(...list.filter(o => o !== m).map(o => Math.abs(o.x - m.x)), Infinity);
+      m.hit.setAttribute('r', Math.max(m.r + 1, Math.min(m.max, near / 2)));
+    }
   }
 
   // headline band: each big deal named above the lanes, with a hairline down to its mark
@@ -1096,7 +1116,7 @@ function familyBlock(fam) {
     bandG.append(svg('path', { d: `M${p.x} ${ty + 4}V${p.y - 9}`, class: 'hx-leader' }));
     bandG.append(svg('text', { x: b.tx, y: ty, 'text-anchor': b.anchor, class: 'hx-band-label' }, b.text));
   }
-  s.append(bandG, links, lanesG, marks);
+  s.append(bandG, links, lanesG, marks, minorMarks);
   sec.append(s);
   return sec;
 }
