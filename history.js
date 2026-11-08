@@ -427,6 +427,17 @@ function glyph(type, x, y, r) {
   if (g === 'ring') return svg('circle', { cx: x, cy: y, r: r - 0.5, class: 'hx-mark hx-mark-ring' });
   return svg('circle', { cx: x, cy: y, r, class: 'hx-mark' });
 }
+/* Minor events (renames, listings, small fleet deals and divestments, internal reorganisations) are drawn as small,
+   quiet marks so the deals that shaped each company stand out; they stay clickable and come back full size when
+   an event filter picks their type. */
+const MAJOR_RESTRUCTURING = /chapter 11|bankrupt|scheme|insolven|liquidat|creditor|recapital|restructures? (its )?debt|emerges/i;
+function isMinor(e) {
+  if (LANDMARK_IDS.has(e.id) || e.pending) return false;
+  if (e.type === 'rename' || e.type === 'listing' || e.type === 'divestment') return true;
+  if (e.type === 'fleet') return !(usd(e.value) >= 2e8);
+  if (e.type === 'restructuring') return !(e.from.length > 1 || MAJOR_RESTRUCTURING.test(e.title + ' ' + (e.detail || '')));
+  return false;
+}
 function eventLabel(e) { return formatDate(e.date) + ': ' + e.title + (e.pending ? ' (pending)' : ''); }
 
 /* ---------- header bits: stats, families, controls, legend ---------- */
@@ -803,6 +814,11 @@ function renderLegend() {
   ls.append(svg('rect', { x: 1, y: 5, width: 26, height: BAR_H, rx: 3, class: 'hx-legend-lane' }));
   lane.append(ls, document.createTextNode('Company lifetime'));
   box.append(lane);
+  const small = el('span', { class: 'hx-legend-item' });
+  const ss = svg('svg', { width: 16, height: 16, viewBox: '0 0 16 16', 'aria-hidden': 'true', focusable: 'false' });
+  const sg = svg('g', { class: 'hx-ev is-minor' }); sg.append(glyph('fleet', 8, 8, 2.6)); ss.append(sg);
+  small.append(ss, document.createTextNode('Small marks: renames, listings, smaller fleet deals'));
+  box.append(small);
   box.append(el('span', { class: 'hx-legend-item hx-legend-note' }, 'Busier years are drawn wider'));
   if (EVENTS.some(e => e.pending)) {
     const p = el('span', { class: 'hx-legend-item' });
@@ -1050,29 +1066,44 @@ function familyBlock(fam) {
     n.g.append(svg('text', { x: spot.anchor === 'end' ? spot.b : spot.a, y: n.y + 15, 'text-anchor': spot.anchor, class: 'hx-xref' + (n.pending ? ' is-pending' : '') }, n.text));
   }
 
-  // event markers: on the lane the event happened to; headline deals are larger
-  const placed = {}, pos = {};
+  // event markers: on the lane the event happened to; headline deals are larger. Marks on a lane are spaced so
+  // none sits on another, and each hit area reaches at most halfway to its neighbour, so every mark stays clickable.
+  const pos = {}, laneMarks = new Map();
+  const minorMarks = svg('g', { class: 'hx-events hx-events-minor' });
   for (const e of fam.events) {
     const lane = markerLane(e, visSet);
     if (!lane || e._x === null) continue;
     let x = scale.x(e._x);
     const y = yOf(lane);
     const big = LANDMARK_IDS.has(e.id) && fam.landmarks.some(c => c.e === e);
-    const key = lane.i + ':' + Math.round(x / 9);
-    placed[key] = (placed[key] || 0) + 1;
-    if (placed[key] > 1 && !big) x += (placed[key] - 1) * 9; // nudge markers that would sit on one another
+    const minor = !big && state.type === 'all' && isMinor(e);
+    const r = big ? 7 : minor ? 2.6 : 4.5;
+    const taken = laneMarks.get(lane) || [];
+    for (let guard = 0, moved = true; moved && guard < 30; guard++) {
+      moved = false;
+      for (const p of taken) if (Math.abs(x - p.x) < r + p.r + 3) { x = p.x + r + p.r + 3; moved = true; }
+    }
     pos[e.id] = { x, y };
-    const g = svg('g', { class: 'hx-ev hx-ev-' + e.type + (big ? ' is-landmark' : '') + (e.pending ? ' is-pending' : '') + (eventMatches(e) ? '' : ' is-dim'),
+    const g = svg('g', { class: 'hx-ev hx-ev-' + e.type + (big ? ' is-landmark' : '') + (minor ? ' is-minor' : '') + (e.pending ? ' is-pending' : '') + (eventMatches(e) ? '' : ' is-dim'),
       tabindex: '0', role: 'button', 'aria-label': eventLabel(e), 'data-ev': e.id });
-    g.append(svg('circle', { cx: x, cy: y, r: big ? 14 : 12, class: 'hx-hit' }));
-    g.append(glyph(e.type, x, y, big ? 7 : 4.5));
+    const hit = svg('circle', { cx: x, cy: y, r: big ? 14 : 12, class: 'hx-hit' });
+    g.append(hit, glyph(e.type, x, y, r));
+    taken.push({ x, r, hit, max: big ? 14 : minor ? 9 : 12 });
+    laneMarks.set(lane, taken);
     g.addEventListener('click', () => openPanel(e, g));
     g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openPanel(e, g); } });
     g.addEventListener('pointerenter', ev => showTip(e, ev));
     g.addEventListener('pointerleave', hideTip);
     g.addEventListener('focus', () => showTipAt(e, g));
     g.addEventListener('blur', hideTip);
-    if (big) marks.append(g); else marks.insertBefore(g, marks.firstChild);
+    // small marks draw on top of the full-size ones
+    if (big) marks.append(g); else if (minor) minorMarks.append(g); else marks.insertBefore(g, marks.firstChild);
+  }
+  for (const list of laneMarks.values()) {
+    for (const m of list) {
+      const near = Math.min(...list.filter(o => o !== m).map(o => Math.abs(o.x - m.x)), Infinity);
+      m.hit.setAttribute('r', Math.max(m.r + 1, Math.min(m.max, near / 2)));
+    }
   }
 
   // headline band: each big deal named above the lanes, with a hairline down to its mark
@@ -1083,7 +1114,7 @@ function familyBlock(fam) {
     bandG.append(svg('path', { d: `M${p.x} ${ty + 4}V${p.y - 9}`, class: 'hx-leader' }));
     bandG.append(svg('text', { x: b.tx, y: ty, 'text-anchor': b.anchor, class: 'hx-band-label' }, b.text));
   }
-  s.append(bandG, links, lanesG, marks);
+  s.append(bandG, links, lanesG, marks, minorMarks);
   sec.append(s);
   return sec;
 }
