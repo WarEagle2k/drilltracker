@@ -93,6 +93,8 @@ On a first visit, a short tour opens: a pointer moves to each part of the page (
 
 `history.html` is a family tree of the drillers on the map: how each came to be through mergers, acquisitions, spin-offs, renames, restructurings and major fleet deals, as far back as the sources go (1915 for the earliest drilling company).
 
+- **At a glance** opens the page: one card per driller with its number of companies, how far back it goes and its biggest deals; a card jumps to that family on the timeline. A short "how to read" guide with a small example sits above the timeline.
+- **Each family** starts with a one-line story ("Noble brings together 11 other companies, going back to 1921. The biggest steps: …"). Its **biggest deals** are large, labelled marks with their names above the lanes: chosen by stated US-dollar value or, where none is given, by how much of the family's history a deal brought in, favouring the deals that built today's company directly. Families with more than six companies open compact (today's company, its main line and the companies behind its biggest deals), with a button to show them all; a search or event filter shows every company.
 - **One lane per company**, grouped by the present-day driller it ended up in, in that driller's map colour. Lanes join where a company merged into or was bought by another, branch where a business was spun out, and carry a tick where a company was renamed. A company whose founding date is unknown starts, faded, a few years before its first recorded event.
 - **Companies outside the tree** (parents such as Schlumberger or Loews, oil companies, and outside buyers such as Shelf Drilling) are not drawn as lanes; they appear as text where they touch a lane ("from Loews", "→ Hercules Offshore").
 - **Pending deals** are dashed: Transocean–Valaris (expected to close about Dec 1, 2026) and Saipem–Subsea7 (agreed, not completed).
@@ -174,7 +176,7 @@ Use `null` for anything missing. The validator rejects placeholder strings such 
    ```
    node scripts/test-a11y.js
    ```
-   `validate.js` fails on errors; `--strict` also fails on warnings. `test-dates.js` tests the date and contract logic with a fixed data date, so it does not change with a refresh. The same checks run on every pull request and push to `main` (`.github/workflows/test.yml`), along with a check that `changes.js` matches the data and the accessibility check: axe-core runs in headless Chrome against 23 states of the page (each view, both themes, the details pane, dialogs, the intro tour and phone layouts) and fails on any WCAG 2.2 AA or best-practice problem.
+   `validate.js` fails on errors; `--strict` also fails on warnings. `test-dates.js` tests the date and contract logic with a fixed data date, so it does not change with a refresh. The same checks run on every pull request and push to `main` (`.github/workflows/test.yml`), along with a check that `changes.js` matches the data and the accessibility check: axe-core runs in headless Chrome against 31 states of the two pages (each view, both themes, the details pane, dialogs, the intro tour, phone layouts and the driller history page) and fails on any WCAG 2.2 AA or best-practice problem.
 3. Build the change list, then stamp the asset versions so browsers fetch the new files instead of cached ones (CI fails if you forget either):
    ```
    node scripts/build-changes.js
