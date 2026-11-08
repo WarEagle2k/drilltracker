@@ -99,10 +99,10 @@ On a first visit, a short tour opens: a pointer moves to each part of the page (
 - **Companies outside the tree** (parents such as Schlumberger or Loews, oil companies, and outside buyers such as Shelf Drilling) are not drawn as lanes; they appear as text where they touch a lane ("from Loews", "→ Hercules Offshore").
 - **Pending deals** are dashed: Transocean–Valaris (expected to close about Dec 1, 2026) and Saipem–Subsea7 (agreed, not completed).
 - **Time is weighted by activity**: busier years are drawn wider, so the deal-heavy recent decades are readable without hiding the early history; the axis shows where each decade falls.
-- **Select any point** for the deal: dates (completed and announced), value as stated, the companies on each side, and its sources, each marked Primary (company or official), Press or Reference (encyclopedias, Wikipedia, company-history books). Where sources disagree, the details give both.
+- **Select any point** for the deal: dates (completed and announced), value as stated, the companies on each side, and its sources, each marked Primary (company or official), Press or Reference (encyclopedias, Wikipedia, company-history books). Where sources disagree, the details give both. A source that was cited but not opened (a few SEC filings seen only in search results) is marked as such.
 - **Filters** (drillers, search, event type, start year) apply to the timeline and to the **List** view, which shows every event in date order. The URL hash keeps them, plus an open event (`#ev=…`).
 
-The data is in `history-data.js` and is checked by `scripts/validate-history.js` (ids resolve, dates are valid and in order, every event has a source, every present-day driller is a contractor in `rigs.js`). About three quarters of the events have a primary source; the rest, mostly before the 1990s, rest on press or reference works and are labelled as such.
+The data is in `history-data.js` and is checked by `scripts/validate-history.js` (ids resolve, dates are valid and in order, every event has a source, every present-day driller is a contractor in `rigs.js`). About four in five events have a primary source; the rest, mostly before the 1990s, rest on press or reference works and are labelled as such. An independent audit (Grok, Nov 8, 2026) checked 70 events against 52 sources; its verified corrections are applied.
 
 ## Sharing a view
 

@@ -287,10 +287,22 @@ function familyStory(fam) {
   const landmarks = pool.slice(0, 3).sort((a, b) => a.e._x - b.e._x);
   const starts = fam.lanes.filter(l => !l.startUnknown && l.start !== null).map(l => l.start);
   const since = starts.length ? Math.floor(Math.min(...starts)) : null;
-  const others = fam.lanes.length - 1;
+  // companies the driller spun off or set up (and their own offshoots) are offshoots, not companies it brought together
+  const offshoots = new Set();
+  for (const l of fam.lanes) {
+    for (let cur = l, guard = 0; cur && cur !== head && guard++ < 40; ) {
+      const v = cur._via;
+      if (!v) break;
+      if (v.kind === 'branch' && v.from === head) { offshoots.add(l); break; }
+      cur = v.kind === 'branch' ? v.from : v.to;
+    }
+  }
+  const others = fam.lanes.length - 1 - offshoots.size;
   const who = shortName(head.name);
+  const offNames = [...offshoots].filter(l => l._via && l._via.from === head).map(l => shortName(l.segs[0].name));
+  const offText = offNames.length ? ' It also spun off or set up ' + (offNames.length <= 2 ? offNames.join(' and ') : offNames.length + ' companies') + '.' : '';
   let text;
-  if (!others) text = who + (since ? ' dates from ' + since : '') + ' and has no recorded mergers or spin-offs.';
+  if (!others) text = who + (since ? ' dates from ' + since : '') + (offNames.length ? '.' + offText : ' and has no recorded mergers or spin-offs.');
   else {
     text = who + ' brings together ' + others + ' other ' + (others === 1 ? 'company' : 'companies') + (since ? ', going back to ' + since : '') + '.';
     if (landmarks.length) {
@@ -298,6 +310,11 @@ function familyStory(fam) {
       text += ' The biggest steps: ' + (parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0]) + '.';
     }
   }
+  // don't repeat an offshoot the steps above already name
+  const named = new Set(landmarks.map(c => c.label.replace(/ spin-off$/, '')));
+  const offRest = offNames.filter(n => !named.has(n));
+  const offText2 = offRest.length ? ' It also spun off or set up ' + (offRest.length <= 2 ? offRest.join(' and ') : offRest.length + ' companies') + '.' : '';
+  if (others) text += offText2;
   const pending = EVENTS.filter(e => e.pending && e.from.concat(e.to).some(id => { const l = MODEL.laneOf[id]; return l && inFam.has(l); }));
   if (pending.length) text += ' Pending: ' + pending.map(e => e.title.replace(/ \(pending\)$/, '')).join('; ') + '.';
   return { text, landmarks, since, head, trunk };
@@ -887,6 +904,7 @@ function openPanel(e, from) {
         const a = el('a', { href: s.url, target: '_blank', rel: 'noopener noreferrer' }, label || s.url);
         li.append(kind, a);
       } else li.append(kind, el('span', null, label));
+      if (s.opened === false) li.append(el('span', { class: 'hx-unopened' }, 'cited, not opened by us'));
       ul.append(li);
     }
     body.append(ul);
