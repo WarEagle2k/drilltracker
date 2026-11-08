@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* Accessibility check: serves the site, opens it in headless Chrome in each state that matters
-   (views, both themes, the details pane, dialogs, the intro tour, phone layouts) and runs axe-core on each.
+   (views, both themes, the details pane, dialogs, the intro tour, phone layouts, and the history page) and runs axe-core on each.
    Fails on any WCAG 2.2 A/AA or best-practice violation.
 
      npm install --no-save axe-core@4.14.0   once (CI does this; node_modules is ignored)
@@ -49,7 +49,14 @@ const STATES = [
   { name: 'tour: welcome', hash: '#view=map', tour: true },
   { name: 'tour: filters step, dark', hash: '#view=map', theme: 'dark', run: "startTour(); document.getElementById('tourNext').click(); document.getElementById('tourNext').click()" },
   { name: 'tour: map key step', hash: '#view=map', run: "startTour(); for (let i = 0; i < 4; i++) document.getElementById('tourNext').click()" },
-  { name: 'phone: tour', hash: '#view=map', phone: true, tour: true }
+  { name: 'phone: tour', hash: '#view=map', phone: true, tour: true },
+  { name: 'history: timeline', page: 'history.html', hash: '' },
+  { name: 'history: timeline, dark', page: 'history.html', hash: '', theme: 'dark' },
+  { name: 'history: event open', page: 'history.html', hash: '', run: "document.querySelector('.hx-ev').dispatchEvent(new MouseEvent('click', { bubbles: true }))" },
+  { name: 'history: list, dark', page: 'history.html', hash: '#view=list', theme: 'dark' },
+  { name: 'history: no matches', page: 'history.html', hash: '#q=zzzz' },
+  { name: 'phone: history', page: 'history.html', hash: '', phone: true },
+  { name: 'phone: history event, dark', page: 'history.html', hash: '#view=list', phone: true, theme: 'dark', run: "document.querySelector('.hx-row').click()" }
 ];
 const TOUR_VERSION = fs.readFileSync(path.join(ROOT, 'tour.js'), 'utf8').match(/TOUR_VERSION = '([^']+)'/)[1];
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa', 'best-practice'];
@@ -113,10 +120,13 @@ async function main() {
       // the intro tour opens by itself on a first visit; only the tour states want that
       await evaluate(st.tour ? "localStorage.removeItem('drilltracker-tour')" : "localStorage.setItem('drilltracker-tour', '" + TOUR_VERSION + "')");
       errors.length = 0;
-      await send('Page.navigate', { url: base + '?a11y=' + Date.now() + st.hash });
+      await send('Page.navigate', { url: base + (st.page || '') + '?a11y=' + Date.now() + st.hash });
+      const ready = st.page
+        ? "document.readyState === 'complete' && !!document.querySelector('.hx-family, .hx-row, .hx-empty:not([hidden])')"
+        : "document.readyState === 'complete' && typeof filteredRigs !== 'undefined' && document.querySelectorAll('.kpi-value').length > 0";
       for (let i = 0; i < 50; i++) {
         await sleep(100);
-        if (await evaluate("document.readyState === 'complete' && typeof filteredRigs !== 'undefined' && document.querySelectorAll('.kpi-value').length > 0")) break;
+        if (await evaluate(ready)) break;
       }
       await sleep(600);
       if (st.run) { await evaluate(st.run); await sleep(500); }
