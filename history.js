@@ -147,6 +147,15 @@ function buildModel() {
       }
     }
   }
+  // A company bought in stages joins its buyer once, at the takeover that ended it; earlier stake
+  // purchases stay as event marks on the buyer's lane, not as joins.
+  for (const lane of lanes) {
+    const joins = lane.outbound.filter(l => l.kind === 'join' && !l.pending);
+    if (!joins.length) continue;
+    const endX = lane.end === null ? Infinity : lane.end;
+    lane.terminal = joins.reduce((best, l) => Math.abs(l.e._x - endX) < Math.abs(best.e._x - endX) || (endX === Infinity && l.e._x > best.e._x) ? l : best);
+    for (const l of joins) if (l !== lane.terminal) l.stake = true;
+  }
   // links to companies outside the tree (parents, conglomerates, outside buyers) become text references
   const isOut = id => CO[id] && CO[id].outside;
   for (const e of EVENTS) {
@@ -164,7 +173,7 @@ function buildModel() {
     // only drillers on the rig map get a family; other present-day drillers sit with the family they came from
     if (lane.current && lane.trackerName) fam = lane.trackerName;
     else {
-      const join = lane.outbound.find(l => l.kind === 'join' && !l.pending);
+      const join = lane.terminal;
       const parent = lane.inbound.find(l => l.kind === 'branch' && !l.pending);
       const fleetBuyer = EVENTS.find(e => e.type === 'fleet' && !e.pending && e.from.some(f => laneOf[f] === lane) && laneOf[e.to[0]]);
       const child = lane.outbound.find(l => l.kind === 'branch' && !l.pending);
@@ -496,7 +505,7 @@ function familyBlock(fam) {
     const x1 = scale.x(lane.end === null ? NOW : lane.end);
     const g = svg('g', { class: 'hx-lane' + (lane.current ? ' is-current' : '') + (laneMatches(lane) ? '' : ' is-dim'), 'data-lane': lane.i });
     // bar, leaving room for the curve into the lane it joined
-    const joinOut = lane.outbound.find(l => l.kind === 'join' && inFam.has(l.to) && !l.pending);
+    const joinOut = lane.terminal && inFam.has(lane.terminal.to) ? lane.terminal : null;
     const branchIn = lane.inbound.find(l => l.kind === 'branch' && inFam.has(l.from));
     const bx0 = branchIn ? Math.min(x1, x0 + JOIN) : x0;
     const bx1 = joinOut ? Math.max(bx0, x1 - JOIN) : x1;
@@ -524,12 +533,12 @@ function familyBlock(fam) {
     });
     // links to other families
     for (const l of lane.inbound) {
-      if (inFam.has(l.from)) continue;
+      if (inFam.has(l.from) || l.stake) continue;
       const lx = scale.x(l.e._x);
       g.append(svg('text', { x: Math.max(4, lx - 6), y: y + 16, 'text-anchor': lx > 120 ? 'end' : 'start', class: 'hx-xref' }, (l.kind === 'branch' ? 'from ' : '') + l.from.name + (l.pending ? ' (pending)' : '') + (l.kind === 'join' ? ' →' : '')));
     }
     for (const l of lane.outbound) {
-      if (inFam.has(l.to) && !l.pending) continue;
+      if ((inFam.has(l.to) && !l.pending) || l.stake) continue;
       const lx = scale.x(l.e._x);
       const t = (l.kind === 'join' ? '→ into ' : '→ spun off ') + l.to.name + (l.pending ? ' (pending)' : '');
       g.append(svg('text', { x: lx + 8, y: y + 16, class: 'hx-xref' + (l.pending ? ' is-pending' : '') }, t));
