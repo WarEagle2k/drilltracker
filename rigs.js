@@ -4,7 +4,7 @@
 
 /* The date the data was last checked. Every status, "time left" and backlog
    figure in the app is computed as of this date, not the viewer's clock. */
-const DATA_AS_OF = '2026-10-04';
+const DATA_AS_OF = '2026-11-08';
 
 const RIG_DATA = [
   {
@@ -25,12 +25,12 @@ const RIG_DATA = [
     lng: -89.5,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Chevron", start: "Apr 2023", end: "Apr 2028", dayRate: 463000, firmness: "firm" }
     ],
-    note: "Chevron USGOM; firm to Apr 2028 at $463k/day (Aug 5, 2026 FSR; $462k in May, the change is cost escalation)."
+    note: "Chevron USGOM; firm to Apr 2028 at $463k/day (Nov 2, 2026 FSR, unchanged since Aug; $462k in May, the change was cost escalation)."
   },
   {
     id: "rig-002",
@@ -50,18 +50,17 @@ const RIG_DATA = [
     lng: -88.8,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Beacon Offshore", start: "Aug 2025", end: "Oct 2026", dayRate: 580000, firmness: "firm", note: "term began Aug 2025 at $505k; $580k rate period from Aug 2026" },
-      { customer: "Beacon Offshore", start: "Oct 2026", end: "Dec 2026", dayRate: 650000, firmness: "option", note: "contingent" },
-      { customer: "Beacon Offshore", start: "Dec 2026", end: "Dec 2026", dayRate: 580000, firmness: "firm" },
-      { customer: "Beacon Offshore", start: "Dec 2026", end: "Feb 2027", dayRate: 650000, firmness: "option", note: "contingent" },
-      { customer: "Beacon Offshore", start: "Feb 2027", end: "Feb 2027", dayRate: 580000, firmness: "firm" },
-      { customer: "Beacon Offshore", start: "Feb 2027", end: "Jul 2027", dayRate: 505000, firmness: "firm" },
+      { customer: "Beacon Offshore", start: "Aug 2025", end: "Nov 2026", dayRate: 580000, firmness: "firm", note: "term began Aug 2025 at $505k; $580k rate period Sep-Nov 2026 per the Nov 2, 2026 FSR (Aug 5 FSR: Aug-Oct 2026)" },
+      { customer: "Beacon Offshore", start: "Nov 2026", end: "Jan 2027", dayRate: 650000, firmness: "firm", note: "shown as a contingent period in the Aug 5 FSR; firm in the Nov 2, 2026 FSR" },
+      { customer: "Beacon Offshore", start: "Jan 2027", end: "Apr 2027", dayRate: 650000, firmness: "option", note: "contingent" },
+      { customer: "Beacon Offshore", start: "Apr 2027", end: "Jun 2027", dayRate: 505000, firmness: "firm" },
+      { customer: "Beacon Offshore", start: "Jun 2027", end: "Sep 2027", dayRate: 505000, firmness: "option", note: "contingent" },
       { customer: "bp", start: "Jun 2028", end: "Jun 2030", dayRate: 635000, firmness: "firm" }
     ],
-    note: "Beacon USGOM: firm periods at $580k and $505k/day, with contingent periods at $650k/day, running to Jul 2027 (Aug 5, 2026 FSR). Then bp fixtures at $635k/day from Jun 2028 to Jun 2030."
+    note: "Beacon USGOM (Nov 2, 2026 FSR): $580k/day Sep-Nov 2026, then a firm $650k/day period Nov 2026-Jan 2027, a contingent $650k/day period Jan-Apr 2027, firm $505k/day Apr-Jun 2027 and a contingent $505k/day period Jun-Sep 2027. Then bp fixtures at $635k/day from Jun 2028 to Jun 2030."
   },
   {
     id: "rig-003",
@@ -81,13 +80,13 @@ const RIG_DATA = [
     lng: -40.2,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Petrobras", start: "Jun 2024", end: "Dec 2026", dayRate: 438000, firmness: "firm" },
-      { customer: "Petrobras", start: "Jan 2027", end: "Jun 2028", dayRate: 443000, firmness: "firm", note: "365-day extension" }
+      { customer: "Petrobras", start: "Jan 2027", end: "Jun 2028", dayRate: 442000, firmness: "firm", note: "365-day extension" }
     ],
-    note: "Petrobras Brazil pre-salt; 365-day extension takes firm work to Jun 2028. Aug 5, 2026 FSR: $438k/day to Dec 2026, then $443k/day Jan 2027 to Jun 2028."
+    note: "Petrobras Brazil pre-salt; 365-day extension takes firm work to Jun 2028. Nov 2, 2026 FSR: $438k/day to Dec 2026, then $442k/day Jan 2027 to Jun 2028 ($443k in the Aug FSR; the change is cost escalation/currency)."
   },
   {
     id: "rig-004",
@@ -107,12 +106,12 @@ const RIG_DATA = [
     lng: -89.2,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Shell", start: "Sep 2018", end: "Feb 2028", dayRate: 501000, firmness: "firm" }
     ],
-    note: "Long-term Shell USGOM contract firm to Feb 2028 at $501k/day (Aug 5, 2026 FSR)."
+    note: "Long-term Shell USGOM contract firm to Feb 2028 at $501k/day (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-005",
@@ -132,12 +131,12 @@ const RIG_DATA = [
     lng: -89.8,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Shell", start: "Oct 2017", end: "Oct 2027", dayRate: 499000, firmness: "firm" }
     ],
-    note: "Long-term Shell USGOM contract firm to Oct 2027 at $499k/day (Aug 5, 2026 FSR)."
+    note: "Long-term Shell USGOM contract firm to Oct 2027 at $499k/day (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-006",
@@ -157,13 +156,14 @@ const RIG_DATA = [
     lng: -90.1,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026; award, Sep 15, 2026",
-    asOf: "2026-09-15",
+    source: "Transocean fleet status report, Nov 2, 2026; award, Oct 19, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: null, start: "Oct 2025", end: "Jan 2027", dayRate: 530000, firmness: "firm" },
-      { customer: null, start: "Feb 2027", end: "Jul 2027", dayRate: null, firmness: "firm", note: "Equatorial Guinea, two wells, ~170 days, ~$80M; months estimated from \"2027, in direct continuation\"" }
+      { customer: null, start: "Oct 2025", end: "Dec 2026", dayRate: 530000, firmness: "firm", note: "US Gulf; the Aug 5, 2026 FSR showed an end of Jan 2027" },
+      { customer: null, start: "Jan 2027", end: "Jul 2027", dayRate: 465000, firmness: "firm", note: "Equatorial Guinea, two wells, ~170 days, ~$80M (Sep 15, 2026 award); rate and dates per the Nov 2, 2026 FSR" },
+      { customer: null, start: "Aug 2027", end: "Nov 2028", dayRate: 499000, firmness: "firm", note: "US Gulf, five wells, ~450 days, ~$225M excluding mobilization fees; in direct continuation of the Equatorial Guinea program (Oct 19, 2026 award)" }
     ],
-    note: "Undisclosed US Gulf operator; two-well extension (Aug 5, 2026 FSR) keeps the rig working to ~Jan 2027 at $530k/day. Sep 15, 2026 award: two-well, ~170-day Equatorial Guinea contract (~$80M, undisclosed operator) commencing 2027 in direct continuation."
+    note: "Undisclosed US Gulf operator at $530k/day to ~Dec 2026 (Nov 2, 2026 FSR). Then a two-well, ~170-day Equatorial Guinea contract (~$80M, undisclosed operator; Sep 15, 2026 award), shown as Jan-Jul 2027 at $465k/day. Oct 19, 2026: five-well, ~450-day US Gulf contract (~$225M excl. mobilization, undisclosed operator) in direct continuation, Aug 2027-Nov 2028 at $499k/day."
   },
   {
     id: "rig-007",
@@ -183,12 +183,12 @@ const RIG_DATA = [
     lng: -88.4,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "bp", start: "Apr 2025", end: "Apr 2028", dayRate: 485000, firmness: "firm" }
+      { customer: "bp", start: "Apr 2025", end: "Apr 2028", dayRate: 494000, firmness: "firm" }
     ],
-    note: "3-year bp USGOM campaign firm to Apr 2028 at $485k/day"
+    note: "3-year bp USGOM campaign firm to Apr 2028; Nov 2, 2026 FSR shows $494k/day ($485k in the Aug FSR, the change is likely cost escalation)."
   },
   {
     id: "rig-008",
@@ -208,12 +208,12 @@ const RIG_DATA = [
     lng: 34.5,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: null, start: "Dec 2026", end: "Dec 2027", dayRate: 405000, firmness: "firm", note: "Eastern Mediterranean, five wells, ~$158M" }
     ],
-    note: "US Gulf work for an undisclosed operator ended ~Jun 2026. Next: five-well Eastern Mediterranean campaign (~$158M, ~390 days, undisclosed operator), shown in the Aug 5, 2026 FSR as Dec 2026-Dec 2027 at $405k/day after ~20 days of contract preparation. Plotted at the Mediterranean work area; current position unconfirmed."
+    note: "US Gulf work for an undisclosed operator ended ~Jun 2026. Next: five-well Eastern Mediterranean campaign (~$158M, ~390 days, undisclosed operator), Dec 2026-Dec 2027 at $405k/day after ~20 days of contract preparation (Nov 2, 2026 FSR, unchanged). AIS (VesselFinder, Nov 2026): left Las Palmas on Nov 1 and was in the western Mediterranean about Nov 7, bound for Limassol, Cyprus (ETA Nov 15). Plotted at its Eastern Mediterranean contract area (approximate)."
   },
   {
     id: "rig-009",
@@ -233,8 +233,8 @@ const RIG_DATA = [
     lng: -92.5,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Woodside", start: "Mar 2026", end: "Feb 2029", dayRate: 495000, firmness: "firm" }
     ],
@@ -253,20 +253,20 @@ const RIG_DATA = [
     hookload_tons: 1250,
     buildYear: 2013,
     region: "West Africa",
-    country: "Côte d'Ivoire",
-    lat: 4.8,
-    lng: -4.2,
+    country: "Namibia",
+    lat: -22.95,
+    lng: 14.45,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Murphy Oil", start: "Dec 2025", end: "Sep 2026", dayRate: 361000, firmness: "firm" },
-      { customer: "Murphy Oil", start: "Sep 2026", end: "Nov 2026", dayRate: 361000, firmness: "option", note: "priced option; exercise not confirmed" },
-      { customer: null, start: "Apr 2027", end: "Mar 2028", dayRate: null, firmness: "firm", note: "Australia" },
-      { customer: null, start: "Mar 2028", end: "Aug 2030", dayRate: null, firmness: "option", note: "Australia; priced options" }
+      { customer: "Murphy Oil", start: "Sep 2026", end: "Oct 2026", dayRate: 361000, firmness: "option", note: "priced option; exercise never confirmed. Murphy work is no longer in the Nov 2, 2026 FSR; end estimated from AIS (left the Abidjan anchorage Oct 28, 2026); the Aug FSR showed the option to Nov 2026" },
+      { customer: null, start: "Mar 2027", end: "Feb 2028", dayRate: null, firmness: "firm", note: "Australia; 60 days of contract preparation before start (Nov 2, 2026 FSR); was Apr 2027-Mar 2028 in the Aug FSR" },
+      { customer: null, start: "Feb 2028", end: "Jul 2030", dayRate: null, firmness: "option", note: "Australia; priced options" }
     ],
-    note: "Murphy Côte d'Ivoire at $361k/day, firm to Sep 2026 with a priced option at the same rate to Nov 2026 (Aug 5, 2026 FSR; option exercise not yet confirmed). Next firm work: an undisclosed-operator Australia campaign Apr 2027-Mar 2028, with priced options to Aug 2030."
+    note: "Murphy Côte d'Ivoire at $361k/day, firm to Sep 2026 with a priced option to Nov 2026. The Murphy work no longer appears in the Nov 2, 2026 FSR, and AIS (VesselFinder) shows the rig left the Abidjan anchorage on Oct 28, 2026, bound for Walvis Bay, Namibia (ETA Nov 9); option exercise was never confirmed, so the Oct 2026 end is estimated. Next firm work: an undisclosed-operator Australia campaign Mar 2027-Feb 2028 after 60 days of contract preparation, with priced options to Jul 2030 (Nov 2, 2026 FSR). Plotted at Walvis Bay, its AIS destination (approximate)."
   },
   {
     id: "rig-011",
@@ -286,13 +286,13 @@ const RIG_DATA = [
     lng: -41.5,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Petrobras", start: "Sep 2023", end: "Dec 2026", dayRate: 379000, firmness: "firm" },
-      { customer: "Petrobras", start: "Jan 2027", end: "Nov 2030", dayRate: 390000, firmness: "firm", note: "1,156-day extension" }
+      { customer: "Petrobras", start: "Sep 2023", end: "Dec 2026", dayRate: 381000, firmness: "firm" },
+      { customer: "Petrobras", start: "Jan 2027", end: "Nov 2030", dayRate: 392000, firmness: "firm", note: "1,156-day extension" }
     ],
-    note: "New 1,156-day Petrobras extension; Aug 5, 2026 FSR shows $379k/day to Dec 2026, then $390k/day to Nov 2030."
+    note: "1,156-day Petrobras extension; Nov 2, 2026 FSR shows $381k/day to Dec 2026, then $392k/day to Nov 2030 ($379k and $390k in the Aug FSR, the change is cost escalation/currency)."
   },
   {
     id: "rig-012",
@@ -312,12 +312,12 @@ const RIG_DATA = [
     lng: -39.8,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "bp", start: "Sep 2026", end: "Jun 2027", dayRate: 426000, firmness: "firm" }
+      { customer: "bp", start: "Aug 2026", end: "Jun 2027", dayRate: 420000, firmness: "firm", note: "Aug 5, 2026 FSR showed Sep 2026 at $426k" }
     ],
-    note: "bp Brazil campaign Sep 2026 to Jun 2027 at $426k/day, after 80 days out of service for contract preparation (May to Aug 2026), per the Aug 5, 2026 FSR."
+    note: "bp Brazil campaign Aug 2026 to Jun 2027 at $420k/day (Nov 2, 2026 FSR; the Aug FSR showed a Sep 2026 start at $426k, the rate includes a non-USD component and the change is likely currency/escalation), after an out-of-service period for contract preparation from May 2026."
   },
   {
     id: "rig-013",
@@ -337,13 +337,13 @@ const RIG_DATA = [
     lng: -40.5,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Petrobras", start: "Mar 2024", end: "Dec 2026", dayRate: 375000, firmness: "firm" },
-      { customer: "Petrobras", start: "Jan 2027", end: "Mar 2030", dayRate: 390000, firmness: "firm", note: "1,095-day extension" }
+      { customer: "Petrobras", start: "Mar 2024", end: "Dec 2026", dayRate: 377000, firmness: "firm" },
+      { customer: "Petrobras", start: "Jan 2027", end: "Mar 2030", dayRate: 392000, firmness: "firm", note: "1,095-day extension" }
     ],
-    note: "New 1,095-day Petrobras extension; Aug 5, 2026 FSR shows $375k/day to Dec 2026, then $390k/day to Mar 2030."
+    note: "1,095-day Petrobras extension; Nov 2, 2026 FSR shows $377k/day to Dec 2026, then $392k/day to Mar 2030 ($375k and $390k in the Aug FSR, the change is cost escalation/currency)."
   },
   {
     id: "rig-014",
@@ -363,12 +363,13 @@ const RIG_DATA = [
     lng: 82.2,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Reliance Industries", start: "Aug 2026", end: "Mar 2028", dayRate: 410000, firmness: "firm" }
+      { customer: "Reliance Industries", start: "Aug 2026", end: "Mar 2028", dayRate: 410000, firmness: "firm" },
+      { customer: "Reliance Industries", start: "Mar 2028", end: "Aug 2029", dayRate: null, firmness: "option", note: "priced options" }
     ],
-    note: "ONGC contract ended Jul 2026; ~70 days out of service for contract preparation, then the Reliance KG Basin program at $410k/day from ~Aug 2026 to Mar 2028 (six wells plus an exercised four-well option) with further priced options, per the Aug 5, 2026 FSR."
+    note: "ONGC contract ended Jul 2026; ~70 days out of service for contract preparation, then the Reliance KG Basin program at $410k/day from Aug 2026 to Mar 2028 (six wells plus an exercised four-well option), with priced options to Aug 2029 (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-015",
@@ -388,15 +389,16 @@ const RIG_DATA = [
     lng: -42,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Petrobras", start: "Oct 2025", end: "Oct 2026", dayRate: 416000, firmness: "firm" },
-      { customer: "Petrobras", start: "Oct 2026", end: "Oct 2027", dayRate: 428000, firmness: "firm" },
-      { customer: "Petrobras", start: "Oct 2027", end: "Oct 2028", dayRate: 441000, firmness: "firm" },
+      { customer: "Petrobras", start: "Oct 2026", end: "May 2027", dayRate: 428000, firmness: "firm" },
+      { customer: "Petrobras", start: "Jun 2027", end: "Oct 2027", dayRate: 428000, firmness: "firm", note: "after ~20 days of planned maintenance in May 2027" },
+      { customer: "Petrobras", start: "Oct 2027", end: "Oct 2028", dayRate: 440000, firmness: "firm", note: "$441k in the Aug 5, 2026 FSR" },
       { customer: "Petrobras", start: "Oct 2028", end: "Aug 2029", dayRate: 454000, firmness: "firm" }
     ],
-    note: "Multi-year escalating Petrobras contract, stepping each October (Aug 5, 2026 FSR): $416k to Oct 2026, $428k, $441k, then $454k/day through Aug 2029."
+    note: "Multi-year escalating Petrobras contract, stepping each October (Nov 2, 2026 FSR): $416k to Oct 2026, $428k (with ~20 days of planned maintenance in May 2027), $440k from Oct 2027 ($441k in the Aug FSR, cost escalation/currency), then $454k/day through Aug 2029."
   },
   {
     id: "rig-016",
@@ -416,14 +418,17 @@ const RIG_DATA = [
     lng: 3.8,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026; award, Oct 9, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Harbour Energy / OMV", start: "Jan 2026", end: "Jan 2028", dayRate: 472000, firmness: "firm" },
-      { customer: "Harbour Energy", start: "Jan 2028", end: "Nov 2028", dayRate: 513000, firmness: "firm", note: "five wells" },
-      { customer: "Harbour Energy", start: "Nov 2028", end: "Mar 2029", dayRate: null, firmness: "option", note: "three one-well priced options" }
+      { customer: "Harbour Energy / OMV", start: "Jan 2026", end: "Dec 2027", dayRate: 476000, firmness: "firm" },
+      { customer: "Harbour Energy / OMV", start: "Jan 2028", end: "Jan 2028", dayRate: 558000, firmness: "firm", note: "short rate period, new in the Nov 2, 2026 FSR" },
+      { customer: "Harbour Energy", start: "Jan 2028", end: "Oct 2028", dayRate: 517000, firmness: "firm", note: "five wells" },
+      { customer: "Harbour Energy", start: "Oct 2028", end: "Mar 2029", dayRate: null, firmness: "option", note: "three one-well priced options" },
+      { customer: "Shell", start: "Mar 2029", end: "Jul 2029", dayRate: 517000, firmness: "firm", note: "A/S Norske Shell, two wells, ~120 days, ~$62M excluding additional services (Oct 9, 2026 award)" },
+      { customer: "Shell", start: "Jul 2029", end: "Aug 2029", dayRate: null, firmness: "option", note: "one single-well priced option" }
     ],
-    note: "Harbour/OMV NCS contract to Jan 2028 at $472k/day, then a five-well Harbour Energy program Jan to Nov 2028 at $513k/day with three one-well priced options to Mar 2029 (Aug 5, 2026 FSR)."
+    note: "Harbour/OMV NCS contract to Dec 2027 at $476k/day, then a short $558k/day period in Jan 2028 (Nov 2, 2026 FSR). A five-well Harbour Energy program follows, Jan to Oct 2028 at $517k/day, with three one-well priced options to Mar 2029. Oct 9, 2026: two-well A/S Norske Shell contract (~120 days, ~$62M) in direct continuation, Mar-Jul 2029 at $517k/day, plus a single-well priced option to Aug 2029."
   },
   {
     id: "rig-017",
@@ -443,13 +448,13 @@ const RIG_DATA = [
     lng: 4.5,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Equinor", start: "Mar 2026", end: "Mar 2027", dayRate: 413000, firmness: "firm" },
-      { customer: "Equinor", start: "Mar 2027", end: "Nov 2027", dayRate: 515000, firmness: "firm" }
+      { customer: "Equinor", start: "Mar 2026", end: "Apr 2027", dayRate: 417000, firmness: "firm" },
+      { customer: "Equinor", start: "Apr 2027", end: "Dec 2027", dayRate: 519000, firmness: "firm" }
     ],
-    note: "Equinor NCS campaign; Aug 5, 2026 FSR shows $413k/day to Mar 2027, then $515k/day to Nov 2027."
+    note: "Equinor NCS campaign; Nov 2, 2026 FSR shows $417k/day to Apr 2027, then $519k/day to Dec 2027 (Aug FSR: $413k to Mar 2027 and $515k to Nov 2027; rate changes are cost escalation/currency)."
   },
   {
     id: "rig-018",
@@ -469,15 +474,15 @@ const RIG_DATA = [
     lng: 30.8,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "OMV Petrom", start: "Mar 2025", end: "Sep 2026", dayRate: 482000, firmness: "firm" },
-      { customer: "OMV Petrom", start: "Sep 2026", end: "Feb 2027", dayRate: 498000, firmness: "firm" },
-      { customer: "Vår Energi", start: "Jul 2027", end: "Jul 2030", dayRate: 467000, firmness: "firm", note: "Norway, 1,095 days" },
-      { customer: "Vår Energi", start: "Jul 2030", end: "Jul 2034", dayRate: null, firmness: "option", note: "priced options" }
+      { customer: "OMV Petrom", start: "Sep 2026", end: "Jan 2027", dayRate: 498000, firmness: "firm" },
+      { customer: "Vår Energi", start: "Jun 2027", end: "Jun 2030", dayRate: 470000, firmness: "firm", note: "Norway, 1,095 days" },
+      { customer: "Vår Energi", start: "Jun 2030", end: "Jun 2034", dayRate: null, firmness: "option", note: "priced options" }
     ],
-    note: "OMV Petrom Romania at $482k/day, then $498k/day from Sep 2026 to Feb 2027. About 135 days of mobilization and contract preparation follow, then a 1,095-day Vår Energi Norway contract at $467k/day from Jul 2027 to Jul 2030, with priced options to 2034 (Aug 5, 2026 FSR)."
+    note: "OMV Petrom Romania at $482k/day, then $498k/day from Sep 2026 to Jan 2027. About 145 days of mobilization and contract preparation follow (Feb-Jun 2027), then a 1,095-day Vår Energi Norway contract at $470k/day from Jun 2027 to Jun 2030, with priced options to 2034 (Nov 2, 2026 FSR; the Aug FSR showed Jul 2027-Jul 2030 at $467k, the rate change is cost escalation/currency)."
   },
   {
     id: "rig-019",
@@ -497,15 +502,15 @@ const RIG_DATA = [
     lng: 3.2,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Equinor", start: "Jul 2024", end: "Apr 2026", dayRate: 420000, firmness: "firm" },
-      { customer: "Equinor", start: "May 2026", end: "Jan 2027", dayRate: 436000, firmness: "firm" },
-      { customer: "Equinor", start: "Jan 2027", end: "Mar 2028", dayRate: 476000, firmness: "firm" },
-      { customer: "Equinor", start: "Mar 2028", end: "Mar 2031", dayRate: 399000, firmness: "conditional", note: "three years; conditional on licence-partner approvals" }
+      { customer: "Equinor", start: "May 2026", end: "Dec 2026", dayRate: 440000, firmness: "firm" },
+      { customer: "Equinor", start: "Dec 2026", end: "Apr 2028", dayRate: 480000, firmness: "firm" },
+      { customer: "Equinor", start: "Apr 2028", end: "Apr 2031", dayRate: 402000, firmness: "firm", note: "three years; licence-partner approvals received late Sep 2026" }
     ],
-    note: "Equinor NCS. Aug 5, 2026 FSR: $436k/day May 2026-Jan 2027 (after an out-of-service period in Apr-May 2026), then $476k/day to Mar 2028. A three-year Equinor program in direct continuation, Mar 2028-Mar 2031 at $399k/day, is conditional on licence-partner approvals (part of Equinor's ~$1.0B three-rig agreement, Jun 30, 2026)."
+    note: "Equinor NCS. Nov 2, 2026 FSR: $440k/day May-Dec 2026, then $480k/day to Apr 2028. The three-year Equinor program in direct continuation, Apr 2028-Apr 2031 at $402k/day, became firm when licence-partner approvals were received in late Sep 2026 (part of Equinor's ~$1.0B three-rig agreement; Transocean, Oct 9, 2026). Rate changes from the Aug FSR are cost escalation/currency."
   },
   {
     id: "rig-020",
@@ -525,14 +530,14 @@ const RIG_DATA = [
     lng: 4,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Equinor", start: "Jan 2026", end: "May 2027", dayRate: 511000, firmness: "firm" },
-      { customer: "Equinor", start: "May 2027", end: "May 2028", dayRate: 437000, firmness: "firm" },
-      { customer: "Equinor", start: "May 2028", end: "May 2030", dayRate: 399000, firmness: "conditional", note: "two years; conditional on licence-partner approvals" }
+      { customer: "Equinor", start: "Jan 2026", end: "May 2027", dayRate: 516000, firmness: "firm" },
+      { customer: "Equinor", start: "May 2027", end: "May 2028", dayRate: 441000, firmness: "firm" },
+      { customer: "Equinor", start: "May 2028", end: "May 2030", dayRate: 402000, firmness: "firm", note: "two years; licence-partner approvals received late Sep 2026" }
     ],
-    note: "Equinor NCS. Aug 5, 2026 FSR: $511k/day Jan 2026-May 2027, then $437k/day to May 2028. A two-year Equinor program in direct continuation, May 2028-May 2030 at $399k/day, is conditional on licence-partner approvals (part of Equinor's ~$1.0B three-rig agreement, Jun 30, 2026)."
+    note: "Equinor NCS. Nov 2, 2026 FSR: $516k/day Jan 2026-May 2027, then $441k/day to May 2028. The two-year Equinor program in direct continuation, May 2028-May 2030 at $402k/day, became firm when licence-partner approvals were received in late Sep 2026 (part of Equinor's ~$1.0B three-rig agreement). Rate changes from the Aug FSR ($511k, $437k, $399k) are cost escalation/currency."
   },
   {
     id: "rig-021",
@@ -547,18 +552,18 @@ const RIG_DATA = [
     hookload_tons: 750,
     buildYear: 2015,
     region: "Asia Pacific",
-    country: "Australia",
-    lat: -19.8,
-    lng: 116.5,
-    position: "area",
+    country: "Singapore",
+    lat: 1.26,
+    lng: 103.8,
+    position: "ais",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Woodside", start: "Feb 2026", end: "Nov 2026", dayRate: 390000, firmness: "firm" },
-      { customer: "Equinor", start: "Jun 2027", end: "Jun 2029", dayRate: 399000, firmness: "conditional", note: "Norway; two years; conditional on licence-partner approvals" }
+      { customer: "Woodside", start: "Feb 2026", end: "Sep 2026", dayRate: 390000, firmness: "firm", note: "end estimated: no longer in the Nov 2, 2026 FSR (the Aug FSR showed Nov 2026), and the rig reached Singapore on Oct 11, 2026 (AIS)" },
+      { customer: "Equinor", start: "Jun 2027", end: "Jun 2029", dayRate: 402000, firmness: "firm", note: "Norway; two years; 75 days of contract preparation before start; licence-partner approvals received late Sep 2026" }
     ],
-    note: "Woodside offshore Australia at $390k/day to Nov 2026 (Aug 5, 2026 FSR). Then mobilizes back to Norway for a two-year Equinor program, Jun 2027-Jun 2029 at $399k/day, conditional on licence-partner approvals (part of Equinor's ~$1.0B three-rig agreement, Jun 30, 2026)."
+    note: "Woodside offshore Australia at $390k/day; that work no longer appears in the Nov 2, 2026 FSR and AIS (VesselFinder) shows the rig arrived at Singapore on Oct 11, 2026, so the Sep 2026 end is estimated. Next: a two-year Equinor program in Norway, Jun 2027-Jun 2029 at $402k/day after 75 days of contract preparation, firm since licence-partner approvals in late Sep 2026 (part of Equinor's ~$1.0B three-rig agreement; Nov 2, 2026 FSR)."
   },
   {
     id: "rig-022",
@@ -578,16 +583,16 @@ const RIG_DATA = [
     lng: 142.85,
     position: "field",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026; Amplitude Energy ASX releases, Aug 24 and Sep 29, 2026",
-    asOf: "2026-09-29",
+    source: "Transocean fleet status report, Nov 2, 2026; Amplitude Energy ASX releases, Aug 24 and Sep 29, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: null, start: "Apr 2026", end: "Aug 2026", dayRate: 485000, firmness: "firm" },
-      { customer: "Amplitude Energy", start: "Aug 2026", end: "Oct 2026", dayRate: 540000, firmness: "firm", note: "Otway campaign (Amplitude operator, O.G. Energy partner): Juliet-1 spud Aug 22, 2026, then Annie-2 from late Sep; FSR lists the operator as not disclosed" },
-      { customer: "Amplitude Energy", start: "Oct 2026", end: "Nov 2026", dayRate: null, firmness: "option", note: "priced option; the JV sanctioned the optional Nestor well to follow Annie-2 (Sep 29, 2026); Transocean has not confirmed exercise" },
+      { customer: "Amplitude Energy", start: "Aug 2026", end: "Nov 2026", dayRate: 540000, firmness: "firm", note: "Otway campaign (Amplitude operator, O.G. Energy partner): Juliet-1 spud Aug 22, 2026, then Annie-2 from late Sep; FSR lists the operator as not disclosed; end Nov 2026 per the Nov 2, 2026 FSR (was Oct)" },
+      { customer: "Amplitude Energy", start: "Nov 2026", end: "Jan 2027", dayRate: 485000, firmness: "firm", note: "optional well exercised, ~50 days (Nov 2, 2026 FSR, operator not disclosed); taken to be the Nestor well the JV sanctioned on Sep 29, 2026; was a priced option from Oct 2026" },
       { customer: "Santos", start: "Apr 2027", end: "Jun 2027", dayRate: 395000, firmness: "firm", note: "two wells" },
       { customer: "Santos", start: "Jun 2027", end: "Oct 2027", dayRate: null, firmness: "option", note: "five one-well priced options" }
     ],
-    note: "Otway Basin, offshore Victoria. Aug 5, 2026 FSR: $485k/day Apr-Aug 2026, then $540k/day firm to Oct 2026 and a priced option to Nov 2026 (operator not disclosed). Amplitude Energy (operator, with O.G. Energy) spudded Juliet-1 on Aug 22, 2026; the rig moved to the Annie-2 development well in late Sep, and the partners sanctioned the optional Nestor well to follow it (Amplitude, Sep 29, 2026). Then a two-well Santos contract, Apr-Jun 2027 at $395k/day, with five one-well priced options to Oct 2027."
+    note: "Otway Basin, offshore Victoria. Nov 2, 2026 FSR: $540k/day firm Aug-Nov 2026, then the client exercised one optional well (~50 days), shown as firm Nov 2026-Jan 2027 at $485k/day (operator not disclosed). Amplitude Energy (operator, with O.G. Energy) spudded Juliet-1 on Aug 22, 2026, moved the rig to the Annie-2 development well in late Sep, and sanctioned the optional Nestor well to follow it (Amplitude, Sep 29, 2026). Then a two-well Santos contract, Apr-Jun 2027 at $395k/day, with five one-well priced options to Oct 2027."
   },
   {
     id: "rig-023",
@@ -607,12 +612,12 @@ const RIG_DATA = [
     lng: -39.4,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Petrobras", start: "Dec 2024", end: "Nov 2027", dayRate: null, firmness: "firm" }
     ],
-    note: "Petrobras Búzios/Santos Basin firm contract, Dec 2024 to Nov 2027 (~$577M total value at signing, incl. mobilization and services). Day rate undisclosed; the 2026 fleet status reports list no options."
+    note: "Petrobras Búzios/Santos Basin firm contract, Dec 2024 to Nov 2027 (~$577M total value at signing, incl. mobilization and services). Day rate undisclosed; the Nov 3, 2026 fleet status report lists no options. On the Q3 2026 call Seadrill said it is the only one of its Brazil rigs with clear availability in late 2027 and is being marketed for regional and international work from early 2028."
   },
   {
     id: "rig-024",
@@ -632,13 +637,13 @@ const RIG_DATA = [
     lng: -90.5,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "LLOG", start: "May 2026", end: "Oct 2026", dayRate: null, firmness: "firm", note: "bridging term, ~120 days, ~$48M" },
       { customer: "LLOG", start: "Oct 2026", end: "Oct 2027", dayRate: null, firmness: "firm", note: "365-day extension" }
     ],
-    note: "LLOG (Harbour Energy subsidiary): a ~120-day bridging term (~$48M) from May 2026, then the 365-day extension from Oct 2026 to Oct 2027 (Aug 10, 2026 FSR; the Apr 22, 2026 award said Sep 2026). Part of a ~$260M combined Neptune and Vela award. Day rate undisclosed."
+    note: "LLOG (Harbour Energy subsidiary): a ~120-day bridging term (~$48M) from May 2026, then the 365-day extension from Oct 2026 to Oct 2027 (Nov 3, 2026 FSR; the Apr 22, 2026 award said Sep 2026). Part of a ~$260M combined Neptune and Vela award. Day rate undisclosed."
   },
   {
     id: "rig-025",
@@ -658,14 +663,14 @@ const RIG_DATA = [
     lng: -89.6,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Talos Energy", start: "May 2026", end: "Aug 2026", dayRate: null, firmness: "firm", note: "~$26M excl. services" },
       { customer: "LLOG", start: "Sep 2026", end: "Jun 2027", dayRate: null, firmness: "firm" },
       { customer: "Talos Energy", start: "Jun 2027", end: "Jun 2028", dayRate: null, firmness: "firm", note: "~$161M excl. services" }
     ],
-    note: "Talos US Gulf work May-Aug 2026 (~$26M excl. services), then LLOG (Harbour Energy) Sep 2026-Jun 2027 (part of the ~$260M Apr 2026 Neptune+Vela award), then a one-year Talos follow-on Jun 2027-Jun 2028 (~$161M excl. services), per the Aug 10, 2026 FSR. Day rate undisclosed."
+    note: "Talos US Gulf work May-Aug 2026 (~$26M excl. services), then LLOG (Harbour Energy) Sep 2026-Jun 2027 (part of the ~$260M Apr 2026 Neptune+Vela award), then a one-year Talos follow-on Jun 2027-Jun 2028 (~$161M excl. services), per the Nov 3, 2026 FSR. Day rate undisclosed."
   },
   {
     id: "rig-026",
@@ -685,8 +690,8 @@ const RIG_DATA = [
     lng: -41,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Petrobras", start: "Mar 2026", end: "Mar 2029", dayRate: null, firmness: "firm" }
     ],
@@ -710,12 +715,13 @@ const RIG_DATA = [
     lng: -40.8,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
-      { customer: "Equinor", start: "Oct 2022", end: "Oct 2027", dayRate: null, firmness: "firm", note: "priced options to Oct 2030" }
+      { customer: "Equinor", start: "Oct 2022", end: "Oct 2027", dayRate: null, firmness: "firm", note: "includes a one-year priced option exercised in Jan 2026, from Oct 2026" },
+      { customer: "Equinor", start: "Oct 2027", end: "Oct 2030", dayRate: null, firmness: "option", note: "priced options for up to three more years (Aug 10, 2026 FSR: through Oct 2030)" }
     ],
-    note: "Equinor Brazil; a one-year priced option exercised in Jan 2026 extends firm work from Oct 2026 to Oct 2027, with further priced options through Oct 2030 (Aug 10, 2026 FSR). Day rate undisclosed."
+    note: "Equinor Brazil; a one-year priced option exercised in Jan 2026 extends firm work from Oct 2026 to Oct 2027, with priced options for up to three more years, through Oct 2030 (Nov 3, 2026 FSR; Aug 10, 2026 FSR). Total contract value at signing ~$114M. Day rate undisclosed."
   },
   {
     id: "rig-028",
@@ -735,14 +741,14 @@ const RIG_DATA = [
     lng: -39.6,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
-      { customer: "Petrobras", start: "Apr 2026", end: "Mar 2027", dayRate: 413400, firmness: "firm" },
-      { customer: "Petrobras", start: "Apr 2027", end: "Jan 2028", dayRate: 459400, firmness: "firm" },
-      { customer: "Petrobras", start: "Jan 2028", end: "Jan 2031", dayRate: 441500, firmness: "firm", note: "1,095-day extension, ~$480M" }
+      { customer: "Petrobras", start: "Apr 2026", end: "Mar 2027", dayRate: 414000, firmness: "firm" },
+      { customer: "Petrobras", start: "Apr 2027", end: "Jan 2028", dayRate: 460000, firmness: "firm" },
+      { customer: "Petrobras", start: "Jan 2028", end: "Jan 2031", dayRate: 442000, firmness: "firm", note: "1,095-day extension, ~$480M" }
     ],
-    note: "Petrobras Búzios/Santos Basin. Aug 10, 2026 FSR: $413,400/day Apr 2026 to Mar 2027, $459,400/day to Jan 15, 2028, then the 1,095-day extension (~$480M, awarded Apr 6, 2026) at $441,500/day to Jan 15, 2031. Rates are subject to foreign-exchange fluctuation."
+    note: "Petrobras Búzios/Santos Basin. Nov 3, 2026 FSR: $414,000/day Apr 2026 to Mar 2027, $460,000/day to Jan 15, 2028, then the 1,095-day extension (~$480M, awarded Apr 6, 2026) at $442,000/day to Jan 15, 2031 (up from $413,400, $459,400 and $441,500 in the Aug 10, 2026 FSR: foreign-exchange movement). Rates are subject to foreign-exchange fluctuation."
   },
   {
     id: "rig-029",
@@ -762,12 +768,12 @@ const RIG_DATA = [
     lng: -42.6,
     position: "area",
     statusOverride: null,
-    source: "Seadrill Q2 2026 results",
-    asOf: "2026-08",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Petrobras", start: "Jun 2026", end: "Jun 2029", dayRate: null, firmness: "firm" }
     ],
-    note: "Petrobras 1,095-day Sepia/Atapu (Santos Basin) contract (~$498M incl. services, plus ~$41M mob fee) commenced Jun 2026 at materially higher rates than the prior program; firm to ~Jun 2029 per Q2 2026 results/10-Q. Day rate undisclosed."
+    note: "Petrobras 1,095-day Sepia/Atapu (Santos Basin) contract (~$539M total value at signing incl. mobilization and services) commenced Jun 2026 at materially higher rates than the prior program; firm to Jun 2029 (Nov 3, 2026 FSR). Lump-sum mobilization revenue was received in Q3 2026. Day rate undisclosed."
   },
   {
     id: "rig-030",
@@ -787,12 +793,13 @@ const RIG_DATA = [
     lng: 112.4,
     position: "area",
     statusOverride: null,
-    source: "Seadrill Q2 2026 results",
-    asOf: "2026-08",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
-      { customer: "PTTEP", start: "Mar 2026", end: "Aug 2027", dayRate: null, firmness: "firm" }
+      { customer: "PTTEP", start: "Mar 2026", end: "Aug 2027", dayRate: null, firmness: "firm", note: "~440-day program (~$157M) plus a ~75-day priced option exercised at the original rate (~$26M)" },
+      { customer: "PTTEP", start: "Aug 2027", end: "Feb 2028", dayRate: null, firmness: "firm", note: "remaining priced options (~120 days, ~$41M excl. services) and unpriced options (~120 days, ~$53M) exercised Oct 2026; direct continuation to Feb 2028 per FSR" }
     ],
-    note: "PTTEP Malaysia 440-day program (~$157M) commenced ~Mar 2026 offshore Sarawak; Aug 2026 Q2 results added a ~75-day PTTEP extension (~$26M) committing the rig into Aug 2027. Day rate undisclosed."
+    note: "PTTEP Malaysia 440-day program (~$157M) commenced ~Mar 2026 offshore Sarawak, plus a ~75-day priced option. In Oct 2026 the remaining priced options (~120 days, ~$41M) and unpriced options (~120 days, ~$53M) were exercised, so the rig works in direct continuation to Feb 2028 (Oct 12, 2026 release; Nov 3, 2026 FSR). On the Q3 2026 call Seadrill said the unpriced options were exercised at a rate in the mid-$400s thousand a day excluding services, and several unpriced options remain. Day rate undisclosed."
   },
   {
     id: "rig-031",
@@ -812,14 +819,16 @@ const RIG_DATA = [
     lng: -90.03,
     position: "ais",
     statusOverride: null,
-    source: "Seadrill Q2 2026 results; AIS, Sep 18, 2026",
-    asOf: "2026-09-18",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Walter Oil & Gas", start: "Jun 2026", end: "Jul 2026", dayRate: null, firmness: "firm" },
       { customer: "Guardian / LLOG", start: "Jul 2026", end: "Aug 2026", dayRate: null, firmness: "firm" },
-      { customer: "Walter Oil & Gas", start: "Aug 2026", end: "Aug 2026", dayRate: null, firmness: "firm" }
+      { customer: "Walter Oil & Gas", start: "Aug 2026", end: "Aug 2026", dayRate: null, firmness: "firm" },
+      { customer: "Kosmos Energy", start: "Nov 2026", end: "Nov 2026", dayRate: null, firmness: "firm", note: "25 days" },
+      { customer: "LLOG", start: "Nov 2026", end: "Jan 2027", dayRate: null, firmness: "firm", note: "~60 days, direct continuation" }
     ],
-    note: "Short US Gulf jobs Jun-Aug 2026 per the Aug 10, 2026 FSR: Walter Oil & Gas (Jun-Jul), Guardian/LLOG (Jul-Aug), then Walter Oil & Gas again (Aug). Management cited limited visibility for the rest of 2026 and no follow-on has been announced; AIS (Sep 18, 2026) still shows the rig in the US Gulf, so an unannounced short job is possible. Sevan 650 design."
+    note: "Short US Gulf jobs Jun-Aug 2026: Walter Oil & Gas (Jun-Jul), Guardian/LLOG (Jul-Aug), then Walter Oil & Gas again (Aug). After a gap, a 25-day Kosmos job starts Nov 2026, followed directly by ~60 days for LLOG to Jan 2027 (Oct 12, 2026 release; Nov 3, 2026 FSR). Seadrill says visibility further into 2027 is limited and it expects near-term gaps. Sevan 650 design."
   },
   {
     id: "rig-032",
@@ -839,12 +848,13 @@ const RIG_DATA = [
     lng: 2.8,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
-      { customer: "Equinor", start: "Sep 2026", end: "Dec 2027", dayRate: null, firmness: "firm", note: "accommodation, ~$78M incl. mobilization; three 3-month priced options" }
+      { customer: "Equinor", start: "Sep 2026", end: "Nov 2027", dayRate: null, firmness: "firm", note: "accommodation, ~$78M incl. mobilization" },
+      { customer: "Equinor", start: "Nov 2027", end: "Aug 2028", dayRate: null, firmness: "option", note: "three 3-month priced options (~270 days); end estimated from the FSR chart" }
     ],
-    note: "Equinor NCS accommodation contract, Sep 2026 to Dec 2027 (~$78M incl. mobilization), with three 3-month priced options (Aug 10, 2026 FSR; Jan 21, 2026 award). The previous ConocoPhillips contract ended Aug 2026. Day rate undisclosed."
+    note: "Equinor NCS accommodation contract, Sep 2026 to Nov 2027 (~$78M incl. mobilization), with priced options for up to ~270 more days, to about Aug 2028 (estimated) if all are exercised (Nov 3, 2026 FSR; Jan 21, 2026 award). The Nov 2026 FSR moved the firm end from Dec 2027 to Nov 2027. The previous ConocoPhillips contract ended Aug 2026. Day rate undisclosed."
   },
   {
     id: "rig-033",
@@ -864,13 +874,13 @@ const RIG_DATA = [
     lng: 12,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Azule Energy", start: "Q3 2025", end: "Feb 2027", dayRate: null, firmness: "firm", note: "~525-day firm term" },
-      { customer: "Azule Energy", start: "Mar 2027", end: "Jan 2030", dayRate: null, firmness: "option", note: "priced options" }
+      { customer: "Azule Energy", start: "Mar 2027", end: "Jan 2030", dayRate: null, firmness: "firm", note: "all remaining priced options (~3 years) exercised Oct 2026, direct continuation" }
     ],
-    note: "Azule Energy Angola contract with a ~525-day firm term from Q3 2025 to Feb 2027, plus priced options through Jan 2030 (Aug 25, 2025 award; Aug 10, 2026 FSR). Owned by Sonangol and bareboat-chartered into Sonadrill, the Seadrill/Sonangol JV; Seadrill earns a management fee, not a day rate."
+    note: "Azule Energy Angola contract with a ~525-day firm term from Q3 2025 to Feb 2027 (Aug 25, 2025 award). In Oct 2026 the customer exercised all remaining priced options, about three years, committing the rig in direct continuation to Jan 2030 (Oct 12, 2026 release; Nov 3, 2026 FSR). Owned by Sonangol and bareboat-chartered into Sonadrill, the Seadrill/Sonangol JV; Seadrill earns a management fee, not a day rate."
   },
   {
     id: "rig-034",
@@ -890,12 +900,12 @@ const RIG_DATA = [
     lng: 11.5,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "TotalEnergies", start: "May 2024", end: "Jul 2028", dayRate: null, firmness: "firm", note: "includes a seven-well (~480-day) option exercised in 2026" }
     ],
-    note: "TotalEnergies Angola ultra-deepwater drillship. A seven-well (~480-day) priced option exercised in Mar 2026 commits the rig to Jul 2028 (Aug 10, 2026 FSR; the Mar 16, 2026 release said Jun 2028). Owned by Sonangol and bareboat-chartered into Sonadrill; Seadrill earns a management fee, not a day rate."
+    note: "TotalEnergies Angola ultra-deepwater drillship. A seven-well (~480-day) priced option exercised in Mar 2026 commits the rig to Jul 2028 (Nov 3, 2026 FSR; the Mar 16, 2026 release said Jun 2028). Owned by Sonangol and bareboat-chartered into Sonadrill; Seadrill earns a management fee, not a day rate."
   },
   {
     id: "rig-035",
@@ -915,12 +925,12 @@ const RIG_DATA = [
     lng: 11.8,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026; Q2 2026 call",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026; Q3 2026 call",
+    asOf: "2026-11-03",
     contracts: [
-      { customer: "Sonangol E&P", start: "Feb 2026", end: "Nov 2026", dayRate: null, firmness: "firm" }
+      { customer: "Sonangol E&P", start: "Feb 2026", end: "Jan 2027", dayRate: null, firmness: "firm", note: "well-based campaign; end moved from Nov 2026 to Jan 2027 in the Nov 3, 2026 FSR" }
     ],
-    note: "Sonangol E&P ~284-day Angola campaign, Feb 2026 to ~Nov 2026. Seadrill-owned and bareboat-chartered into Sonadrill; Seadrill earns a management fee, not a day rate. On the Aug 10, 2026 Q2 call management said the rig rolls off later in 2026 with no follow-on yet and is being marketed in West Africa, where most campaigns start in H1 2027."
+    note: "Sonangol E&P well-based Angola campaign, Feb 2026 to Jan 2027 (Nov 3, 2026 FSR; the Aug 10, 2026 FSR said Nov 2026). Seadrill-owned and bareboat-chartered into Sonadrill; Seadrill earns a management fee, not a day rate. On the Q3 2026 call management said no follow-on is yet secured and the rig is being marketed in Angola, wider West Africa and Asia."
   },
   {
     id: "rig-036",
@@ -940,10 +950,13 @@ const RIG_DATA = [
     lng: -13.52,
     position: "ais",
     statusOverride: null,
-    source: "AIS, early Sep 2026",
-    asOf: "2026-09",
-    contracts: [],
-    note: "Idle since the OMV Petrom Bulgaria (Black Sea) campaign ended in Q2 2026. Arrived at Arrecife, Lanzarote (Canary Islands) ~Jun 19, 2026 for a 4-6 month stay for maintenance and inspections; AIS still showed it moored there in early Sep 2026. Noble is bidding it for intervention/specialist work; trade press calls it a divestment candidate if no work materializes."
+    source: "Noble fleet status report, Oct 26, 2026; Noble Q3 2026 results, Oct 26, 2026; AIS, early Sep 2026 (position)",
+    asOf: "2026-10-26",
+    contracts: [
+      { customer: "Occidental", start: "Q2 2027", end: "Q2 2027", dayRate: 400000, firmness: "firm", note: "Peru, two wells, plus a mobilization fee; rate from the Q3 2026 results release (the FSR lists it as undisclosed)" },
+      { customer: "TotalEnergies", start: "Late 2027", end: "2030", dayRate: null, firmness: "firm", note: "West Africa, three-year capacity reservation agreement for light well intervention, minimum 150 days per year; first call-off in Angola expected Q3/Q4 2027" }
+    ],
+    note: "Idle since the OMV Petrom Bulgaria (Black Sea) campaign ended in Q2 2026; moored at Arrecife, Lanzarote (Las Palmas province, Canary Islands) from ~Jun 19, 2026 for maintenance and inspections (AIS, early Sep 2026). Next: a two-well Occidental contract in Peru from Q2 2027 at $400,000/day plus a mobilization fee (Oct 26, 2026 results release; the FSR shows the rate as undisclosed), then a three-year TotalEnergies capacity reservation agreement in West Africa for light well intervention (minimum 150 days per year) running to 2030, with the first call-off in Angola expected in Q3/Q4 2027 (Oct 26, 2026 FSR)."
   },
   {
     id: "rig-037",
@@ -963,12 +976,12 @@ const RIG_DATA = [
     lng: -57.5,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026; Drilling Contractor, Sep 28, 2026",
-    asOf: "2026-09-28",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "ExxonMobil", start: "Apr 2019", end: "Feb 2029", dayRate: null, firmness: "firm", note: "market-based rate under the ExxonMobil Commercial Enabling Agreement, reset each Jan 1 and Jul 1" }
     ],
-    note: "ExxonMobil Guyana, Stabroek block, under the Commercial Enabling Agreement. The rate is market-based and not disclosed; it resets each Jan 1 and Jul 1 after a Mar 1, 2026 pricing reset. On Jan 26, 2026 ExxonMobil added two rig-years across the four Noble rigs, taking each to Feb 2029. Back at work on the Whiptail WT_4i02 well from Sep 23, 2026 (Drilling Contractor)."
+    note: "ExxonMobil Guyana, Stabroek block, under the Commercial Enabling Agreement. The rate is market-based and not disclosed; it resets each Jan 1 and Jul 1 after a Mar 1, 2026 pricing reset. On Jan 26, 2026 ExxonMobil added two rig-years across the four Noble rigs, taking each to Feb 2029 (unchanged in the Oct 26, 2026 FSR)."
   },
   {
     id: "rig-038",
@@ -988,8 +1001,8 @@ const RIG_DATA = [
     lng: -57.8,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "ExxonMobil", start: "Apr 2018", end: "Feb 2029", dayRate: null, firmness: "firm", note: "market-based rate under the ExxonMobil Commercial Enabling Agreement, reset each Jan 1 and Jul 1" }
     ],
@@ -1013,12 +1026,12 @@ const RIG_DATA = [
     lng: -57.2,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026; Drilling Contractor, Sep 28, 2026",
-    asOf: "2026-09-28",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "ExxonMobil", start: "Dec 2019", end: "Feb 2029", dayRate: null, firmness: "firm", note: "market-based rate under the ExxonMobil Commercial Enabling Agreement, reset each Jan 1 and Jul 1" }
     ],
-    note: "ExxonMobil Guyana development drilling under the Commercial Enabling Agreement, to Feb 2029. Market-based rate, not disclosed. Resumed at the Whiptail WT_1i11 well on Sep 26, 2026, with drilling due to finish Oct 31 (Drilling Contractor)."
+    note: "ExxonMobil Guyana development drilling under the Commercial Enabling Agreement, to Feb 2029. Market-based rate, not disclosed; it resets each Jan 1 and Jul 1 (Oct 26, 2026 FSR)."
   },
   {
     id: "rig-040",
@@ -1038,8 +1051,8 @@ const RIG_DATA = [
     lng: -57,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "ExxonMobil", start: "Nov 2019", end: "Feb 2029", dayRate: null, firmness: "firm", note: "market-based rate under the ExxonMobil Commercial Enabling Agreement, reset each Jan 1 and Jul 1" }
     ],
@@ -1063,8 +1076,8 @@ const RIG_DATA = [
     lng: -88,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "bp", start: "Feb 2025", end: "Feb 2027", dayRate: null, firmness: "firm", note: "two years, ~$350M" },
       { customer: "bp", start: "Feb 2027", end: "Feb 2029", dayRate: null, firmness: "firm", note: "two-year extension, ~$310M excl. MPD" },
@@ -1090,8 +1103,8 @@ const RIG_DATA = [
     lng: -88.5,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "bp", start: "Sep 2024", end: "Sep 2026", dayRate: null, firmness: "firm", note: "two years, ~$350M" },
       { customer: "bp", start: "Sep 2026", end: "Sep 2028", dayRate: null, firmness: "firm", note: "two-year extension, ~$310M excl. MPD" },
@@ -1117,10 +1130,14 @@ const RIG_DATA = [
     lng: -89.3,
     position: "area",
     statusOverride: null,
-    source: "rig-tracker reporting, early Oct 2026",
-    asOf: "2026-10",
-    contracts: [],
-    note: "Beacon Offshore Energy US Gulf workover program (one firm well from Mar 2026 plus the ~100-day option well from Apr 2026) wrapped up ~early Aug 2026 per rig-tracker reporting. No follow-on contract announced through early Oct 2026; available in the US Gulf."
+    source: "Noble fleet status report, Oct 26, 2026; Apr 26, 2026 (Beacon)",
+    asOf: "2026-10-26",
+    contracts: [
+      { customer: "Beacon Offshore", start: "Mar 2026", end: "Jul 2026", dayRate: null, firmness: "firm", note: "US Gulf workover: one firm well plus one exercised option well" },
+      { customer: "TotalEnergies", start: "Nov 2026", end: "Apr 2027", dayRate: null, firmness: "firm", note: "Nigeria, four wells (~150 days)" },
+      { customer: "TotalEnergies", start: "Apr 2027", end: "Q4 2027", dayRate: null, firmness: "option", note: "six priced option wells; end estimated from the FSR timeline chart" }
+    ],
+    note: "Beacon Offshore Energy US Gulf workover program: one firm well plus one exercised option well, Mar to Jul 2026 (Apr 26, 2026 FSR); the Jul 27, 2026 FSR listed the rig as available in the US Gulf. Next: a four-well TotalEnergies contract in Nigeria from Nov 2026 to Apr 2027 (~150 days), plus six priced option wells (Oct 26, 2026 FSR; option end estimated from its timeline as Q4 2027). Day rate undisclosed."
   },
   {
     id: "rig-044",
@@ -1140,12 +1157,12 @@ const RIG_DATA = [
     lng: 7.6,
     position: "area",
     statusOverride: null,
-    source: "Esso/ExxonMobil, Aug 2026",
-    asOf: "2026-08-20",
+    source: "Noble fleet status report, Oct 26, 2026; Esso/ExxonMobil, Aug 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "ExxonMobil", start: "Aug 2026", end: "Jul 2028", dayRate: null, firmness: "firm", note: "Usan Infill Project; ~$292M plus up to three years of options" }
+      { customer: "ExxonMobil", start: "Aug 2026", end: "Aug 2028", dayRate: null, firmness: "firm", note: "Usan Infill Project; ~$292M plus three unpriced one-year options" }
     ],
-    note: "Arrived at the Usan field (OML 138, offshore Akwa Ibom) ~Aug 20, 2026 for Esso/ExxonMobil's ~$1B Usan Infill Project (an eight-well campaign per Esso). Two-year contract via the PIDWAL JV, ~$292M plus up to three years of options. Day rate not disclosed."
+    note: "Arrived at the Usan field (OML 138, offshore Akwa Ibom) ~Aug 20, 2026 for Esso/ExxonMobil's ~$1B Usan Infill Project (an eight-well campaign per Esso). Two-year contract via the PIDWAL JV, ~$292M plus three unpriced one-year options, Aug 2026 to Aug 2028 (Oct 26, 2026 FSR; the Jul 27 FSR had Jul 2028). Day rate not disclosed."
   },
   {
     id: "rig-045",
@@ -1165,14 +1182,14 @@ const RIG_DATA = [
     lng: -55.3,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "PETRONAS", start: "Jul 2025", end: "Sep 2026", dayRate: null, firmness: "firm", note: "Suriname" },
-      { customer: "ExxonMobil", start: "Oct 2026", end: "Nov 2026", dayRate: 375000, firmness: "firm", note: "Guyana, one well (~50 days), ~$22M incl. mob/demob" },
-      { customer: "bp", start: "Dec 2026", end: "Aug 2027", dayRate: 375000, firmness: "firm", note: "Trinidad, three wells plus three unpriced option wells" }
+      { customer: "PETRONAS", start: "Jul 2025", end: "Oct 2026", dayRate: null, firmness: "firm", note: "Suriname" },
+      { customer: "ExxonMobil", start: "Nov 2026", end: "Jan 2027", dayRate: 375000, firmness: "firm", note: "Guyana, one well (~50 days), ~$22M incl. mob/demob" },
+      { customer: "bp", start: "Jan 2027", end: "Sep 2027", dayRate: 375000, firmness: "firm", note: "Trinidad, three wells plus three unpriced option wells" }
     ],
-    note: "DSS-21 DP semisubmersible (ex-Maersk Developer). The Jul 27, 2026 FSR shows a Petronas Suriname job to Sep 2026, then one ExxonMobil Guyana well (Oct to Nov 2026, $375k/day), then a three-well bp Trinidad program (Dec 2026 to Aug 2027, $375k/day). A 120-180 day Shell contract (~$70M) listed in the Jan and Apr FSRs no longer appears; management called the change a resequencing and gave no further reason."
+    note: "DSS-21 DP semisubmersible (ex-Maersk Developer). The Oct 26, 2026 FSR shows the Petronas Suriname job running to Oct 2026, then one ExxonMobil Guyana well (Nov 2026 to Jan 2027, $375k/day), then a three-well bp Trinidad program (Jan to Sep 2027, $375k/day, plus three unpriced option wells); each slipped about a month from the Jul 27 FSR. A 120-180 day Shell contract (~$70M) listed in the Jan and Apr FSRs no longer appears; management called the change a resequencing and gave no further reason."
   },
   {
     id: "rig-046",
@@ -1192,8 +1209,8 @@ const RIG_DATA = [
     lng: -61,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: null, start: "Jan 2027", end: "Jun 2028", dayRate: 300000, firmness: "firm", note: "11 wells, South America; plus performance bonus and mob/demob fees" }
     ],
@@ -1217,8 +1234,8 @@ const RIG_DATA = [
     lng: 3.5,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026; Drilling Contractor, Jun 9, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026; Drilling Contractor, Jun 9, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "bp", start: "Mar 2027", end: "Sep 2027", dayRate: 320000, firmness: "firm", note: "UK, three wells (150-210 days), plus $5M mobilization fee" },
       { customer: "Aker BP", start: "Sep 2027", end: "Sep 2030", dayRate: null, firmness: "firm", note: "three years, ~$473M incl. mobilization" }
@@ -1243,15 +1260,14 @@ const RIG_DATA = [
     lng: -1.5,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "Tullow", start: "Nov 2025", end: "Sep 2026", dayRate: null, firmness: "firm", note: "Ghana, Jubilee; plus one priced option well" },
-      { customer: "Planet One", start: "Dec 2026", end: "Feb 2027", dayRate: 430000, firmness: "firm", note: "one well (~45 days), two unpriced option wells" },
-      { customer: "Amni", start: "Feb 2027", end: "Mar 2027", dayRate: 450000, firmness: "firm", note: "one exploration well" },
+      { customer: "Tullow", start: "Nov 2025", end: "Sep 2026", dayRate: null, firmness: "firm", note: "Ghana, Jubilee; $171M for ~360 days across two phases, plus one priced option well" },
+      { customer: "Planet One", start: "Oct 2026", end: "Nov 2026", dayRate: 430000, firmness: "firm", note: "Ghana, one well (~45 days), two unpriced option wells" },
       { customer: "Shell", start: "Q4 2027", end: "Q3 2031", dayRate: null, firmness: "firm", note: "US Gulf, four years, ~$606M base plus up to 20% performance pay; four 1-year options at mutually agreed rates" }
     ],
-    note: "Tullow's Ghana Jubilee campaign ran to Sep 2026. Next: a Planet One Ghana well (Dec 2026 to Feb 2027, $430k/day, two unpriced option wells), an Amni Ghana exploration well (Feb to Mar 2027, $450k/day), then a four-year Shell US Gulf contract from Q4 2027 to Q3 2031 (~$606M base plus up to 20% performance pay, four one-year options), per the Jul 27, 2026 FSR."
+    note: "Tullow's Ghana Jubilee campaign ran to Sep 2026. The Planet One Ghana well was brought forward to Oct to Nov 2026 ($430k/day, plus two unpriced option wells). The Amni Ghana exploration well (Feb to Mar 2027, $450k/day) shown in the Jul 27, 2026 FSR no longer appears in the Oct 26, 2026 FSR, with no reason given. Then a four-year Shell US Gulf contract from Q4 2027 to Q3 2031 (~$606M base plus up to 20% performance pay, four one-year options at mutually agreed rates)."
   },
   {
     id: "rig-049",
@@ -1297,13 +1313,14 @@ const RIG_DATA = [
     lng: 3.39,
     position: "field",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026; Noble award announcement (via trade press), Aug 7, 2026",
-    asOf: "2026-08-07",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "Aker BP", start: "Sep 2026", end: "Feb 2027", dayRate: null, firmness: "firm", note: "Valhall accommodation, $38.7M incl. mob/demob" },
-      { customer: "ConocoPhillips", start: "Q3 2027", end: "Mid 2029", dayRate: null, firmness: "firm", note: "Greater Ekofisk P&A, ~670 days; end estimated from duration; announced by Noble Aug 2026, not yet in an FSR" }
+      { customer: "Aker BP", start: "Sep 2026", end: "Jan 2027", dayRate: null, firmness: "firm", note: "Valhall accommodation, 150 days, $38.7M incl. mob/demob; plus up to 90 days of options" },
+      { customer: "DNO", start: "Q3 2027", end: "Q3 2027", dayRate: null, firmness: "firm", note: "Norway, one well (50-90 days)" },
+      { customer: "ConocoPhillips", start: "Q3 2027", end: "Q3 2029", dayRate: null, firmness: "firm", note: "Greater Ekofisk P&A, ~670 days (26 wells), in direct continuation of the DNO well" }
     ],
-    note: "Aker BP 150-day accommodation scope ($38.7M incl. mob/demob, up to 90 days of options) at Valhall supporting the PWP-Fenris offshore completion, ~Sep 2026 to Feb 2027. ConocoPhillips then awarded a ~670-day Greater Ekofisk P&A contract from Q3 2027, announced by Noble around Aug 7, 2026 and not yet in a Noble fleet status report. Day rate not disclosed."
+    note: "Aker BP 150-day accommodation scope ($38.7M incl. mob/demob, up to 90 days of options) at Valhall supporting the PWP-Fenris offshore completion, Sep 2026 to Jan 2027 (Oct 26, 2026 FSR; was Feb 2027). Next: a one-well DNO contract in Norway from Q3 2027 (50-90 days), followed in direct continuation by a ~670-day, 26-well ConocoPhillips P&A campaign on Ekofisk running to Q3 2029. Day rates not disclosed."
   },
   {
     id: "rig-051",
@@ -1323,13 +1340,13 @@ const RIG_DATA = [
     lng: 12.5,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Azule Energy", start: "Jun 2024", end: "Oct 2026", dayRate: null, firmness: "firm", note: "~850 days, ~$364M" },
-      { customer: "Azule Energy", start: "Oct 2026", end: "Sep 2027", dayRate: null, firmness: "firm", note: "~325 days, ~$125M" }
+      { customer: "Azule Energy", start: "Oct 2026", end: "Jul 2027", dayRate: null, firmness: "firm", note: "~325 days, ~$125M" }
     ],
-    note: "Azule Energy, Angola. The current program (from Jun 2024, ~$364M over ~850 days) runs to Oct 2026, then a firm extension to Sep 2027 (~325 days, ~$125M). The Aug 5, 2026 FSR shows no options after it. Day rate undisclosed."
+    note: "Azule Energy, Angola. The program from Jun 2024 (~$364M over ~850 days) ran to Oct 2026, followed by a firm extension now shown to Jul 2027 (was Sep 2027; still ~325 days, ~$125M). The Nov 2, 2026 FSR shows no options after it. Day rate undisclosed."
   },
   {
     id: "rig-052",
@@ -1349,13 +1366,13 @@ const RIG_DATA = [
     lng: -43,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Petrobras", start: "Dec 2023", end: "Dec 2026", dayRate: 428000, firmness: "firm" },
       { customer: "Shell", start: "Mar 2027", end: "May 2029", dayRate: null, firmness: "firm", note: "~800 days, ~$300M, ~1 year of options" }
     ],
-    note: "Petrobras Brazil Dec 2023-Dec 2026 at $428,000/day plus ~$30M mobilization fee. Next: Shell Brazil Mar 2027-May 2029 (~$300M over ~800 days, ~1 year of options) after ~60 days out of service for upgrades in 1Q27 (Aug 5, 2026 FSR)."
+    note: "Petrobras Brazil Dec 2023-Dec 2026 at $428,000/day plus ~$30M mobilization fee. Next: Shell Brazil Mar 2027-May 2029 (~$300M over ~800 days, ~1 year of options) after ~60 days out of service for upgrades in 1Q27 (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-053",
@@ -1375,12 +1392,12 @@ const RIG_DATA = [
     lng: 12.8,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "ExxonMobil", start: "Jul 2026", end: "Jul 2028", dayRate: null, firmness: "firm", note: "two 6-month options" }
     ],
-    note: "ExxonMobil (Esso Exploration Angola); two-year extension Jul 2026 to Jul 2028 in direct continuation, with MPD services and two 6-month options. The day rate is described only as in line with recent market rates in the region. About 15 days out of service for maintenance expected in Q2 2027. On continuous ExxonMobil Angola hire since Jul 2022."
+    note: "ExxonMobil (Esso Exploration Angola); two-year extension Jul 2026 to Jul 2028 in direct continuation, with MPD services and two 6-month options. The day rate is described only as in line with recent market rates in the region; Valaris's Q3 2026 results say the new contract started in the third quarter at a higher day rate. About 15 days out of service for maintenance now expected in Q3 2027 (was Q2 2027). On continuous ExxonMobil Angola hire since Jul 2022 (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-054",
@@ -1400,12 +1417,13 @@ const RIG_DATA = [
     lng: 1.2,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Adura", start: "Feb 2026", end: "Nov 2026", dayRate: null, firmness: "firm", note: "~194 days, >$25M" }
+      { customer: "Adura", start: "Feb 2026", end: "Nov 2026", dayRate: null, firmness: "firm", note: "~194 days, >$25M" },
+      { customer: "Eni", start: "Nov 2026", end: "Aug 2027", dayRate: null, firmness: "firm", note: "East Irish Sea; ~8.5 months of VALARIS 72's Eni program reassigned; direct continuation" }
     ],
-    note: "Adura (Shell/Equinor UK JV); current firm term Feb 2026-Nov 2026 (per Aug 5, 2026 FSR), >$25M backlog on ~194 days; the FSR shows no options after it. Prior term Jan 2025-Jan 2026 (~$55M). Day rate undisclosed."
+    note: "Adura (Shell/Equinor UK JV); firm term Feb 2026-Nov 2026 (>$25M on ~194 days). Next, in direct continuation from Nov 2026 to Aug 2027: about eight and a half months of Eni's East Irish Sea (UK) program, reassigned from VALARIS 72 by a contract amendment that added ~$17M of backlog overall (Valaris release Oct 7, 2026; Nov 2, 2026 FSR). Prior term Jan 2025-Jan 2026 (~$55M). Day rates undisclosed."
   },
   {
     id: "rig-055",
@@ -1425,12 +1443,13 @@ const RIG_DATA = [
     lng: 1.8,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "Ithaca Energy", start: "May 2026", end: "Feb 2027", dayRate: null, firmness: "firm" }
+      { customer: "Ithaca Energy", start: "May 2026", end: "Apr 2027", dayRate: null, firmness: "firm", note: "300 days, ~$36M" },
+      { customer: "Ithaca Energy", start: "Jun 2027", end: "Dec 2027", dayRate: null, firmness: "firm", note: "~200 days, ~$27M; priced options totalling ~163 days" }
     ],
-    note: "Ithaca Energy, UK (harsh-environment jackup); current extension May 2026-Feb 2027 with contracted revenue backlog of ~$36M based on duration of 300 days; prior firm term Apr 2025-May 2026 (TCV ~$39M, 292 days). Day rate undisclosed."
+    note: "Ithaca Energy, UK (harsh-environment jackup). Current extension May 2026-Apr 2027 (was Feb 2027 in the Aug FSR; backlog ~$36M on 300 days), ~30 days out of service for planned maintenance in 2Q27, then a further Ithaca extension Jun 2027-Dec 2027 (~200 days, ~$27M) with priced options totalling ~163 days (Nov 2, 2026 FSR). Prior firm term Apr 2025-May 2026 (TCV ~$39M, 292 days). Day rates undisclosed."
   },
   {
     id: "rig-056",
@@ -1450,12 +1469,13 @@ const RIG_DATA = [
     lng: 117,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026; Feb 17, 2026 (eight wells)",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026; Feb 17, 2026 (eight wells)",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "bp", start: "Oct 2026", end: "Sep 2028", dayRate: null, firmness: "firm", note: "eight wells, ~2 years, ~$74M" }
+      { customer: "bp", start: "Nov 2026", end: "Oct 2028", dayRate: null, firmness: "firm", note: "eight wells, ~2 years, ~$74M" },
+      { customer: "bp", start: "Nov 2028", end: "Jan 2029", dayRate: null, firmness: "firm", note: "one-well priced extension, ~90 days, ~$10M; three 1-well options remain" }
     ],
-    note: "BP Indonesia 8-well contract (~2 years, ~$74M, four 1-well options), expected to start late 3Q/4Q26 after ~90 days out of service for leg repairs (Aug 5, 2026 FSR). The interim Medco Energi one-well job was terminated by mutual agreement. Day rate undisclosed."
+    note: "BP Indonesia 8-well contract (~2 years, ~$74M), now expected Nov 2026-Oct 2028 after leg repairs (the Nov 2, 2026 FSR no longer lists out-of-service days), then a one-well priced extension in direct continuation, Nov 2028-Jan 2029 (~90 days, ~$10M), leaving three 1-well options. The interim Medco Energi one-well job was terminated by mutual agreement. Day rate undisclosed."
   },
   {
     id: "rig-057",
@@ -1475,13 +1495,13 @@ const RIG_DATA = [
     lng: 1.5,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "GE Vernova", start: "Nov 2025", end: "Sep 2026", dayRate: null, firmness: "firm", note: "offshore wind accommodation support, incl. 101-day extension" },
+      { customer: "Seatrium", start: "Nov 2025", end: "Nov 2026", dayRate: null, firmness: "firm", note: "offshore wind accommodation support, 386 days incl. extensions, ~$28M" },
       { customer: null, start: "Apr 2027", end: "Mar 2030", dayRate: null, firmness: "firm", note: "41-well P&A, ~1,080 days, ~$140M" }
     ],
-    note: "GE Vernova offshore-wind accommodation work ended ~Sep 2026 and the Eni East Irish Sea contract was reassigned to VALARIS 120 (Aug 5, 2026 FSR). Next: 41-well UK North Sea P&A contract, Apr 2027 to Mar 2030 in the fleet status table (mid-2027 in its summary), ~1,080 days, ~$140M with annual escalation and two unpriced 1-year options; customer undisclosed."
+    note: "Offshore-wind accommodation support in the UK North Sea from Nov 2025, now extended to Nov 2026 (386 days in total, ~$28M) by a 61-day extension from Oct 2026; Valaris now names the customer as Seatrium (GE Vernova in earlier FSRs). The Eni East Irish Sea contract was reassigned to VALARIS 120. Next: 41-well UK North Sea P&A contract, Apr 2027 to Mar 2030, ~1,080 days, ~$140M with annual escalation and two unpriced 1-year options; customer undisclosed (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-058",
@@ -1501,12 +1521,12 @@ const RIG_DATA = [
     lng: 4.2,
     position: "area",
     statusOverride: null,
-    source: "Odfjell Drilling Q2 2026 report, Aug 18, 2026",
-    asOf: "2026-08-18",
+    source: "Odfjell Drilling Q3 2026 report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Aker BP", start: "Q1 2025", end: "Q2 2030", dayRate: null, firmness: "firm", note: "five years, base value $620-730M" }
     ],
-    note: "Aker BP five-year Yggdrasil firm contract (including the Munin production wells) from early 2025 to ~Q2 2030, following earlier Aker BP frame work; base value $620-730M. The day rate is market-based within a pre-agreed range, set by brokers each year. 99% financial utilization in Q2 2026. Harsh-environment Tier 1 semisub."
+    note: "Aker BP five-year Yggdrasil firm contract (including the Munin production wells) from early 2025 to ~Q2 2030, following earlier Aker BP frame work; base value $620-730M. The day rate is market-based within a pre-agreed range, set by brokers each year. Worked on the Yggdrasil development throughout Q3 2026 at 99.8% financial utilization (Odfjell Q3 2026 report, Nov 3, 2026). Harsh-environment Tier 1 semisub."
   },
   {
     id: "rig-059",
@@ -1526,12 +1546,12 @@ const RIG_DATA = [
     lng: 5,
     position: "area",
     statusOverride: null,
-    source: "Aker BP extension, Jul 17, 2026",
-    asOf: "2026-07-17",
+    source: "Odfjell Drilling Q3 2026 report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Aker BP", start: "2024", end: "End 2028", dayRate: null, firmness: "firm" }
     ],
-    note: "Aker BP NCS since 2019 delivery. Jul 17, 2026: Aker BP confirmed a further one-year firm extension taking backlog to end-2028, with further options. Extension rate to be set by two independent brokers by end-2026; undisclosed."
+    note: "Aker BP NCS since 2019 delivery. Jul 17, 2026: Aker BP confirmed a further one-year firm extension taking backlog to end-2028, with further unpriced options. Extension rate to be set by two independent brokers by end-2026; undisclosed. Worked on the Symra field throughout Q3 2026 at 99.4% financial utilization (Odfjell Q3 2026 report, Nov 3, 2026); Havtil consented on Aug 17, 2026 to its use for production drilling and completion at Øst Frigg."
   },
   {
     id: "rig-060",
@@ -1551,13 +1571,13 @@ const RIG_DATA = [
     lng: 2.5,
     position: "area",
     statusOverride: null,
-    source: "Odfjell Drilling Q2 2026 report, Aug 18, 2026",
-    asOf: "2026-08-18",
+    source: "Odfjell Drilling Q3 2026 report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Equinor", start: "Q4 2025", end: "Q3 2026", dayRate: null, firmness: "firm", note: "eight-well option, ~$121M" },
       { customer: "Equinor", start: "Q4 2026", end: "Q1 2029", dayRate: null, firmness: "firm", note: "~$373M firm; interim NCS scope, then Fram Sør" }
     ],
-    note: "Equinor NCS: an eight-well extension (~$121M) ran from Q4 2025 to Q3 2026, followed in direct continuation by a new contract signed Dec 19, 2025 (~$373M firm, excl. integrated services, bonuses, fuel incentives and escalation): an interim NCS scope, then the Fram Sør development, Q4 2026 to Q1 2029. No release has yet confirmed the new contract started."
+    note: "Equinor NCS: an eight-well extension (~$121M) ran from Q4 2025 to Q3 2026, drilling development wells on Breidablikk during Q3 2026 (94.5% financial utilization, hit by a third-party supplier's labour dispute), followed in direct continuation by a new contract signed Dec 19, 2025 (~$373M firm, excl. integrated services, bonuses, fuel incentives and escalation): an interim NCS scope, then the Fram Sør development, Q4 2026 to Q1 2029. Odfjell's Q3 2026 report (Nov 3, 2026) says the owned fleet is fully contracted to at least end-2027 but does not confirm the new contract's start date."
   },
   {
     id: "rig-061",
@@ -1577,13 +1597,14 @@ const RIG_DATA = [
     lng: -3.8,
     position: "area",
     statusOverride: null,
-    source: "Odfjell Drilling Q2 2026 report, Aug 18, 2026",
-    asOf: "2026-08-18",
+    source: "Odfjell Drilling Q3 2026 report, Nov 3, 2026; Equinor option exercise, Oct 16, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Adura", start: "2022", end: "Q3 2027", dayRate: null, firmness: "firm" },
-      { customer: "Adura", start: "Q4 2027", end: "2030", dayRate: null, firmness: "option", note: "priced one-well options, then unpriced optional periods" }
+      { customer: "Adura", start: "Q4 2027", end: "End 2027", dayRate: null, firmness: "firm", note: "two priced one-well options exercised by Equinor Oct 16, 2026, in direct continuation at the original contract pricing; firm to late Q4 2027; start estimated" },
+      { customer: "Adura", start: "2028", end: "2030", dayRate: null, firmness: "option", note: "two further priced one-well options, then unpriced optional periods into 2030; dates estimated" }
     ],
-    note: "Owned (not managed) rig working the Rosebank development west of Shetland for Adura (contract signed with Equinor). Off hire from Apr 18, 2026 after its BOP dropped to the seabed; back on rate Aug 2, 2026 after 106 days, with $82M of insurance income. Odfjell (Q2 2026 report) says its fleet is firm until at least Q3 2027, with Deepsea Atlantic the first unit available, in late 2027; after the firm term come priced one-well options, then optional periods at rates to be agreed."
+    note: "Owned (not managed) rig working the Rosebank development west of Shetland for Adura (contract signed with Equinor). Off hire from Apr 18, 2026 after its BOP dropped to the seabed; back on rate Aug 2, 2026 after 106 days (55.8% financial utilization in Q3 2026), with insurance covering the claim. On Oct 16, 2026 Equinor exercised priced options for two more wells at the original contract pricing, extending firm work to late Q4 2027; Equinor keeps priced options for two further wells, followed by unpriced options into 2030 (Odfjell Q3 2026 report and presentation, Nov 3, 2026). It remains the first Odfjell owned unit to come free. Day rate undisclosed."
   },
   {
     id: "rig-062",
@@ -1603,13 +1624,14 @@ const RIG_DATA = [
     lng: 2.9,
     position: "area",
     statusOverride: null,
-    source: "Vår Energi award, Sep 10, 2026",
-    asOf: "2026-09-10",
+    source: "Odfjell Drilling Q3 2026 report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Equinor", start: "Dec 2025", end: "Q1 2028", dayRate: null, firmness: "firm" },
-      { customer: "Vår Energi", start: "Early 2028", end: "Q1 2031", dayRate: null, firmness: "loi", note: "3-year letter of award, ~$518M incl. mob" }
+      { customer: "Vår Energi", start: "Early 2028", end: "Q1 2031", dayRate: null, firmness: "firm", note: "3-year contract, ~$518M incl. mob; letter of award Sep 10, 2026, called a firm contract in Odfjell's Q3 2026 report" },
+      { customer: "Vår Energi", start: "Q1 2031", end: "Q1 2035", dayRate: null, firmness: "option", note: "four one-year priced options after the firm period (Odfjell Q3 2026 report)" }
     ],
-    note: "Renamed Deepsea Bergen after Odfjell's USD 480M purchase from Northern Ocean (Dec 2025). Novated Equinor NCS contract firm to Q1 2028 (~USD 355M). Sep 10, 2026: Var Energi awarded a 3-year LOA from early 2028 in direct continuation (~USD 518M incl. mob), extending firm backlog to Q1 2031. Day rates undisclosed."
+    note: "Renamed Deepsea Bergen after Odfjell's USD 480M purchase from Northern Ocean (Dec 2025). Novated Equinor NCS contract firm to Q1 2028 (~USD 355M); drilling Johan Sverdrup Phase III production wells in Q3 2026 (94% financial utilization, hit by a third-party labour dispute). Vår Energi: a 3-year contract from early 2028 in direct continuation (~USD 518M incl. mob; letter of award Sep 10, 2026, a firm contract per Odfjell's Q3 2026 report), extending firm backlog to Q1 2031; Odfjell's Q3 2026 report (Nov 3, 2026) adds four one-year priced options running to Q1 2035. Day rates undisclosed."
   },
   {
     id: "rig-063",
@@ -1623,19 +1645,19 @@ const RIG_DATA = [
     waterDepth_ft: 12000,
     hookload_tons: 1250,
     buildYear: 2021,
-    region: "Mediterranean & Black Sea",
-    country: null,
-    lat: 33.2,
-    lng: 34,
-    position: "area",
+    region: "West Africa",
+    country: "Spain (Canary Islands)",
+    lat: 28.13,
+    lng: -15.42,
+    position: "ais",
     statusOverride: null,
-    source: "Saipem H1 2026 interim report; release, Jul 22, 2026",
-    asOf: "2026-07-22",
+    source: "Saipem H1 2026 interim report; Saipem release, Jul 22, 2026; AIS (VesselFinder), Nov 8, 2026",
+    asOf: "2026-11-08",
     contracts: [
-      { customer: "Energean", start: "Apr 2026", end: "Late 2026", dayRate: null, firmness: "firm", note: "Eastern Mediterranean; term undisclosed, end estimated" },
+      { customer: "Energean", start: "Apr 2026", end: "Sep 2026", dayRate: null, firmness: "firm", note: "Eastern Mediterranean; term undisclosed; end estimated from AIS (arrived Las Palmas Sep 26, 2026)" },
       { customer: "Eni", start: "Early 2027", end: null, dayRate: null, firmness: "firm", note: "Côte d'Ivoire long-term development drilling, ~$260M; optional periods; term undisclosed" }
     ],
-    note: "Worked for Eni in Ghana and Côte d'Ivoire until end-Mar 2026, then began work for Energean in the Eastern Mediterranean (Saipem H1 2026 interim report; term undisclosed). Jul 22, 2026: Eni awarded a ~USD 260M long-term development drilling contract in Côte d'Ivoire from early 2027, with optional periods and possible work in neighbouring countries. A maintenance stop comes before the Eni mobilization."
+    note: "Worked for Eni in Ghana and Côte d'Ivoire until end-Mar 2026, then for Energean in the Eastern Mediterranean (Saipem H1 2026 interim report; term undisclosed). AIS shows it arrived at Las Palmas, Canary Islands, on Sep 26, 2026 and was still moored there in early Nov 2026, so the Energean work ended by about Sep 2026 (estimated). Saipem said a maintenance stop comes before its next job: Eni's ~USD 260M long-term development drilling contract in Côte d'Ivoire from early 2027 (Saipem release, Jul 22, 2026), with optional periods and possible work in neighbouring countries. Plotted at Las Palmas under West Africa, the market it is heading to."
   },
   {
     id: "rig-064",
@@ -1650,17 +1672,17 @@ const RIG_DATA = [
     hookload_tons: 1250,
     buildYear: 2014,
     region: "Asia Pacific",
-    country: "Indonesia",
-    lat: -4.3,
-    lng: 133,
-    position: "area",
+    country: "Malaysia",
+    lat: 1.43,
+    lng: 103.93,
+    position: "ais",
     statusOverride: null,
-    source: "Deep Value Driller AS release, Sep 10, 2026; Ventura Offshore release, Sep 4, 2026; presentation, Sep 16, 2026",
-    asOf: "2026-09-16",
+    source: "Deep Value Driller AS release, Sep 10, 2026; Ventura Offshore release, Sep 4, 2026; presentation, Sep 16, 2026; AIS (VesselFinder), Nov 8, 2026",
+    asOf: "2026-11-08",
     contracts: [
       { customer: "PETRONAS", start: "Q4 2026", end: "Q1 2027", dayRate: null, firmness: "firm", note: "one well, Bobara PSC, ~$58M incl. provisional sums; start not disclosed; firm to Q1 2027 per Ventura (Sep 16, 2026)" }
     ],
-    note: "Bareboat-chartered to Saipem from 2023. Eldorado Drilling's $300M offer beat Saipem's agreed purchase in Feb 2026, and the sale from Deep Value Driller AS completed Sep 10, 2026 (Deep Value Driller AS release). Ventura Offshore markets and operates the rig for Eldorado and signed a one-well contract (~$58M incl. provisional sums) with PETRONAS E&P Bobara for an ultra-deepwater exploration well in the Bobara PSC, offshore West Papua, Indonesia. Indonesian press names the well Redha-1, while Ventura's Q2 report referred to PETRONAS Bobara's Akbar-1 well; neither Ventura nor PETRONAS has confirmed the well name or a spud date."
+    note: "Bareboat-chartered to Saipem from 2023. Eldorado Drilling's $300M offer beat Saipem's agreed purchase in Feb 2026, and the sale from Deep Value Driller AS completed Sep 10, 2026 (Deep Value Driller AS release). Ventura Offshore markets and operates the rig for Eldorado and signed a one-well contract (~$58M incl. provisional sums) with PETRONAS E&P Bobara for an ultra-deepwater exploration well in the Bobara PSC, offshore West Papua, Indonesia. Indonesian press names the well Redha-1, while Ventura's Q2 report referred to PETRONAS Bobara's Akbar-1 well; neither Ventura nor PETRONAS has confirmed the well name or a spud date. AIS shows the rig at anchor off Pasir Gudang, Johor, Malaysia, since Oct 12, 2026 (after leaving Singapore anchorage), so it had not yet mobilized to Indonesia in early Nov 2026."
   },
   {
     id: "rig-065",
@@ -1680,10 +1702,12 @@ const RIG_DATA = [
     lng: -2.5,
     position: "area",
     statusOverride: null,
-    source: "Saipem H1 2026 interim report; AIS, Jul 2026",
-    asOf: "2026-07",
-    contracts: [],
-    note: "Eni Libya work ended in H1 2026 (152 of 181 H1 days under contract). Moved to West Africa \"in anticipation of works\"; AIS (Jul 2026) showed it heading for Takoradi, Ghana. Saipem's H1 schedule shows only ongoing discussions, and no new contract had been announced as of early Oct 2026."
+    source: "Saipem release, Oct 27, 2026; Saipem H1 2026 interim report; AIS, Nov 2026",
+    asOf: "2026-11-08",
+    contracts: [
+      { customer: "Eni", start: "Q4 2026", end: null, dayRate: null, firmness: "firm", note: "Eni Ghana E&P, drilling offshore Ghana; awarded Oct 27, 2026 (part of ~$121M for two contracts with Saipem 10000); start and term not disclosed; start estimated" }
+    ],
+    note: "Eni Libya work ended in H1 2026 (152 of 181 H1 days under contract). Moved to West Africa \"in anticipation of works\" and has been offshore Ghana since mid-2026; AIS shows it left the Sankofa field terminal (Eni's OCTP) on Sep 5, 2026 and holding position off Ghana. On Oct 27, 2026 Saipem announced a contract from Eni Ghana Exploration & Production for drilling offshore Ghana (start and term undisclosed; the two contracts announced that day total ~USD 121M, with the Saipem 10000 Cyprus award). Day rate undisclosed."
   },
   {
     id: "rig-066",
@@ -1703,14 +1727,14 @@ const RIG_DATA = [
     lng: -56.6,
     position: "area",
     statusOverride: null,
-    source: "Stena Drilling fleet schedule, Sep 17, 2026; MARAD, Aug 2026",
-    asOf: "2026-09-17",
+    source: "Stena Drilling fleet schedule, Oct 27, 2026; Stena AB Q2 2026 interim report, Aug 27, 2026; AIS, Nov 2026",
+    asOf: "2026-11-08",
     contracts: [
       { customer: "ExxonMobil", start: "2025", end: "Dec 2026", dayRate: null, firmness: "firm" },
-      { customer: null, start: "Jan 2027", end: "Jun 2027", dayRate: null, firmness: "firm", note: "Stena schedule; customer not named" },
-      { customer: null, start: "Jul 2027", end: "Dec 2027", dayRate: null, firmness: "option", note: "Stena schedule; customer not named" }
+      { customer: "ExxonMobil", start: "Jan 2027", end: "Jun 2027", dayRate: null, firmness: "firm", note: "new Esso contract signed Aug 2026, to Jun 30, 2027 (Stena AB Q2 2026 report)" },
+      { customer: "ExxonMobil", start: "Jul 2027", end: "Mar 2028", dayRate: null, firmness: "option", note: "options for further extensions; Stena schedule (Oct 27, 2026) shows options to at least Mar 2028, where the chart ends" }
     ],
-    note: "Sole Stena drillship in Guyana's Stabroek Block; ExxonMobil/Esso extension (signed Jul 2025) to Dec 31, 2026. After Goby-1 it drilled the Rockhead-1 exploration well (~213 km offshore), due to finish by end-Aug 2026 per MARAD. Stena's Sep 17, 2026 fleet schedule shows it contracted to Jun 2027, then options to Dec 2027 (customer not named)."
+    note: "Sole Stena drillship in Guyana's Stabroek Block; ExxonMobil/Esso extension (signed Jul 2025) to Dec 31, 2026, then a new Esso contract signed Aug 2026 to Jun 30, 2027 with options for further extensions (Stena AB Q2 2026 report). After Goby-1 it drilled the Rockhead-1 exploration well (~213 km offshore), due to finish by end-Aug 2026 per MARAD; AIS (Nov 2026) shows it at Stabroek. Stena's Oct 27, 2026 fleet schedule shows it contracted to Jun 2027, then options to at least Mar 2028."
   },
   {
     id: "rig-067",
@@ -1724,21 +1748,22 @@ const RIG_DATA = [
     waterDepth_ft: 10000,
     hookload_tons: 1000,
     buildYear: 2007,
-    region: "South America",
-    country: "Suriname",
-    lat: 6.6,
-    lng: -54.6,
+    region: "West Africa",
+    country: "Namibia",
+    lat: -27.3,
+    lng: 14.3,
     position: "area",
     statusOverride: null,
-    source: "Stena Drilling fleet schedule, Sep 17, 2026; Stena Drilling release, Apr 15, 2026",
-    asOf: "2026-09-17",
+    source: "Stena Drilling fleet schedule, Oct 27, 2026; Stena Drilling release, Apr 15, 2026; AIS, Nov 2026",
+    asOf: "2026-11-08",
     contracts: [
       { customer: "TotalEnergies / Shell", start: "2025", end: "End 2025", dayRate: null, firmness: "firm", note: "Suriname: TotalEnergies one well (Macaw-1), Shell two wells" },
       { customer: "TotalEnergies / Shell", start: "Jan 2026", end: "2026", dayRate: null, firmness: "option", note: "options into 2026; exercise not confirmed" },
-      { customer: null, start: "Oct 2026", end: "Dec 2027", dayRate: null, firmness: "firm", note: "Stena schedule; customer not named; includes the Energean well" },
-      { customer: "Energean", start: "Early 2027", end: null, dayRate: null, firmness: "firm", note: "Greece, Block 2, one well with MPD" }
+      { customer: null, start: "Oct 2026", end: "Feb 2028", dayRate: null, firmness: "firm", note: "Stena schedule (Oct 27, 2026); customer not named; covers the Namibia campaign and the Energean well" },
+      { customer: "Energean", start: "Early 2027", end: null, dayRate: null, firmness: "firm", note: "Greece, Block 2, one well with MPD" },
+      { customer: null, start: "Mar 2028", end: "Mar 2028", dayRate: null, firmness: "option", note: "Stena schedule shows an option in Mar 2028, where the chart ends; customer not named" }
     ],
-    note: "Drilled Suriname wells for TotalEnergies (Macaw-1 from Jun 2025, plus up to three option wells) and Shell (two firm plus two option wells); no 2026 source confirms the options were exercised. Stena's Sep 17, 2026 fleet schedule shows it preparing in Sep 2026 for a contract running Oct 2026-Dec 2027 (customer not named), which takes in one firm well for Energean in Greece's Block 2 (NW Ionian Sea) from early 2027, Greece's first deepwater well (Stena release, Apr 15, 2026)."
+    note: "Drilled Suriname wells for TotalEnergies (Macaw-1 from Jun 2025, plus up to three option wells) and Shell (two firm plus two option wells); no 2026 source confirms the options were exercised. It left Las Palmas on Oct 6, 2026 and called at Walvis Bay, Namibia (Oct 25-30); AIS (Nov 2026) shows it working in Namibian waters. Trade press reports the Namibia campaign is for Shell on PEL 39 (Orange Basin), but neither Stena nor Shell has confirmed the contract. Stena's Oct 27, 2026 fleet schedule shows it contracted from Oct 2026 to Feb 2028 (customer not named), then an option in Mar 2028; this takes in one firm well for Energean in Greece's Block 2 (NW Ionian Sea) from early 2027, Greece's first deepwater well (Stena release, Apr 15, 2026). Plotted in the Orange Basin (approximate)."
   },
   {
     id: "rig-068",
@@ -1758,15 +1783,14 @@ const RIG_DATA = [
     lng: 30.5,
     position: "area",
     statusOverride: null,
-    source: "Stena Drilling fleet schedule, Sep 17, 2026; Stena Drilling LinkedIn post, ~Aug 17, 2026 (via Offshore magazine)",
-    asOf: "2026-09-17",
+    source: "Stena Drilling fleet schedule, Oct 27, 2026; Stena AB Q2 2026 interim report, Aug 27, 2026; Stena Drilling LinkedIn post, ~Aug 17, 2026 (via Offshore magazine)",
+    asOf: "2026-10-27",
     contracts: [
-      { customer: null, start: "Aug 2026", end: "Oct 2026", dayRate: null, firmness: "firm" },
-      { customer: null, start: "Nov 2026", end: "Nov 2026", dayRate: null, firmness: "option" },
-      { customer: null, start: "Dec 2026", end: "Mar 2027", dayRate: null, firmness: "firm" },
-      { customer: null, start: "Apr 2027", end: "Dec 2027", dayRate: null, firmness: "option" }
+      { customer: null, start: "Aug 2026", end: "Nov 2026", dayRate: null, firmness: "firm", note: "undisclosed client in the region; the Nov 2026 option on the Sep 17 schedule shows as contracted on the Oct 27, 2026 schedule" },
+      { customer: "ExxonMobil", start: "Dec 2026", end: "Jul 2027", dayRate: null, firmness: "firm", note: "initial two firm wells in Cyprus and one in Egypt, signed Jun 2026, from Dec 2026 (Stena AB Q2 2026 report); Stena schedule shows contracted to Jul 2027" },
+      { customer: null, start: "Aug 2027", end: "Feb 2028", dayRate: null, firmness: "option", note: "Stena schedule (Oct 27, 2026); customer not named; the ExxonMobil contract has two further option wells" }
     ],
-    note: "Completed Shell's Egypt campaign ahead of schedule with 99.5% uptime: both Mina West development wells completed and tested, and Velox-1X (2,810 m water depth, the Mediterranean's deepest) reached TD early with oil indicators (Egypt petroleum ministry, Jul 24, 2026). Stena said (LinkedIn, mid-Aug 2026) it would move directly to a new, undisclosed client in the region. Stena's Sep 17, 2026 fleet schedule shows it contracted to Oct 2026, an option in Nov 2026, contracted Dec 2026-Mar 2027, then options to Dec 2027."
+    note: "Completed Shell's Egypt campaign ahead of schedule with 99.5% uptime: both Mina West development wells completed and tested, and Velox-1X (2,810 m water depth, the Mediterranean's deepest) reached TD early with oil indicators (Egypt petroleum ministry, Jul 24, 2026). Stena said (LinkedIn, mid-Aug 2026) it would move directly to a new, undisclosed client in the region; AIS (Nov 2026) shows it offshore Egypt. In Jun 2026 ExxonMobil signed it for an initial two firm wells in Cyprus and one in Egypt from Dec 2026, plus two option wells (Stena AB Q2 2026 report). Stena's Oct 27, 2026 fleet schedule shows it contracted from Oct 2026 to Jul 2027, then options to Feb 2028, and available from Mar 2028."
   },
   {
     id: "rig-069",
@@ -1782,17 +1806,18 @@ const RIG_DATA = [
     buildYear: 2001,
     region: "North Sea",
     country: "United Kingdom",
-    lat: 58.5,
-    lng: 0.5,
-    position: "area",
+    lat: 61.6,
+    lng: 1.55,
+    position: "field",
     statusOverride: null,
-    source: "Stena Drilling fleet schedule, Sep 17, 2026",
-    asOf: "2026-09-17",
+    source: "Stena Drilling fleet schedule, Oct 27, 2026; Stena AB Restricted Group report 2025 (Apr 2026); AIS, Nov 2026",
+    asOf: "2026-11-08",
     contracts: [
-      { customer: null, start: "Feb 2026", end: "Mar 2027", dayRate: null, firmness: "firm", note: "four wells" },
-      { customer: null, start: "Apr 2027", end: "Dec 2027", dayRate: null, firmness: "option", note: "options shown on the Stena schedule to Dec 2027; up to 24 months were announced" }
+      { customer: "Adura", start: "Feb 2026", end: "Mar 2027", dayRate: null, firmness: "firm", note: "four wells; about one year after a suspension from Sep 2025 (Stena AB 2025 report)" },
+      { customer: "Adura", start: "Apr 2027", end: "Oct 2027", dayRate: null, firmness: "firm", note: "shown as options on the Sep 17 schedule; contracted on the Oct 27, 2026 schedule; option exercise not announced" },
+      { customer: "Adura", start: "Nov 2027", end: "Mar 2028", dayRate: null, firmness: "option", note: "four individual six-month options in the 2025 extension; schedule shows options to at least Mar 2028, where the chart ends" }
     ],
-    note: "Four-well firm UK campaign for an undisclosed operator from Feb 2026 (originally ~10 months, with up to 24 months of options). Stena's Sep 17, 2026 fleet schedule shows it contracted to Mar 2027, then options to at least Dec 2027. The previous customer was Shell UK, whose UK assets moved to Adura on Dec 1, 2025, so Adura is plausible, but no source names it. Named Shell's Floating Rig of the Year 2025."
+    note: "Working for Adura (formerly Shell UK; Adura took over Shell's UK assets on Dec 1, 2025) in the UK. A Jun 2025 extension restarted work in Feb 2026, after a suspension from Sep 2025, for about one year, with four individual six-month options (Stena AB 2025 report). AIS shows it at the Penguins field since Feb 12, 2026. Stena's Oct 27, 2026 fleet schedule shows it contracted to Oct 2027, then options to at least Mar 2028. Named Shell's Floating Rig of the Year 2025."
   },
   {
     id: "rig-070",
@@ -1808,16 +1833,16 @@ const RIG_DATA = [
     buildYear: 2012,
     region: "North Sea",
     country: "Norway",
-    lat: 60.4,
-    lng: 2.8,
+    lat: 58.507,
+    lng: 2.273,
     position: "area",
     statusOverride: null,
-    source: "Havtil consent, Sep 24, 2026",
-    asOf: "2026-09-24",
+    source: "Havtil consent (Equinor, 16/4-14 Pedalo North), Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Equinor", start: "Q2 2025", end: "Q2 2027", dayRate: null, firmness: "firm", note: "up to 3 years of options" }
     ],
-    note: "On a 2-year firm Equinor NCS contract (Q2 2025-Q2 2027) with up to 3 years of options. 2026 Sodir permits name it for wildcats 34/10-56 S, 16/4-14 and 25/9-5 S (Grane prospect); Havtil consent for 25/9-5 S came Sep 24, 2026, with drilling expected Nov 2026."
+    note: "On a 2-year firm Equinor NCS contract (Q2 2025-Q2 2027) with up to 3 years of options. 2026 Sodir permits name it for wildcats 34/10-56 S, 16/4-14 and 25/9-5 S (Grane prospect); Havtil consented to 25/9-5 S on Sep 24, 2026 (drilling expected Nov 2026) and to 16/4-14 (Pedalo North, PL1174S, 93 m water depth) on Nov 2, 2026. Plotted at Pedalo North; which of the two wells it is drilling now is unconfirmed. Day rate undisclosed."
   },
   {
     id: "rig-071",
@@ -1864,13 +1889,13 @@ const RIG_DATA = [
     lng: 14.1,
     position: "area",
     statusOverride: null,
-    source: "Northern Ocean release, Oct 2, 2026",
-    asOf: "2026-10-02",
+    source: "Odfjell Drilling Q3 2026 report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Shell", start: "Apr 2027", end: "Q3 2027", dayRate: null, firmness: "firm", note: "Trinidad and Tobago / wider Caribbean, ~150 days, ~$70M incl. mob/demob; end estimated" },
       { customer: "Shell", start: "Q3 2027", end: "2028", dayRate: null, firmness: "option", note: "one-year optional programme; ~$226M in total if exercised" }
     ],
-    note: "Shell Namibia (PEL 39) contract ended Jul 2, 2026, followed by ~30 days in Walvis Bay upgrading the drilling control system. Oct 2, 2026: Northern Ocean signed a Shell contract for Trinidad and Tobago / the wider Caribbean, ~150 days firm from Apr 2027 (~$70M incl. mob/demob) plus a one-year optional programme (~$226M in total if exercised); Odfjell Drilling remains its operating partner. Day rate undisclosed."
+    note: "Shell Namibia (PEL 39) contract ended Jul 2, 2026, followed by ~30 days in Walvis Bay upgrading the drilling control system; it remained in Walvis Bay through Q3 2026 preparing for its next contract (Odfjell Q3 2026 report, Nov 3, 2026). Oct 2, 2026: Northern Ocean signed a Shell contract for Trinidad and Tobago / the wider Caribbean, ~150 days firm from Apr 2027 (~$70M incl. mob/demob) plus a one-year optional programme (~$226M in total if exercised); Odfjell Drilling remains its operating partner. Day rate undisclosed."
   },
   {
     id: "rig-073",
@@ -2064,17 +2089,18 @@ const RIG_DATA = [
     hookload_tons: 1400,
     buildYear: 2024,
     region: "Gulf of America",
-    country: "United States",
+    country: null,
     lat: 27,
     lng: -91.5,
     position: "area",
     statusOverride: null,
-    source: "Stena Drilling contract release, May 29, 2023",
-    asOf: "2023-05-29",
+    source: "Stena Drilling fleet schedule, Oct 27, 2026; Stena AB Restricted Group reports 2023 and 2024; AIS (Maritime Optima), Nov 8, 2026",
+    asOf: "2026-11-08",
     contracts: [
-      { customer: "Shell", start: "Q2 2024", end: "Q2 2029", dayRate: null, firmness: "firm", note: "five-year primary term, then an extension option" }
+      { customer: "Shell", start: "Q2 2024", end: "Q2 2031", dayRate: null, firmness: "firm", note: "five-year primary term extended to seven years in Oct 2024 (Stena AB 2024 report); end estimated from the Apr 2024 start" },
+      { customer: "Shell", start: "Q2 2031", end: null, dayRate: null, firmness: "option", note: "options for further extension; the Stena AB 2023 report described a 10-year contract that Shell may terminate in the latter five years" }
     ],
-    note: "Ultra-deepwater DP3 drillship, delivered by Samsung Heavy Industries in Jan 2024 (Stena AB Q1 2024 report), on a five-year Shell Offshore US Gulf contract from Q2 2024 (to ~Q2 2029, with an extension option); being upgraded with a 20,000-psi BOP from 2026 for Shell's Sparta completions (first oil 2028). Day rate undisclosed."
+    note: "Ultra-deepwater DP3 drillship, delivered by Samsung Heavy Industries in Jan 2024 (Stena AB Q1 2024 report). Began a Shell Offshore US Gulf contract in Apr 2024; in Oct 2024 the term was extended from five to seven years (to about Q2 2031, estimated), with options for further extension (Stena AB 2024 report). It is being fitted with a 20,000-psi BOP and other equipment from 2026 for Shell's Sparta completions (Stena release, Mar 27, 2024). AIS shows it left Garden Banks 959 on Oct 23, 2026 and heading for Las Palmas, where Stena has said the 20K BOP stack was delivered for installation (LinkedIn, via search; not confirmed by a Stena document). Stena's Oct 27, 2026 fleet schedule shows it contracted through Mar 2028, where the chart ends. Plotted in the US Gulf; current position mid-Atlantic. Day rate undisclosed."
   },
   {
     id: "rig-081",
@@ -2088,18 +2114,19 @@ const RIG_DATA = [
     waterDepth_ft: 10000,
     hookload_tons: 1000,
     buildYear: 2009,
-    region: "Mediterranean & Black Sea",
-    country: "Egypt",
-    lat: 31.7,
-    lng: 33.3,
+    region: "West Africa",
+    country: null,
+    lat: -22.5,
+    lng: 12.8,
     position: "area",
     statusOverride: null,
-    source: "Stena Drilling fleet schedule, Sep 17, 2026; AIS, Jun 28, 2026",
-    asOf: "2026-09-17",
+    source: "Stena Drilling fleet schedule, Oct 27, 2026; Stena AB Q2 2026 interim report, Aug 27, 2026; AIS, Nov 8, 2026",
+    asOf: "2026-11-08",
     contracts: [
-      { customer: "Chevron", start: "May 2026", end: "Dec 2026", dayRate: null, firmness: "firm" }
+      { customer: "Chevron", start: "May 2026", end: "Oct 2026", dayRate: null, firmness: "firm", note: "Egypt, one well (Nargis-2 appraisal); end estimated from AIS (rig at Las Palmas Oct 27-31, 2026)" },
+      { customer: "Chevron", start: "Nov 2026", end: "Jan 2027", dayRate: null, firmness: "firm", note: "Namibia, one well, signed Jun 2026 to commence Sep 2026 (Stena AB Q2 2026 report); start estimated from AIS (en route to Walvis Bay, ETA ~Nov 19, 2026); Stena schedule shows contracted to Jan 2027" }
     ],
-    note: "Harsh-environment DP3 drillship. Spudded the Nargis-2 appraisal well for Chevron (with Eni, Mubadala and Tharwa) at the Nargis gas field, East Nile Delta offshore Egypt, ~May 21-23, 2026; AIS (Jun 28, 2026) confirms the East Mediterranean position. Stena's Sep 17, 2026 fleet schedule shows it contracted to Dec 2026 and available from Jan 2027."
+    note: "Harsh-environment DP3 drillship; an upgrade project completed in Apr 2026 that Stena says makes it a seventh-generation unit (Stena AB 2025 and Q2 2026 reports). Spudded the Nargis-2 appraisal well for Chevron (with Eni, Mubadala and Tharwa) at the Nargis gas field, East Nile Delta offshore Egypt, ~May 21-23, 2026. In Jun 2026 Chevron signed it for a one-well campaign in Namibia, originally to start in Sep 2026 (Stena AB Q2 2026 report). AIS shows it called at Las Palmas (Oct 27-31, 2026) and in early Nov was off Liberia heading for Walvis Bay, ETA about Nov 19. Stena's Oct 27, 2026 fleet schedule shows it contracted to Jan 2027 and available from Feb 2027. Plotted offshore Namibia (Walvis Basin, approximate); in transit."
   },
   {
     id: "rig-083",
@@ -2145,13 +2172,13 @@ const RIG_DATA = [
     lng: -91.0,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Occidental", start: "Jun 2024", end: "Jun 2026", dayRate: null, firmness: "firm", note: "MPD at an additional rate" },
       { customer: "Occidental", start: "Jun 2026", end: "Dec 2028", dayRate: null, firmness: "firm", note: "940-day extension; two 1-year options" }
     ],
-    note: "Occidental (Anadarko) in the US Gulf of America since Jun 2024; drilled the Bandit discovery (Green Canyon 680, near Constitution; spud Sep 2025, announced Apr 2026). A 940-day extension to Dec 2028 was signed together with a 914-day contract for VALARIS DS-18, adding about $760M of backlog combined, each with two 1-year options. About 35 days out of service for maintenance expected in Q4 2026. Day rate undisclosed (Aug 5, 2026 FSR). Valaris also runs the drilling rigs on BP's Thunder Horse semisubmersible platform and Mad Dog spar in the US Gulf (Jan 2024 to Jan 2027); as BP-owned platform rigs they aren't tracked."
+    note: "Occidental (Anadarko) in the US Gulf of America since Jun 2024; drilled the Bandit discovery (Green Canyon 680, near Constitution; spud Sep 2025, announced Apr 2026). A 940-day extension to Dec 2028 was signed together with a 914-day contract for VALARIS DS-18, adding about $760M of backlog combined, each with two 1-year options. About 35 days out of service for maintenance expected in Q4 2026. Day rate undisclosed (Nov 2, 2026 FSR). Valaris also runs the drilling rigs on BP's Thunder Horse semisubmersible platform and Mad Dog spar in the US Gulf (Jan 2024 to Jan 2027, then a new three-year bp service contract to Jan 2030 worth ~$290M); as BP-owned platform rigs they aren't tracked."
   },
   {
     id: "rig-085",
@@ -2165,19 +2192,19 @@ const RIG_DATA = [
     waterDepth_ft: 12000,
     hookload_tons: 1250,
     buildYear: 2015,
-    region: "Gulf of America",
-    country: "United States",
-    lat: 27.0,
-    lng: -90.3,
+    region: "South America",
+    country: "Suriname",
+    lat: 7,
+    lng: -55.6,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026; Q3 2026 results, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: null, start: "Nov 2026", end: "May 2027", dayRate: null, firmness: "loi", note: "two-well exploration program, up to seven months; location undisclosed" },
+      { customer: "PETRONAS", start: "Nov 2026", end: "May 2027", dayRate: null, firmness: "firm", note: "Suriname, two-well exploration program, up to seven months; started after Sep 30, 2026" },
       { customer: "Occidental", start: "Jun 2027", end: "Dec 2029", dayRate: null, firmness: "firm", note: "914 days; two 1-year options" }
     ],
-    note: "Letter of award for a two-well exploration program (operator and location undisclosed) from Nov 2026 for up to seven months, then a 914-day Occidental contract in the US Gulf of America from Jun 2027, moved to follow on directly from the letter-of-award work. Signed with the DS-16 extension for about $760M of backlog combined. Plotted at the Occidental work area; current position unconfirmed. Day rate undisclosed (Aug 5, 2026 FSR)."
+    note: "Working for PETRONAS Suriname Exploration & Production on a two-well exploration contract of up to seven months (Nov 2026-May 2027 in the FSR), which replaced the letter of award; Valaris's Q3 results (Nov 2, 2026) say the contract started after quarter end. Then a 914-day Occidental contract in the US Gulf of America from Jun 2027 to Dec 2029, signed with the DS-16 extension for about $760M of backlog combined, with two 1-year options. Block and exact position in Suriname undisclosed; plotted offshore Suriname. Day rate undisclosed (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-086",
@@ -2197,12 +2224,12 @@ const RIG_DATA = [
     lng: -40.2,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Equinor", start: "Mar 2026", end: "Jan 2028", dayRate: null, firmness: "firm", note: "~852 days incl. 180-day standby; TCV ~$498M; three priced options, 228 days" }
     ],
-    note: "Equinor’s Raia gas project (BM-C-33), pre-salt Campos Basin, offshore Rio de Janeiro: drilling started Mar 24, 2026. Estimated value $498M including MPD, additional services, mobilization and minor upgrades, over about 852 days (a 180-day standby period and a 672-day drilling program), with three priced options totalling 228 days. Day rate undisclosed (Aug 5, 2026 FSR)."
+    note: "Equinor’s Raia gas project (BM-C-33), pre-salt Campos Basin, offshore Rio de Janeiro: drilling started Mar 24, 2026. Estimated value $498M including MPD, additional services, mobilization and minor upgrades, over about 852 days (a 180-day standby period and a 672-day drilling program), with three priced options totalling 228 days. Day rate undisclosed (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-087",
@@ -2222,12 +2249,12 @@ const RIG_DATA = [
     lng: -4.45,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026; Q3 2026 results, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "CNR International", start: "Sep 2026", end: "May 2027", dayRate: null, firmness: "firm", note: "~250 days, TCV ~$135M incl. upgrades and mobilization; priced options 80-100 days" }
     ],
-    note: "Reactivated from warm stack in Las Palmas, Spain, for CNR International offshore Côte d’Ivoire from Sep 2026: about 250 days valued at about $135M including upfront payments for rig upgrades (an enhanced MPD system) and mobilization, with priced options of 80 to 100 days. Most likely the Baobab Phase Five program (block CI-40): partner Vaalco said on Aug 6, 2026 that a rig had been mobilized for Baobab drilling from Sep 2026; neither Valaris nor CNR names the field. Day rate undisclosed (Aug 5, 2026 FSR)."
+    note: "Reactivated from warm stack in Las Palmas, Spain, and started the CNR International contract offshore Côte d’Ivoire in Sep 2026 after installing a CML+ (enhanced MPD) system (Valaris Q3 2026 results): about 250 days valued at about $135M including upfront payments for rig upgrades and mobilization, with priced options of 80 to 100 days. Most likely the Baobab Phase Five program (block CI-40): partner Vaalco said on Aug 6, 2026 that a rig had been mobilized for Baobab drilling from Sep 2026; neither Valaris nor CNR names the field. Day rate undisclosed (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-088",
@@ -2247,12 +2274,13 @@ const RIG_DATA = [
     lng: 29.9,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
-      { customer: "bp", start: "Apr 2026", end: "Apr 2027", dayRate: null, firmness: "firm", note: "~350 days, TCV ~$140M incl. MPD and mobilization; three option wells" }
+      { customer: "bp", start: "Apr 2026", end: "Dec 2027", dayRate: null, firmness: "firm", note: "initial estimate ~350 days, TCV ~$140M incl. MPD and mobilization; now shown to Dec 2027" },
+      { customer: "bp", start: "Jan 2028", end: "Feb 2028", dayRate: null, firmness: "firm", note: "one-well priced extension, ~60 days, ~$25M; two option wells remain" }
     ],
-    note: "bp (with Arcius) in the West Nile Delta, offshore Egypt, from Apr 2026: about 350 days valued at about $140M including MPD and mobilization, with three option wells. Wells include Fayoum 4, Ghorab and Raven West for bp and Atoll West and Nofret for Arcius. Day rate undisclosed (Aug 5, 2026 FSR)."
+    note: "bp (with Arcius) in the West Nile Delta, offshore Egypt, from Apr 2026: initially about 350 days valued at about $140M including MPD and mobilization, now shown running to Dec 2027 (was Apr 2027), then a one-well priced extension with BP Exploration Delta in direct continuation, Jan-Feb 2028 (~60 days, ~$25M; expected late 2027 or early 2028), with two option wells remaining (Nov 2, 2026 FSR). Wells include Fayoum 4, Ghorab and Raven West for bp and Atoll West and Nofret for Arcius. Day rate undisclosed."
   },
   {
     id: "rig-089",
@@ -2272,12 +2300,12 @@ const RIG_DATA = [
     lng: 4.6,
     position: "area",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Shell", start: "Jun 2026", end: "Jul 2028", dayRate: null, firmness: "firm", note: "two years, TCV $352M; two 1-year options" }
     ],
-    note: "Shell (SNEPCO) offshore Nigeria, reported by trade press as Bonga North, from Jun 2026: two years valued at $352M excluding additional services, with an additional rate for controlled-mud-level services and two 1-year options. About 45 days out of service for rig upgrades expected in Q1 2027. Day rate undisclosed (Aug 5, 2026 FSR)."
+    note: "Shell (SNEPCO) offshore Nigeria, reported by trade press as Bonga North, from Jun 2026: two years valued at $352M excluding additional services, with an additional rate for controlled-mud-level services and two 1-year options. About 45 days out of service for rig upgrades expected in Q1 2027. Day rate undisclosed (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-090",
@@ -2297,13 +2325,13 @@ const RIG_DATA = [
     lng: -42.32,
     position: "field",
     statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Valaris fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Petrobras", start: "Dec 2024", end: "Nov 2027", dayRate: null, firmness: "firm", note: "incl. MPD and additional services; ~$41M mobilization fee" },
       { customer: "Petrobras", start: "Nov 2027", end: "Oct 2030", dayRate: null, firmness: "firm", note: "1,064-day extension, ~$447M" }
     ],
-    note: "Petrobras at the Búzios field, pre-salt Santos Basin, since Dec 2024, then a 1,064-day extension to Oct 2030 (about $447M of backlog). The previous $450,000 day rate has been adjusted down, reducing backlog by about $21M; the new rate is undisclosed (Aug 5, 2026 FSR)."
+    note: "Petrobras at the Búzios field, pre-salt Santos Basin, since Dec 2024, then a 1,064-day extension to Oct 2030 (about $447M of backlog). The previous $450,000 day rate has been adjusted down, reducing backlog by about $21M; the new rate is undisclosed (Nov 2, 2026 FSR)."
   },
   {
     id: "rig-091",
@@ -2323,14 +2351,14 @@ const RIG_DATA = [
     lng: -90.3,
     position: "area",
     statusOverride: null,
-    source: "Transocean fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
+    source: "Transocean fleet status report, Nov 2, 2026; award, Oct 19, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Shell", start: "Aug 2016", end: "Apr 2026", dayRate: 498000, firmness: "firm", note: "ten-year term; the Feb 19, 2026 FSR showed an end of May 2026, the May 4, 2026 FSR shows the rig idle from Apr 2026" },
-      { customer: null, start: "Jul 2026", end: "Nov 2026", dayRate: null, firmness: "firm", note: "US Gulf, two wells" },
-      { customer: null, start: "Nov 2026", end: "Jan 2027", dayRate: null, firmness: "option", note: "two one-well priced options" }
+      { customer: null, start: "Oct 2026", end: "Feb 2027", dayRate: null, firmness: "firm", note: "US Gulf, two wells plus one exercised optional well (~60 days), shown as one firm period in the Nov 2, 2026 FSR; the Aug 5 FSR showed the two wells from Jul 2026" },
+      { customer: null, start: "Feb 2027", end: "Jan 2029", dayRate: 465000, firmness: "firm", note: "US Gulf, ten wells, ~700 days, ~$325M, in direct continuation (Oct 19, 2026 award)" }
     ],
-    note: "Undisclosed US Gulf operator: two-well contract from Jul 2026 to Nov 2026, plus two one-well priced options to Jan 2027 (Aug 5, 2026 FSR). It was idle from Apr 2026 after its long-term Shell contract ended (May 4, 2026 FSR). Day rate undisclosed."
+    note: "Idle from Apr 2026 after its long-term Shell contract ended (May 4, 2026 FSR). Undisclosed US Gulf operator: two wells plus one exercised optional well (~60 days), shown in the Nov 2, 2026 FSR as firm Oct 2026-Feb 2027 (the Aug FSR had a Jul 2026 start), day rate undisclosed. Oct 19, 2026: ten-well, ~700-day US Gulf contract (~$325M, undisclosed operator) in direct continuation, Feb 2027-Jan 2029 at $465k/day."
   },
   {
     id: "rig-092",
@@ -2344,20 +2372,20 @@ const RIG_DATA = [
     waterDepth_ft: 12000,
     hookload_tons: 1000,
     buildYear: 2010,
-    region: "West Africa",
-    country: "Spain (Canary Islands)",
-    lat: 27.95,
-    lng: -15.25,
+    region: "Asia Pacific",
+    country: null,
+    lat: 15.6,
+    lng: 82.4,
     position: "area",
     statusOverride: null,
-    source: "Transocean press release, Aug 20, 2026",
-    asOf: "2026-08-20",
+    source: "Transocean fleet status report, Nov 2, 2026",
+    asOf: "2026-11-02",
     contracts: [
       { customer: "Petrobras", start: "Jun 2024", end: "May 2026", dayRate: 452000, firmness: "firm", note: "Brazil; rate per the May 4, 2026 FSR (escalable, includes a non-USD component, bonus not included)" },
-      { customer: "ONGC", start: "Q1 2027", end: "Q1 2029", dayRate: null, firmness: "loi", note: "India, two-year binding letter of award, ~$300M incl. additional services and mobilization; end estimated from the two-year term" },
-      { customer: "ONGC", start: "Q1 2029", end: "Early 2031", dayRate: null, firmness: "option", note: "two years of priced options, into early 2031 if all are exercised; dates estimated" }
+      { customer: "ONGC", start: "Feb 2027", end: "Feb 2029", dayRate: 389000, firmness: "firm", note: "India; two-year binding letter of award (Aug 20, 2026; ~$300M incl. additional services and mobilization), listed as Firm at $389k in the Nov 2, 2026 FSR" },
+      { customer: "ONGC", start: "Feb 2029", end: "Feb 2031", dayRate: null, firmness: "option", note: "two years of priced options" }
     ],
-    note: "Idle since its Petrobras Brazil contract ended in May 2026 (Aug 5, 2026 FSR). AIS (VesselFinder, early Oct 2026) shows it moored off Gran Canaria, Canary Islands, after leaving the Las Palmas anchorage on Sep 7. Aug 20, 2026: two-year binding letter of award with ONGC in India from Q1 2027 (~$300M incl. services and mobilization) plus two years of priced options into early 2031. Day rate undisclosed."
+    note: "Idle after its Petrobras Brazil contract ended in May 2026. It left the Las Palmas anchorage, Canary Islands, on Sep 7 and is mobilizing to India: AIS (VesselFinder, Nov 8, 2026) shows it off South Africa bound for Port Louis, Mauritius (ETA Nov 25). Plotted at its next contract area off India (approximate; the field is undisclosed). ONGC two-year contract from a binding letter of award (Aug 20, 2026; ~$300M incl. services and mobilization), shown in the Nov 2, 2026 FSR as Firm Feb 2027-Feb 2029 at $389k/day, plus two years of priced options to Feb 2031."
   },
   {
     id: "rig-093",
@@ -2377,12 +2405,13 @@ const RIG_DATA = [
     lng: -91.35,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "Occidental", start: "Nov 2024", end: "Nov 2026", dayRate: null, firmness: "firm", note: "two years, ~$350M excl. MPD fees; three 1-year unpriced options" }
+      { customer: "Occidental", start: "Nov 2024", end: "Nov 2026", dayRate: null, firmness: "firm", note: "two years, ~$350M excl. MPD fees; the three unpriced 1-year options are no longer listed" },
+      { customer: "Apache", start: "Q4 2027", end: "Q4 2027", dayRate: null, firmness: "firm", note: "Uruguay, one well (~50 days), ~$25M excl. mob/demob" }
     ],
-    note: "Occidental in the US Gulf of America on a two-year contract (~$350M, excluding MPD fees) to Nov 2026, with three unpriced one-year options; nothing announced beyond Nov 2026 (Jul 27, 2026 FSR). Day rate undisclosed."
+    note: "Occidental in the US Gulf of America on a two-year contract (~$350M, excluding MPD fees) to Nov 2026; the three unpriced one-year options listed in the Jul 27 FSR no longer appear. Next: a one-well Apache contract in Uruguay from Q4 2027 (~50 days, ~$25M excluding mob/demob), leaving roughly 11 months open in between (Oct 26, 2026 FSR). Day rates undisclosed."
   },
   {
     id: "rig-094",
@@ -2402,12 +2431,12 @@ const RIG_DATA = [
     lng: -89.1,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "Shell", start: "Jul 2026", end: "Jul 2030", dayRate: null, firmness: "firm", note: "four years, ~$606M base plus up to 20% performance pay; four 1-year options at mutually agreed rates" }
+      { customer: "Shell", start: "Sep 2026", end: "Sep 2030", dayRate: null, firmness: "firm", note: "four years, ~$606M base plus up to 20% performance pay; four 1-year options at mutually agreed rates" }
     ],
-    note: "Shell in the US Gulf of America from Jul 2026 on a four-year contract (~$606M base value including upgrades and services, plus up to 20% performance pay) to Jul 2030, with four one-year options at mutually agreed rates (Jul 27, 2026 FSR). Left Las Palmas on Jul 15, 2026; AIS gives its destination as Mississippi Canyon block 809. Noble says its Shell US and TotalEnergies Suriname rates may include ~40% assumed performance revenue. Day rate undisclosed."
+    note: "Shell in the US Gulf of America on a four-year contract (~$606M base value including upgrades and services, plus up to 20% performance pay), which started in Sep 2026 and runs to Sep 2030, with four one-year options at mutually agreed rates (Oct 26, 2026 FSR; the Jul 27 FSR had Jul 2026 to Jul 2030). Noble says its Shell US and TotalEnergies Suriname rates may include ~40% assumed performance revenue. Day rate undisclosed."
   },
   {
     id: "rig-095",
@@ -2427,12 +2456,12 @@ const RIG_DATA = [
     lng: -90.75,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026; Noble 10-Q, Oct 27, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "Murphy Oil", start: "Feb 2025", end: "Jan 2027", dayRate: null, firmness: "firm", note: "well-based contract; the revised well sequence brought the end forward from Aug 2027" }
     ],
-    note: "Murphy Oil in the US Gulf of America on a well-based contract since Feb 2025; the revised well sequence moved completion forward to Jan 2027 from Aug 2027, and the five-well option listed earlier no longer appears (Jul 27, 2026 FSR). No follow-on work announced. Day rate undisclosed."
+    note: "Murphy Oil in the US Gulf of America on a well-based contract since Feb 2025; the revised well sequence moved completion forward to Jan 2027 from Aug 2027, and the five-well option listed earlier no longer appears. Noble's Q3 2026 10-Q puts the end in Dec 2026 or Jan 2027 (Oct 26, 2026 FSR: Jan 2027). No follow-on work announced. Day rate undisclosed."
   },
   {
     id: "rig-096",
@@ -2452,13 +2481,14 @@ const RIG_DATA = [
     lng: -42.9,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026; Tullow half-year results, Sep 28, 2026",
-    asOf: "2026-09-28",
+    source: "Noble fleet status report, Oct 26, 2026; Noble Q3 2026 results and 10-Q, Oct 26-27, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "Petrobras", start: "Jul 2024", end: "Jan 2027", dayRate: null, firmness: "firm", note: "Brazil, includes MPD services; operations suspended in Q2 2026, operating again per the Jul 28, 2026 10-Q" },
-      { customer: "Tullow", start: "Mid 2027", end: null, dayRate: null, firmness: "firm", note: "Ghana 2027-28 campaign, up to 10 wells; firm/option split undisclosed; start estimated" }
+      { customer: "Petrobras", start: "Jul 2024", end: "Jan 2027", dayRate: null, firmness: "firm", note: "Brazil, includes MPD services; operations suspended in Q2 2026, resumed in Q3 2026" },
+      { customer: "Tullow", start: "Mid 2027", end: "Q1 2028", dayRate: null, firmness: "firm", note: "Ghana, five wells (~250 days)" },
+      { customer: "Tullow", start: "Q1 2028", end: "Q4 2028", dayRate: null, firmness: "option", note: "five priced option wells; end estimated from the FSR timeline chart" }
     ],
-    note: "Petrobras in Brazil to Jan 2027. Operations were suspended in Q2 2026 (about $43M of lost revenue); Noble's Jul 28, 2026 10-Q says the rig is operating again but the talks on an administrative solution remain uncertain, so actual revenue may differ from backlog. Next: Tullow's 2027-28 Ghana campaign of up to 10 wells from mid-2027; Tullow confirmed the contract is signed (half-year results, Sep 28, 2026) and Noble named the rig in late Sep 2026; not yet in a Noble fleet status report. Day rate undisclosed."
+    note: "Petrobras in Brazil to Jan 2027. Operations were suspended in Q2 2026 and resumed in Q3 2026 (Q3 2026 results and 10-Q); the suspension cost about $43M of revenue in Q2 across this rig and Noble Courage, plus about $6.3M in Q3. Next: a five-well Tullow contract in Ghana from mid-2027 to Q1 2028 (~250 days), plus five priced option wells (Oct 26, 2026 FSR; option period estimated from its timeline as running to Q4 2028). Day rate undisclosed."
   },
   {
     id: "rig-097",
@@ -2478,12 +2508,12 @@ const RIG_DATA = [
     lng: -15.4,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "TotalEnergies", start: "Nov 2026", end: "Q3 2029", dayRate: null, firmness: "firm", note: "Suriname, 16 wells (~1,060 days); four one-well options shared with Noble Discoverer" }
+      { customer: "TotalEnergies", start: "Dec 2026", end: "Q4 2029", dayRate: null, firmness: "firm", note: "Suriname, 16 wells (~1,060 days); four one-well options shared with Noble Discoverer" }
     ],
-    note: "Idle, moored at Las Palmas, Canary Islands, since Jul 6, 2026 (AIS). Next: a 16-well (~1,060-day) TotalEnergies contract in Suriname from Nov 2026 to Q3 2029, with four one-well options shared with Noble Discoverer (Jul 27, 2026 FSR). Noble says its TotalEnergies Suriname and Shell US rates may include ~40% assumed performance revenue. Day rate undisclosed."
+    note: "Idle, moored at Las Palmas, Canary Islands, since Jul 6, 2026 (AIS). Next: a 16-well (~1,060-day) TotalEnergies contract in Suriname from Dec 2026 to Q4 2029, with four one-well options shared with Noble Discoverer (Oct 26, 2026 FSR; the Jul 27 FSR had Nov 2026 to Q3 2029). Noble says its TotalEnergies Suriname and Shell US rates may include ~40% assumed performance revenue. Day rate undisclosed."
   },
   {
     id: "rig-098",
@@ -2503,16 +2533,17 @@ const RIG_DATA = [
     lng: 115.35,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026; Noble 10-Q, Oct 27, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "Prime Energy", start: "Jun 2025", end: "Apr 2026", dayRate: 499000, firmness: "firm", note: "Philippines; rate excludes MPD and mobilization fees" },
       { customer: "Shell", start: "Apr 2026", end: "Jun 2026", dayRate: 470000, firmness: "firm", note: "Brunei, one well (~30 days), ~$14M" },
-      { customer: null, start: "Aug 2026", end: "Oct 2026", dayRate: null, firmness: "firm", note: "Malaysia, one well; two options, not expected to be exercised in Q4 2026" },
+      { customer: null, start: "Aug 2026", end: "Oct 2026", dayRate: null, firmness: "firm", note: "Malaysia, one well; a customer option was deferred from Q4 2026 into 2027 (10-Q)" },
+      { customer: null, start: "Apr 2027", end: "Jul 2027", dayRate: null, firmness: "option", note: "deferred customer option (Q3 2026 10-Q); dates estimated from the Oct 26, 2026 FSR timeline chart" },
       { customer: null, start: "Q1 2028", end: "Q4 2028", dayRate: null, firmness: "firm", note: "Asia Pacific, six wells (~296 days), ~$136.2M" },
       { customer: null, start: "Q4 2028", end: "Q1 2029", dayRate: null, firmness: "option", note: "three option wells" }
     ],
-    note: "One-well contract in Malaysia (undisclosed operator) from Aug to Oct 2026; Noble's Jul 28, 2026 10-Q no longer expects the option to be exercised in Q4 2026, and AIS shows it at anchor off Labuan in early Oct 2026. Next confirmed work: a six-well Asia Pacific contract (~$136.2M, undisclosed operator) from Q1 2028 to Q4 2028, with options to Q1 2029 (Jul 27, 2026 FSR). A TotalEnergies Papua New Guinea well listed for Jun to Aug 2026 in the Apr 2026 FSR no longer appears. Day rates undisclosed for the current and future work."
+    note: "The one-well Malaysia contract (undisclosed operator) ran Aug to Oct 2026 and has dropped off the Oct 26, 2026 FSR; AIS showed the rig at anchor off Labuan in early Oct 2026. Noble's Q3 2026 10-Q says a customer option for the rig was deferred from Q4 2026 into 2027, and the FSR timeline shows an option period of roughly Apr to Jul 2027 (estimated). Next confirmed work: a six-well Asia Pacific contract (~$136.2M, undisclosed operator) from Q1 2028 to Q4 2028, with options to Q1 2029. A TotalEnergies Papua New Guinea well listed for Jun to Aug 2026 in the Apr 2026 FSR no longer appears. Day rates undisclosed for the current and future work."
   },
   {
     id: "rig-099",
@@ -2532,12 +2563,12 @@ const RIG_DATA = [
     lng: -39.9,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026; Noble Q3 2026 results and 10-Q, Oct 26-27, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "Petrobras", start: "Dec 2023", end: "Dec 2030", dayRate: null, firmness: "firm", note: "Brazil; includes a 1,115-day extension through Dec 2030 (~$339M net incremental backlog); operations suspended in Q2 2026, operating again per the Jul 28, 2026 10-Q" }
+      { customer: "Petrobras", start: "Dec 2023", end: "Dec 2030", dayRate: null, firmness: "firm", note: "Brazil; includes a 1,115-day extension through Dec 2030 (~$339M net incremental backlog); operations suspended in Q2 2026, resumed in Q3 2026" }
     ],
-    note: "Petrobras in Brazil to Dec 2030, after a 1,115-day extension (Apr 26, 2026 FSR). Operations were suspended in Q2 2026 (about $43M of lost revenue across this rig and Noble Faye Kozack); Noble's Jul 28, 2026 10-Q says it is operating again but the talks on an administrative solution remain uncertain, so actual revenue may differ from backlog. Day rate undisclosed."
+    note: "Petrobras in Brazil to Dec 2030, after a 1,115-day extension (Apr 26, 2026 FSR). Operations were suspended in Q2 2026 (about $43M of lost revenue across this rig and Noble Faye Kozack) and resumed in Q3 2026 (Q3 2026 results and 10-Q). Day rate undisclosed."
   },
   {
     id: "rig-100",
@@ -2557,13 +2588,13 @@ const RIG_DATA = [
     lng: -68.95,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "Petrobras", start: "Jun 2024", end: "Sep 2026", dayRate: null, firmness: "firm", note: "Colombia" },
       { customer: "TotalEnergies", start: "Dec 2026", end: "Q4 2029", dayRate: null, firmness: "firm", note: "Suriname, 16 wells (~1,060 days); four one-well options shared with Noble Valiant" }
     ],
-    note: "Petrobras Colombia work ended Sep 2026; AIS (VesselFinder, early Oct 2026, rounded position) shows it moored off Curaçao. Next: a 16-well (~1,060-day) TotalEnergies contract in Suriname from Dec 2026 to Q4 2029, reassigned from Noble Developer, with four one-well options shared with Noble Valiant (Jul 27, 2026 FSR). Day rate undisclosed."
+    note: "Petrobras Colombia work ended Sep 2026; AIS (VesselFinder, early Oct 2026, rounded position) shows it moored off Curaçao. Next: a 16-well (~1,060-day) TotalEnergies contract in Suriname from Dec 2026 to Q4 2029, reassigned from Noble Developer, with four one-well options shared with Noble Valiant (Oct 26, 2026 FSR). Day rate undisclosed."
   },
   {
     id: "rig-101",
@@ -2583,12 +2614,13 @@ const RIG_DATA = [
     lng: 115.1,
     position: "area",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "Woodside", start: "Q2 2027", end: "Q1 2028", dayRate: null, firmness: "firm", note: "Australia, five wells, ~$121M excl. additional services and potential upgrades; two option wells" }
+      { customer: "Woodside", start: "Q2 2027", end: "Q1 2028", dayRate: null, firmness: "firm", note: "Australia, five wells, ~$121M excl. additional services and potential upgrades" },
+      { customer: "Woodside", start: "Q1 2028", end: "Q2 2028", dayRate: null, firmness: "option", note: "two priced option wells; dates estimated from the FSR timeline chart" }
     ],
-    note: "Available in Malaysia (Jan 26, 2026 FSR); AIS shows it at anchor off Labuan in early Oct 2026. Noble raised its 2026 capex guidance by $25M to reactivate it (Apr 26, 2026) for a five-well Woodside contract in Australia from Q2 2027 to Q1 2028 (~$121M, plus two option wells). Day rate undisclosed."
+    note: "Available in Malaysia (Jan 26, 2026 FSR); AIS shows it at anchor off Labuan in early Oct 2026. Noble raised its 2026 capex guidance by $25M to reactivate it (Apr 26, 2026) for a five-well Woodside contract in Australia from Q2 2027 to Q1 2028 (~$121M), plus two priced option wells (estimated Q1 to Q2 2028 from the Oct 26, 2026 FSR timeline). Day rate undisclosed."
   },
   {
     id: "rig-102",
@@ -2608,12 +2640,12 @@ const RIG_DATA = [
     lng: 1.07,
     position: "field",
     statusOverride: null,
-    source: "Noble fleet status report, Jul 27, 2026",
-    asOf: "2026-07-27",
+    source: "Noble fleet status report, Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
       { customer: "TAQA", start: "Jan 2025", end: "Jun 2028", dayRate: null, firmness: "firm", note: "UK North Sea, 52-well P&A scope; includes one exercised option well (~32 days from Mar 2028)" }
     ],
-    note: "Bingo 3000 mid-water semisubmersible (1983, moored, harsh-environment) doing plug-and-abandonment work for TAQA in the UK northern North Sea: a 52-well scope from Jan 2025 to Jun 2028 (Jul 27, 2026 FSR). AIS shows it arrived at the Cormorant field on Aug 8, 2026. Noble lists it under \"Semisubmersibles (other)\", outside the 6th to 8th generation classes. Day rate undisclosed."
+    note: "Bingo 3000 mid-water semisubmersible (1983, moored, harsh-environment) doing plug-and-abandonment work for TAQA in the UK northern North Sea: a 52-well scope from Jan 2025 to Jun 2028 (Oct 26, 2026 FSR). AIS shows it arrived at the Cormorant field on Aug 8, 2026. Noble lists it under \"Semisubmersibles (other)\", outside the 6th to 8th generation classes. Day rate undisclosed."
   },
   {
     id: "rig-103",
@@ -2633,12 +2665,14 @@ const RIG_DATA = [
     lng: 14.25,
     position: "area",
     statusOverride: null,
-    source: "Seadrill fleet status report, Aug 10, 2026",
-    asOf: "2026-08-10",
+    source: "Seadrill fleet status report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
-      { customer: "Petrobras", start: "Nov 2022", end: "Jun 2026", dayRate: null, firmness: "firm", note: "Brazil; dates per Seadrill FSR, May 11, 2026" }
+      { customer: "Petrobras", start: "Nov 2022", end: "Jun 2026", dayRate: null, firmness: "firm", note: "Brazil; dates per Seadrill FSR, May 11, 2026" },
+      { customer: null, start: "Apr 2027", end: "Aug 2029", dayRate: null, firmness: "firm", note: "Indonesia, undisclosed operator; ~880 days, ~$420M firm value incl. an ~$85M mobilization fee, excl. additional services; contract preparation Nov 2026-Mar 2027" },
+      { customer: null, start: "Aug 2029", end: "Jan 2032", dayRate: null, firmness: "option", note: "priced options for up to ~880 days; end estimated (computed from 880 days)" }
     ],
-    note: "Available in Namibia with no customer or dates after its Petrobras contract in Brazil ended in Jun 2026 (Seadrill FSRs, May 11 and Aug 10, 2026). Seadrill counts it among its marketed rigs, not its stacked ones, and its Sep 2026 deck cites an opportunity to reprice it at current market rates. Plotted off Walvis Bay; exact position unconfirmed."
+    note: "Its Petrobras contract in Brazil ended in Jun 2026 and it then waited in Namibia. In Oct 2026 it won an Indonesia contract with an undisclosed operator: ~880 days firm (~$420M incl. an ~$85M mobilization fee, excl. additional services) from Apr 2027 to Aug 2029, with priced options for up to ~880 more days (Oct 12, 2026 release; Nov 3, 2026 FSR). The FSR shows contract preparation from Nov 2026 to Mar 2027 and now gives its location as Indonesia; Seadrill calls it the last of three legacy contracts repriced to market rates. Plotted off Walvis Bay; position during mobilization unconfirmed. Day rate undisclosed."
   },
   {
     id: "rig-104",
@@ -2658,12 +2692,13 @@ const RIG_DATA = [
     lng: 2.05,
     position: "area",
     statusOverride: null,
-    source: "Havtil consent (DNO, Norma appraisal), Sep 24, 2026",
-    asOf: "2026-09-24",
+    source: "Odfjell Drilling Q3 2026 report and presentation, Nov 3, 2026; Sodir (35/7-2), Oct 29, 2026",
+    asOf: "2026-11-03",
     contracts: [
-      { customer: null, start: "Q1 2026", end: "End 2026", dayRate: null, firmness: "firm", note: "multi-operator NCS programme (DNO, Wellesley Petroleum, Well Expertise per a Soiltech service-contract notice); end estimated" }
+      { customer: null, start: "Q1 2026", end: "2027", dayRate: null, firmness: "firm", note: "multi-operator NCS programme (Wellesley Petroleum, DNO, Well Expertise per a Soiltech service-contract notice); end estimated" },
+      { customer: "Okea", start: "Q3 2027", end: "Q4 2027", dayRate: null, firmness: "firm", note: "two firm wells, estimated 80 days (Odfjell Q3 2026 presentation); Odfjell says this takes firm backlog to Q4 2027; dates estimated" }
     ],
-    note: "Managed by Odfjell for owner CIMC on a multi-operator Norwegian programme in 2026: it drilled Wellesley Petroleum's Carmen appraisal well 35/10-16 S (completed Jun 2026; Odfjell Q2 2026 report, Aug 18, 2026), then moved to the Afrodite appraisal 35/7-2 in PL293, and DNO received Havtil consent on Sep 24, 2026 to use it for the Norma appraisal 25/7-15 S. Plotted at Norma; which well it is on now is unconfirmed. Odfjell's rig page shows further contract cover and \"continued optionality under frame agreement\" without dates. Day rate undisclosed."
+    note: "Managed by Odfjell for owner CIMC on a multi-operator Norwegian programme: it drilled Wellesley Petroleum's Carmen appraisal 35/10-16 S (completed Jun 2026), then the Afrodite appraisal 35/7-2 in PL293 for Wellesley (Sodir confirmed the discovery on Oct 29, 2026, with the well being plugged), and DNO has Havtil consent (Sep 24, 2026) to use it for the Norma appraisal 25/7-15 S. Odfjell's Q3 2026 report and presentation (Nov 3, 2026) add two firm Okea wells (~80 days) and say the unit now has firm backlog to Q4 2027; the order and dates of the remaining wells are estimated. Plotted at Norma; which well it is on now is unconfirmed. Day rate undisclosed."
   },
   {
     id: "rig-105",
@@ -2683,12 +2718,12 @@ const RIG_DATA = [
     lng: 5.75,
     position: "area",
     statusOverride: null,
-    source: "Odfjell Drilling Q2 2026 report, Aug 18, 2026",
-    asOf: "2026-08-18",
+    source: "Odfjell Drilling Q3 2026 report, Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Suncor", start: "Q1 2027", end: "Q2 2028", dayRate: null, firmness: "firm", note: "Terra Nova field, offshore Newfoundland, Canada; 400-day minimum term, ~$170M (SFL, Mar 6, 2026); end estimated from the 400-day term" }
     ],
-    note: "SFL-owned, Odfjell-managed GVA 7500 semi, warm-stacked at Ølen, Norway, while it prepares for a long-term Suncor contract in Canada expected to start in Q1 2027 (Odfjell Q2 2026 report, Aug 18, 2026). SFL announced the contract on Mar 6, 2026: a 400-day minimum term worth about $170M; Suncor will use it for maintenance and reliability work at Terra Nova. Day rate undisclosed."
+    note: "SFL-owned, Odfjell-managed GVA 7500 semi, warm-stacked at Ølen, Norway, while it prepares for a long-term Suncor contract in Canada expected to start in Q1 2027 (Odfjell Q3 2026 report, Nov 3, 2026). SFL announced the contract on Mar 6, 2026: a 400-day minimum term worth about $170M; Suncor will use it for maintenance and reliability work at Terra Nova. Day rate undisclosed."
   },
   {
     id: "rig-106",
@@ -2703,20 +2738,20 @@ const RIG_DATA = [
     hookload_tons: 1000,
     buildYear: 2010,
     region: "West Africa",
-    country: null,
+    country: "Mozambique",
     lat: -10.5,
     lng: 40.95,
     position: "area",
     statusOverride: null,
-    source: "Saipem H1 2026 results presentation, Jul 28, 2026",
-    asOf: "2026-07-28",
+    source: "Saipem H1 2026 results presentation, Jul 28, 2026; AIS (VesselFinder), Nov 8, 2026",
+    asOf: "2026-11-08",
     contracts: [
       { customer: "Azule Energy", start: "2025", end: "Apr 2026", dayRate: null, firmness: "firm", note: "Angola; two-well extension in continuity with the earlier Azule contract" },
       { customer: "Rhino Resources", start: "Apr 2026", end: "Jun 2026", dayRate: null, firmness: "firm", note: "Namibia; one firm well (an optional second well was also in the award)" },
       { customer: "Eni", start: "Q4 2026", end: "Mid 2027", dayRate: null, firmness: "firm", note: "Mozambique (Rovuma); 4 firm wells from H2 2026; dates estimated from Saipem's chart" },
       { customer: "Eni", start: "Mid 2027", end: "Q3 2027", dayRate: null, firmness: "option", note: "2 optional wells; dates estimated from Saipem's chart" }
     ],
-    note: "Saipem-owned. It finished two wells for Azule in Angola in Apr 2026 and a well for Rhino Resources in Namibia in Jun 2026, then was idle while it mobilized for Eni in Mozambique (Rovuma): 4 firm wells and 2 optional wells from H2 2026 (Saipem H1 2026 report). Saipem's chart shows the Eni work from about Q4 2026 into mid-2027, then an optional period; arrival in Mozambique is unconfirmed. Put in West Africa as the nearest of the six markets (Mozambique is East Africa). Day rate undisclosed."
+    note: "Saipem-owned. It finished two wells for Azule in Angola in Apr 2026 and a well for Rhino Resources in Namibia in Jun 2026, then was idle while it prepared for Eni in Mozambique (Rovuma): 4 firm wells and 2 optional wells from H2 2026 (Saipem H1 2026 report). AIS shows it left Walvis Bay anchorage on Oct 9, 2026 for the Coral North field (ETA Nov 1), and in early Nov it was off East Africa. Saipem's chart shows the Eni work from about Q4 2026 into mid-2027, then an optional period. Put in West Africa as the nearest of the six markets (Mozambique is East Africa). Day rate undisclosed."
   },
   {
     id: "rig-107",
@@ -2736,14 +2771,15 @@ const RIG_DATA = [
     lng: 32.86,
     position: "area",
     statusOverride: null,
-    source: "Porto Empedocle Coast Guard notice, Aug 5, 2026; Saipem H1 2026 results, Jul 28, 2026",
-    asOf: "2026-08-05",
+    source: "Saipem release, Oct 27, 2026; Porto Empedocle Coast Guard notice, Aug 5, 2026; Saipem H1 2026 results, Jul 28, 2026",
+    asOf: "2026-10-27",
     contracts: [
       { customer: "Eni", start: "2025", end: "Apr 2026", dayRate: null, firmness: "firm", note: "Eni Libya until Apr 2026 (earlier 2025 work included Zohr, Egypt); then shipyard maintenance" },
       { customer: "Eni", start: "Aug 2026", end: "Sep 2026", dayRate: null, firmness: "firm", note: "Gemini-1 completion offshore Sicily, Aug 10-Sep 29, 2026 per Coast Guard notice" },
-      { customer: "Eni", start: "Q4 2026", end: "End 2026", dayRate: null, firmness: "firm", note: "Petrobel (Eni/EGPC) at Zohr, Egypt; two-well intervention per trade press; Saipem's chart shows committed work to end-2026; start estimated" }
+      { customer: "Eni", start: "Q4 2026", end: "End 2026", dayRate: null, firmness: "firm", note: "Petrobel (Eni/EGPC) at Zohr, Egypt; two-well intervention per trade press; Saipem's chart shows committed work to end-2026; start estimated" },
+      { customer: "Eni", start: "Dec 2026", end: null, dayRate: null, firmness: "firm", note: "Eni Cyprus, drilling in Cyprus' EEZ; awarded Oct 27, 2026 (part of ~$121M for two contracts with Scarabeo 9); Saipem expects start between Nov 2026 and Jan 2027; start estimated; term undisclosed" }
     ],
-    note: "Saipem-owned 5th-generation drillship (generation left blank). It worked for Eni in Libya until Apr 2026, had scheduled yard maintenance, then completed Eni's Gemini-1 gas well offshore Sicily (Aug 10-Sep 29, 2026 per a Coast Guard notice) and is due back at Zohr, Egypt, for Petrobel late in 2026. Saipem shows committed work only to end-2026; 2027 is \"ongoing discussions\". Plotted at Zohr; current position unconfirmed. Day rate undisclosed."
+    note: "Saipem-owned 5th-generation drillship (generation left blank). It worked for Eni in Libya until Apr 2026, had scheduled yard maintenance, then completed Eni's Gemini-1 gas well offshore Sicily (Aug 10-Sep 29, 2026 per a Coast Guard notice). Trade press had it due back at Zohr, Egypt, for Petrobel late in 2026. On Oct 27, 2026 Saipem announced an Eni Cyprus contract for drilling in Cyprus' EEZ, expected to start between Nov 2026 and Jan 2027 (term undisclosed; ~USD 121M together with a Scarabeo 9 award). AIS in early Nov 2026 still showed 'Licata Offshore' (Sicily) as its destination. Plotted at Zohr; current position unconfirmed. Day rate undisclosed."
   },
   {
     id: "rig-108",
@@ -2789,14 +2825,14 @@ const RIG_DATA = [
     lng: 4.23,
     position: "area",
     statusOverride: null,
-    source: "Havtil consent (Vår Energi, 36/7-6 S), Sep 16, 2026",
-    asOf: "2026-09-16",
+    source: "Sodir (6407/5-3 S Lakris), Oct 19, 2026",
+    asOf: "2026-10-19",
     contracts: [
       { customer: "Vår Energi", start: "Q3 2024", end: "Q3 2026", dayRate: null, firmness: "firm", note: "2-year firm term" },
       { customer: "Vår Energi", start: "Q3 2026", end: "Q4 2027", dayRate: null, firmness: "firm", note: "first option, exercised Dec 18, 2025; end estimated from COSL Drilling Europe's booking timeline (about 77% of 2027 booked)" },
       { customer: "Vår Energi", start: "Q4 2027", end: "Q3 2029", dayRate: null, firmness: "option", note: "remaining options; contract maximum is 5 years from Q3 2024; dates estimated" }
     ],
-    note: "Operated by COSL Drilling Europe for Vår Energi on the NCS under a 2-year firm contract from Q3 2024 with 3 years of options; the first option was exercised Dec 18, 2025, and COSL's timeline shows it booked into about Q4 2027. Havtil consented in Sep 2026 to Vår Energi wildcats with it at Anabelle (35/6-7 S, Sep 7) and Sava (36/7-6 S, Sep 16); plotted at Sava. Day rate undisclosed."
+    note: "Operated by COSL Drilling Europe for Vår Energi on the NCS under a 2-year firm contract from Q3 2024 with 3 years of options; the first option was exercised Dec 18, 2025, and COSL's timeline shows it booked into about Q4 2027. Havtil consented in Sep 2026 to Vår Energi wildcats with it at Anabelle (35/6-7 S, Sep 7) and Sava (36/7-6 S, Sep 16); on Oct 19, 2026 Sodir reported its Lakris wildcat 6407/5-3 S in the Norwegian Sea (Vår Energi, PL1002) as a small gas/condensate discovery, to be plugged. Plotted at Sava; its current well is unconfirmed. Day rate undisclosed."
   },
   {
     id: "rig-110",
@@ -2816,14 +2852,14 @@ const RIG_DATA = [
     lng: 2.33,
     position: "area",
     statusOverride: null,
-    source: "Havtil consent (Vår Energi, 25/7-14 S), Sep 7, 2026",
-    asOf: "2026-09-07",
+    source: "Sodir (25/8-24 S Jotun Deep), Nov 3, 2026",
+    asOf: "2026-11-03",
     contracts: [
       { customer: "Vår Energi", start: "2025", end: "Late 2026", dayRate: null, firmness: "firm", note: "18-month firm term; start and end estimated" },
       { customer: "Vår Energi", start: "Late 2026", end: "Early 2028", dayRate: null, firmness: "firm", note: "6-month options exercised Dec 18, 2025 and May 5, 2026; end estimated from COSL Drilling Europe's booking timeline (2027 fully booked, ~5% of 2028)" },
       { customer: "Vår Energi", start: "Early 2028", end: "Mid 2030", dayRate: null, firmness: "option", note: "remaining 6-month options (five per trade press); dates estimated" }
     ],
-    note: "Operated by COSL Drilling Europe for Vår Energi on the NCS: an 18-month firm term from 2025 plus up to 3.5 years of 6-month options. Vår Energi exercised options on Dec 18, 2025 and May 5, 2026 (COSL calls the May one its second; Drilling Contractor, Jul 14, 2026, called it the third), and COSL's timeline shows it booked into early 2028. Havtil consented on Sep 7, 2026 to the Jotun Deep wildcat 25/7-14 S (PL1203), where it is plotted. Day rate undisclosed."
+    note: "Operated by COSL Drilling Europe for Vår Energi on the NCS: an 18-month firm term from 2025 plus up to 3.5 years of 6-month options. Vår Energi exercised options on Dec 18, 2025 and May 5, 2026 (COSL calls the May one its second; Drilling Contractor, Jul 14, 2026, called it the third), and COSL's timeline shows it booked into early 2028. It drilled the Jotun Deep wildcat in PL1203 (Havtil consent Sep 7, 2026, as 25/7-14 S; Sodir reports it as 25/8-24 S), which Sodir announced as dry and permanently plugged on Nov 3, 2026; its next well is unconfirmed. Plotted at Jotun Deep. Day rate undisclosed."
   },
   {
     id: "rig-111",
@@ -3025,8 +3061,8 @@ const RIG_DATA = [
     lng: -43.15,
     position: "area",
     statusOverride: null,
-    source: "Ventura Offshore presentation, Sep 16, 2026",
-    asOf: "2026-09-16",
+    source: "Ventura Offshore release, Oct 7, 2026; presentation, Sep 16, 2026",
+    asOf: "2026-10-07",
     contracts: [
       { customer: "Petrobras", start: "2023", end: "Sep 2026", dayRate: null, firmness: "firm", note: "three-year contract plus 135-day extension (Apr 10, 2026); ended Sep 7, 2026; ANP interdiction Jan to Mar 3, 2025" },
       { customer: "Petrobras", start: "Jan 2027", end: "Q3 2029", dayRate: null, firmness: "firm", note: "Sépia-Atapu; 910 days (911 in Ventura Q2 2026 report), ~$363M incl. $26M mobilization; start estimated; Q3 2029 per Ventura (Jan 2027 + 910 days = about Jul 2029)" },
@@ -3053,8 +3089,8 @@ const RIG_DATA = [
     lng: -43.12,
     position: "area",
     statusOverride: null,
-    source: "Ventura Offshore presentation, Sep 16, 2026",
-    asOf: "2026-09-16",
+    source: "Ventura Offshore release, Oct 7, 2026; presentation, Sep 16, 2026",
+    asOf: "2026-10-07",
     contracts: [
       { customer: "Petrobras", start: "2023", end: "Jul 2026", dayRate: null, firmness: "firm", note: "three-year contract; ended Jul 7, 2026" },
       { customer: "Petrobras", start: "Jan 2027", end: "Q1 2031", dayRate: null, firmness: "firm", note: "Búzios; 1,455-day extension, ~$466M; start estimated; Petrobras may terminate from day 910 (about mid-2029, computed); Q1 2031 per Ventura" }
@@ -3079,8 +3115,8 @@ const RIG_DATA = [
     lng: 117.75,
     position: "area",
     statusOverride: null,
-    source: "Ventura Offshore release, Sep 24, 2026",
-    asOf: "2026-09-24",
+    source: "Ventura Offshore release, Sep 24, 2026; AIS, Nov 2026",
+    asOf: "2026-11-08",
     contracts: [
       { customer: "Eni", start: "Aug 2024", end: "Dec 2026", dayRate: null, firmness: "firm", note: "Searah (Eni/PETRONAS JV) subsidiaries; 4 firm wells from Aug 17, 2024, all 4 option wells exercised, plus JKNE Upside-1 Dir well added Sep 24, 2026; end estimated (\"into December 2026\")" }
     ],
@@ -3131,13 +3167,14 @@ const RIG_DATA = [
     lng: -39.6,
     position: "area",
     statusOverride: null,
-    source: "Foresea fleet status report, Jul 31, 2026",
-    asOf: "2026-07-31",
+    source: "Foresea fleet status report, Oct 28, 2026",
+    asOf: "2026-10-28",
     contracts: [
       { customer: "Petrobras", start: "Nov 2023", end: "Nov 2026", dayRate: null, firmness: "firm", note: "original term" },
-      { customer: "Petrobras", start: "Nov 2026", end: "Nov 2028", dayRate: null, firmness: "firm", note: "two-year extension signed Apr 2026, about $150M of backlog" }
+      { customer: "Petrobras", start: "Nov 2026", end: "Nov 2028", dayRate: null, firmness: "firm", note: "two-year extension signed Apr 2026, about $150M of backlog" },
+      { customer: "Petrobras", start: "Dec 2028", end: "Q4 2029", dayRate: null, firmness: "option", note: "extension option shown on Foresea's FSR timeline (Jul and Oct 2026); dates estimated from the chart; terms undisclosed" }
     ],
-    note: "GustoMSC TDS-2000Plus DP semisubmersible owned and operated by Foresea, working for Petrobras in the Campos Basin since Nov 2023. A two-year extension signed in Apr 2026 (about $150M of backlog) runs it to Nov 2028 (Foresea FSR, Jul 31, 2026; 1Q26 results, Apr 30, 2026). Foresea's website spec sheet calls it 5th generation but its fleet status report says 6th. Day rate undisclosed."
+    note: "GustoMSC TDS-2000Plus DP semisubmersible owned and operated by Foresea, working for Petrobras in the Campos Basin since Nov 2023. A two-year extension signed in Apr 2026 (about $150M of backlog) runs it to Nov 2028, and Foresea's timeline shows a further extension option to about late 2029 (estimated) (Foresea FSR, Oct 28, 2026). Foresea's website spec sheet calls it 5th generation but its fleet status report says 6th. Day rate undisclosed."
   },
   {
     id: "rig-123",
@@ -3157,13 +3194,13 @@ const RIG_DATA = [
     lng: -40,
     position: "area",
     statusOverride: null,
-    source: "Foresea fleet status report, Jul 31, 2026",
-    asOf: "2026-07-31",
+    source: "Foresea fleet status report, Oct 28, 2026",
+    asOf: "2026-10-28",
     contracts: [
       { customer: "Petrobras", start: "Dec 2024", end: "Dec 2027", dayRate: null, firmness: "firm", note: "1,095 days from Dec 6, 2024; Jan 2025 amendment added shallow-water equipment (about $70M)" },
       { customer: "Petrobras", start: "Dec 2027", end: "Dec 2030", dayRate: null, firmness: "option", note: "renewal of up to 1,095 days by mutual agreement; unpriced" }
     ],
-    note: "DSME drillship owned and operated by Foresea, working for Petrobras in the Campos Basin on a 1,095-day contract that began Dec 6, 2024 at the Marlim Sul field (Foresea, Dec 9, 2024), firm to Dec 2027 (Foresea FSR, Jul 31, 2026). A Jan 2025 amendment added equipment for shallow-water work, commissioned in 2026. Renewal of up to 1,095 more days needs both parties to agree. Day rate undisclosed."
+    note: "DSME drillship owned and operated by Foresea, working for Petrobras in the Campos Basin on a 1,095-day contract that began Dec 6, 2024 at the Marlim Sul field (Foresea, Dec 9, 2024), firm to Dec 2027 (Foresea FSR, Oct 28, 2026). A Jan 2025 amendment added equipment for shallow-water work; the client accepted the last installation in Sep 2026, so the rig now earns its full amended day rate (3Q26 results, Oct 28, 2026). Renewal of up to 1,095 more days needs both parties to agree. Day rate undisclosed."
   },
   {
     id: "rig-124",
@@ -3183,14 +3220,15 @@ const RIG_DATA = [
     lng: -42.85,
     position: "area",
     statusOverride: null,
-    source: "Foresea fleet status report, Jul 31, 2026",
-    asOf: "2026-07-31",
+    source: "Foresea fleet status report, Oct 28, 2026",
+    asOf: "2026-10-28",
     contracts: [
       { customer: "Petrobras", start: "2022", end: "Nov 2025", dayRate: null, firmness: "firm", note: "previous contract, extended to end Nov 2025; special periodic survey Dec 2025 to Mar 2026" },
       { customer: "Petrobras", start: "Mar 2026", end: "Mar 2029", dayRate: null, firmness: "firm", note: "3 years for the Sépia & Atapu Consortium (Petrobras operator); about $417M incl. mobilization at award" },
-      { customer: "Petrobras", start: "Apr 2029", end: "Q4 2033", dayRate: null, firmness: "option", note: "extension shown as up to 4Q33 on Foresea's FSR timeline; terms undisclosed" }
+      { customer: "Petrobras", start: "Apr 2029", end: "Q4 2029", dayRate: null, firmness: "option", note: "priced option shown on Foresea's FSR timeline; dates estimated from the chart; terms undisclosed" },
+      { customer: "Petrobras", start: "Jan 2030", end: "Q4 2033", dayRate: null, firmness: "option", note: "extension option shown as up to 4Q33 on Foresea's FSR timeline; terms undisclosed" }
     ],
-    note: "DSME drillship owned and operated by Foresea. It began a 3-year contract with Petrobras, operator of the Sépia & Atapu Consortium (pre-salt Santos Basin), in late Mar 2026 after its special periodic survey (Foresea, Mar 30, 2026), firm to Mar 2029 with extensions shown up to 4Q33 (Foresea FSR, Jul 31, 2026). Plotted at the Sépia/Atapu area. Day rate undisclosed."
+    note: "DSME drillship owned and operated by Foresea. It began a 3-year contract with Petrobras, operator of the Sépia & Atapu Consortium (pre-salt Santos Basin), in late Mar 2026 after its special periodic survey (Foresea, Mar 30, 2026), firm to Mar 2029. Foresea's timeline shows a priced option to about late 2029, then extension options up to 4Q33 (Foresea FSR, Oct 28, 2026). Plotted at the Sépia/Atapu area. Day rate undisclosed."
   },
   {
     id: "rig-125",
@@ -3210,14 +3248,14 @@ const RIG_DATA = [
     lng: -40,
     position: "area",
     statusOverride: null,
-    source: "Foresea fleet status report, Jul 31, 2026",
-    asOf: "2026-07-31",
+    source: "Foresea fleet status report, Oct 28, 2026",
+    asOf: "2026-10-28",
     contracts: [
-      { customer: "Petrobras", start: "Oct 2023", end: "Oct 2026", dayRate: null, firmness: "firm", note: "Campos Basin; special periodic survey planned for Q4 2026 after this contract" },
+      { customer: "Petrobras", start: "Oct 2023", end: "Q4 2026", dayRate: null, firmness: "firm", note: "Campos Basin; extended past Oct 2026 under a well-in-progress clause; end estimated (special periodic survey planned for Q4 2026 after this contract)" },
       { customer: "Petrobras", start: "Jan 2027", end: "Dec 2030", dayRate: null, firmness: "firm", note: "estimated dates; Mero Consortium (Petrobras operator), 1,443 days, about $465M incl. mobilization; early-termination option after 1,078 days" },
       { customer: "Petrobras", start: "Jan 2031", end: "Q4 2031", dayRate: null, firmness: "option", note: "unpriced 382-day extension; FSR timeline shows up to 4Q31" }
     ],
-    note: "DSME drillship owned and operated by Foresea, working for Petrobras in the Campos Basin to Oct 2026. It then has a special periodic survey and starts a 1,443-day contract for the Mero Consortium (Petrobras operator) in early 2027 (Foresea, Mar 24, 2026; FSR, Jul 31, 2026). Petrobras can end that contract after 1,078 days, and there is an unpriced 382-day extension option. Plotted in the northern Campos Basin; exact location undisclosed. Day rate undisclosed."
+    note: "DSME drillship owned and operated by Foresea, working for Petrobras in the Campos Basin; the contract that was due to end in Oct 2026 continues to finish the current well (well-in-progress clause), estimated into Q4 2026. It then has a special periodic survey and starts a 1,443-day contract for the Mero Consortium (Petrobras operator) in about Jan 2027 (Foresea, Mar 24, 2026; FSR, Oct 28, 2026; 3Q26 results). Petrobras can end that contract after 1,078 days, and there is an unpriced 382-day extension option. Plotted in the northern Campos Basin; exact location undisclosed. Day rate undisclosed."
   },
   {
     id: "rig-126",
@@ -3237,14 +3275,14 @@ const RIG_DATA = [
     lng: -49.7,
     position: "area",
     statusOverride: null,
-    source: "Foresea fleet status report, Jul 31, 2026",
-    asOf: "2026-07-31",
+    source: "Foresea fleet status report, Oct 28, 2026",
+    asOf: "2026-10-28",
     contracts: [
-      { customer: "Petrobras", start: "Mar 2024", end: null, dayRate: null, firmness: "firm", note: "Equatorial Margin; extended Oct 2025 to Mar 2026 (option to Jun 2026), now running to completion of the current well under a well-in-progress clause" },
-      { customer: "Petrobras", start: "Jan 2027", end: "Dec 2029", dayRate: null, firmness: "firm", note: "estimated dates; three-year contract from Petrobras's Dec 2022 tender, after a special periodic survey planned for Q4 2026" },
-      { customer: "Petrobras", start: "Jan 2030", end: "Q4 2032", dayRate: null, firmness: "option", note: "extension shown as up to 4Q32 on Foresea's FSR timeline; terms undisclosed" }
+      { customer: "Petrobras", start: "Mar 2024", end: "Q4 2026", dayRate: null, firmness: "firm", note: "Equatorial Margin; extended Oct 2025 to Mar 2026 (option to Jun 2026), then to completion of the current well under a well-in-progress clause; end estimated from Foresea's FSR timeline (talks may add one more well before the SPS)" },
+      { customer: "Petrobras", start: "Feb 2027", end: "Jan 2030", dayRate: null, firmness: "firm", note: "estimated dates; three-year contract from Petrobras's Dec 2022 tender, after a special periodic survey planned for Q4 2026" },
+      { customer: "Petrobras", start: "Feb 2030", end: "Q4 2032", dayRate: null, firmness: "option", note: "extension shown as up to 4Q32 on Foresea's FSR timeline; terms undisclosed" }
     ],
-    note: "DSME drillship (Petrobras rig code NS-42) owned and operated by Foresea, drilling for Petrobras in block FZA-M-59 in the Foz do Amazonas Basin, about 175 km off Amapá, where it arrived in Aug 2025 (Petrobras, Aug 19, 2025). Its contract runs until the current well is finished. A special periodic survey follows in Q4 2026, then a three-year Petrobras contract from about Jan 2027 (Foresea FSR, Jul 31, 2026). Operations were paused Jan to Mar 2026 after a drilling-fluid loss. Plotted at an approximate block position. Day rate undisclosed."
+    note: "DSME drillship (Petrobras rig code NS-42) owned and operated by Foresea, drilling for Petrobras in block FZA-M-59 in the Foz do Amazonas Basin, about 175 km off Amapá, where it arrived in Aug 2025 (Petrobras, Aug 19, 2025). Its contract runs until the current well is finished, shown to about late 2026 (estimated); Foresea is negotiating a possible extra well before a special periodic survey, after which a three-year Petrobras contract runs from about Feb 2027 to Jan 2030 (estimated) (Foresea FSR, Oct 28, 2026; 3Q26 results). Operations were paused Jan to Mar 2026 after a drilling-fluid loss. Plotted at an approximate block position. Day rate undisclosed."
   },
   {
     id: "rig-127",
@@ -3290,12 +3328,12 @@ const RIG_DATA = [
     lng: 92.95,
     position: "area",
     statusOverride: null,
-    source: "Dolphin Drilling contract extension release, Aug 20, 2026",
-    asOf: "2026-08-20",
+    source: "Dolphin Drilling release (sale to SPM), Oct 26, 2026",
+    asOf: "2026-10-26",
     contracts: [
-      { customer: "Oil India", start: "Nov 2024", end: "Oct 2026", dayRate: null, firmness: "firm", note: "three-well Andaman exploration campaign plus tests and abandonment; extended several times, latest to Oct 15, 2026" }
+      { customer: "Oil India", start: "Nov 2024", end: "Oct 2026", dayRate: null, firmness: "firm", note: "three-well Andaman exploration campaign plus tests and abandonment; extended several times, latest to Oct 15, 2026; completion not separately confirmed" }
     ],
-    note: "Enhanced Aker H-3 moored semi built 1974 and upgraded in 2008 (Dolphin calls it 5th generation, so outside the tracker's 6G-8G classes). Working for Oil India in the Andaman Sea on the last well of a three-well exploration campaign; extended to Oct 15, 2026 (Aug 20, 2026 release). No follow-on announced: Dolphin is bidding tenders, GHL has floated a non-binding Nigeria deployment as part of an arbitration settlement (Aug 28, 2026), and class renewal is due Apr 2027; day rate undisclosed."
+    note: "Enhanced Aker H-3 moored semi built 1974 and upgraded in 2008 (Dolphin calls it 5th generation, so outside the tracker's 6G-8G classes). Worked for Oil India in the Andaman Sea on a three-well exploration campaign, extended to Oct 15, 2026 (Aug 20, 2026 release). On Oct 26, 2026 Dolphin agreed to sell the rig to SPM Energy Shipping FZCO for up to $25M ($10M on delivery, $15M on SPM's first payment under a future drilling contract), with closing expected around Nov 5, 2026 in Singapore, avoiding its class renewal survey; an MoU (subject to definitive documents) would have Dolphin manage future contracts for it, with SPM marketing it in India. No follow-on contract announced; whether the sale has closed is unconfirmed. Plotted at its last Andaman location; day rate undisclosed."
   },
   {
     id: "rig-129",
@@ -3343,13 +3381,13 @@ const RIG_DATA = [
     lng: 86.4,
     position: "field",
     statusOverride: null,
-    source: "ONGC press release, Sep 21, 2026",
-    asOf: "2026-09-21",
+    source: "Eldorado Drilling fleet status report, Oct 2026; ONGC press release, Sep 21, 2026",
+    asOf: "2026-10",
     contracts: [
-      { customer: "ONGC", start: "Jul 2026", end: "Jul 2029", dayRate: null, firmness: "firm", note: "three-year firm term, ~$261M excluding MPD services; dates estimated from the Jul 25, 2026 spud" },
-      { customer: "ONGC", start: "Jul 2029", end: "Jul 2030", dayRate: null, firmness: "option", note: "one-year option; dates estimated" }
+      { customer: "ONGC", start: "Jul 2026", end: "Q3 2029", dayRate: null, firmness: "firm", note: "three-year firm term, ~$261M excluding MPD services; start from the Jul 25, 2026 spud (Eldorado gives commencement as Aug 2026)" },
+      { customer: "ONGC", start: "Q3 2029", end: "Q3 2030", dayRate: null, firmness: "option", note: "one-year option; dates estimated" }
     ],
-    note: "Owned and operated by Vantage Drilling, which Eldorado Drilling has owned since Jun 26, 2026. Three-year ONGC contract (awarded Feb 10, 2026) plus a one-year option; spudded ONGC's first Mahanadi deepwater well, MN-DW18-1-H-D about 43 km off Konark, on Jul 25, 2026 and struck gas on Sep 18 (ONGC, Sep 21, 2026). Equipped for 10,000 ft (hull designed for 12,000 ft); day rate undisclosed."
+    note: "Owned by Eldorado Drilling (which bought Vantage Drilling on Jun 26, 2026) and run under the Eldorado name. Three-year ONGC contract (awarded Feb 10, 2026) plus a one-year option; Eldorado's Oct 2026 fleet status report gives commencement as Aug 2026 and the end of contract as Q3 2029. It spudded ONGC's first Mahanadi deepwater well, MN-DW18-1-H-D about 43 km off Konark, on Jul 25, 2026 and struck gas on Sep 18 (ONGC, Sep 21, 2026). Equipped for 10,000 ft (hull designed for 12,000 ft); day rate undisclosed."
   },
   {
     id: "rig-131",
@@ -3364,44 +3402,21 @@ const RIG_DATA = [
     hookload_tons: 1400,
     buildYear: 2013,
     region: "West Africa",
-    country: "Angola",
-    lat: -7,
-    lng: 11,
+    country: "Namibia",
+    lat: -28.2,
+    lng: 14,
     position: "area",
-    statusOverride: "Unconfirmed",
-    source: "Vantage Drilling Q1 2026 quarterly report, May 26, 2026",
-    asOf: "2026-05-26",
+    statusOverride: null,
+    source: "Eldorado Drilling fleet status report, Oct 2026",
+    asOf: "2026-10-15",
     contracts: [
       { customer: "TotalEnergies", start: "Nov 2025", end: "Mar 2026", dayRate: null, firmness: "firm", note: "Republic of the Congo; start per trade press" },
       { customer: "TotalEnergies", start: "Apr 2026", end: "Jul 2026", dayRate: null, firmness: "firm", note: "Angola, two firm wells, ~90 days; dates estimated" },
-      { customer: "TotalEnergies", start: "Jul 2026", end: "Nov 2026", dayRate: null, firmness: "option", note: "up to ~120 days of optional work; exercise not confirmed; dates estimated" }
+      { customer: "TotalEnergies", start: "Jul 2026", end: "Sep 2026", dayRate: null, firmness: "firm", note: "Angola optional work; Eldorado's Oct 2026 chart shows the Congo/Angola work contracted to the end of Q3 2026; dates estimated" },
+      { customer: "TotalEnergies", start: "Oct 2026", end: "Jun 2027", dayRate: null, firmness: "firm", note: "Namibia, two firm wells (first: Mopane Extension, PEL 83); end estimated from Eldorado's chart" },
+      { customer: "TotalEnergies", start: "Jun 2027", end: "Aug 2027", dayRate: null, firmness: "option", note: "Namibia, one-well option; dates estimated from Eldorado's chart" }
     ],
-    note: "Owned since Aug 2025 by TEVA Ship Charter (TotalEnergies 75%, Vantage 25%) and run by Vantage under a 10-year management agreement to Q3 2035 (5-year option). It left the Republic of the Congo in late Mar 2026 for a TotalEnergies program in Angola (two firm wells, ~90 days, plus up to ~120 days of options) and was listed operating there on May 12, 2026. No later primary source says whether the options were taken up or what it is doing now; equipped for 11,000 ft (designed for 12,000 ft), day rate undisclosed."
-  },
-  {
-    id: "rig-132",
-    name: "VALARIS MS-1",
-    contractor: "Valaris",
-    owner: null,
-    type: "Semisubmersible",
-    generation: "6th Gen",
-    jackupClass: null,
-    environment: null,
-    waterDepth_ft: 8200,
-    hookload_tons: 1000,
-    buildYear: 2011,
-    region: "Asia Pacific",
-    country: "Malaysia",
-    lat: 5.05,
-    lng: 115.3,
-    position: "area",
-    statusOverride: null,
-    source: "Valaris fleet status report, Aug 5, 2026",
-    asOf: "2026-08-05",
-    contracts: [
-      { customer: "Santos", start: "Jan 2024", end: "Oct 2025", dayRate: null, firmness: "firm", note: "Australia (Valaris FSR, Oct 23, 2025)" }
-    ],
-    note: "Moored F&G ExD Millennium semi, warm-stacked in Malaysia with no contract (Valaris FSRs of May 4 and Aug 5, 2026). It finished the Santos work offshore Australia in Q4 2025 and moved to Malaysia; its sister DPS-1 was sold for recycling in Apr 2026, leaving MS-1 as Valaris's only semi. Plotted near Labuan, its last reported AIS destination (Nov 2025); Valaris names only the country."
+    note: "Owned since Aug 2025 by TEVA Ship Charter (TotalEnergies 75%, Eldorado/Vantage 25%) and run by Eldorado (which bought Vantage in Jun 2026) under a 10-year management contract to Q3 2035 (5-year option). After TotalEnergies work in the Republic of the Congo and Angola that Eldorado's Oct 2026 fleet status chart shows running to the end of Q3 2026, it moved to Namibia for a TotalEnergies contract of two firm wells plus a one-well option, due to start Oct 2026; the chart shows the firm wells to about mid-2027 and the option to about Aug 2027 (dates estimated). A licence partner (Sintana) reportedly said on Oct 15, 2026 that the rig was en route to the Mopane Extension well on PEL 83 (Orange Basin); that post was not read directly and the spud is unconfirmed. Plotted in the PEL 83 area (approximate); equipped for 11,000 ft (designed for 12,000 ft), day rate undisclosed."
   },
   {
     id: "rig-133",
@@ -3421,11 +3436,11 @@ const RIG_DATA = [
     lng: -40.6,
     position: "area",
     statusOverride: "Unconfirmed",
-    source: "Brazilian Navy (DPC) platform list, Apr 20, 2026",
-    asOf: "2026-04-20",
+    source: "Brazilian Navy (DPC) platform list, Oct 2026",
+    asOf: "2026-10-08",
     contracts: [
       { customer: "Petrobras", start: "2026", end: null, dayRate: null, firmness: "firm", note: "about 2.5-3 years (~$446M, signed Jan 2025) per trade press only; start, field and end unconfirmed" }
     ],
-    note: "Drillship operated by Etesco for Petrobras. The Brazilian Navy's lists show it chartered by Petrobras and in operation (Jan 5, 2026), in the Campos Basin (Apr 20, 2026). Its new contract (signed Jan 2025, about $446M for 2.5 to 3 years from 2026) is reported only by trade press, so its terms and current status are unconfirmed. Hookload is the design-class value. Day rate undisclosed."
+    note: "Drillship operated by Etesco for Petrobras. The Brazilian Navy's lists show it chartered by Petrobras and in operation (Jan 5, 2026), in the Campos Basin (Apr 20, 2026), and still among the Petrobras-chartered drilling rigs in operation in the lists updated Sep 9, 2026 and Oct 2026. Its new contract (signed Jan 2025, about $446M for 2.5 to 3 years from 2026) is reported only by trade press, so its terms are unconfirmed. Hookload is the design-class value. Day rate undisclosed."
   }
 ];
