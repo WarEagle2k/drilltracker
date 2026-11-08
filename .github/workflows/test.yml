@@ -13,14 +13,14 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # the change list compares the data with an earlier commit
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 22
       - name: Check the scripts parse
-        run: for f in app.js insights.js rigs.js changes.js basemap.js theme-init.js; do node --check "$f"; done
+        run: for f in app.js insights.js rigs.js changes.js basemap.js theme-init.js tour.js; do node --check "$f"; done
       - name: Asset versions match the files
         run: node scripts/stamp-assets.js --check
       - name: Change list matches the data
@@ -35,5 +35,5 @@ jobs:
         run: node scripts/test-insights.js
       - name: Accessibility (axe-core in the runner's Chrome)
         run: |
-          npm install --no-save --no-package-lock --silent axe-core@4.13.0
+          npm install --no-save --no-package-lock --silent axe-core@4.14.0
           node scripts/test-a11y.js

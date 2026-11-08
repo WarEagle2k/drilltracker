@@ -3,7 +3,7 @@
    (views, both themes, the details pane, dialogs, the intro tour, phone layouts) and runs axe-core on each.
    Fails on any WCAG 2.2 A/AA or best-practice violation.
 
-     npm install --no-save axe-core@4.13.0   once (CI does this; node_modules is ignored)
+     npm install --no-save axe-core@4.14.0   once (CI does this; node_modules is ignored)
      node scripts/test-a11y.js
 
    Chrome comes from CHROME_PATH, or the usual install locations (GitHub's Ubuntu runner has it).
@@ -20,7 +20,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 let AXE;
 try { AXE = fs.readFileSync(require.resolve('axe-core/axe.min.js', { paths: [ROOT] }), 'utf8'); }
-catch (e) { console.error('axe-core is not installed. Run: npm install --no-save axe-core@4.13.0'); process.exit(1); }
+catch (e) { console.error('axe-core is not installed. Run: npm install --no-save axe-core@4.14.0'); process.exit(1); }
 
 const CHROME = [process.env.CHROME_PATH, '/usr/bin/google-chrome', '/usr/bin/google-chrome-stable', '/usr/bin/chromium',
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'].find(p => p && fs.existsSync(p));
