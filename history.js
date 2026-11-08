@@ -925,8 +925,9 @@ function closePanel() {
   if (panelReturn && document.contains(panelReturn)) panelReturn.focus();
 }
 function lifeSpan(c) {
+  if (c.outside && !c.start && !c.end) return 'outside the tree';
   const a = c.start ? String(c.start).slice(0, 4) : '?';
-  const b = c.end ? String(c.end).slice(0, 4) : (c.current ? 'today' : '?');
+  const b = c.end ? String(c.end).slice(0, 4) : (c.current || c.active ? 'today' : '?');
   return a + '–' + b;
 }
 
