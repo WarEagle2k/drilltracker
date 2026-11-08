@@ -100,7 +100,6 @@ html.hx-page body { min-height: 100dvh; display: flex; flex-direction: column; }
 .hx-ev:focus-visible .hx-hit, .hx-ev.is-open .hx-hit { stroke: var(--color-primary); stroke-width: 2; }
 .hx-ev.is-pending .hx-mark { stroke-dasharray: 2 2; stroke: var(--fam); fill: var(--panel, var(--color-surface)); }
 .hx-ev.is-minor .hx-mark { opacity: 0.6; stroke-width: 1.5; }
-.hx-ev.is-minor .hx-hit { r: 9; }
 .hx-ev.is-minor:hover .hx-mark, .hx-ev.is-minor:focus-visible .hx-mark, .hx-ev.is-minor.is-open .hx-mark { opacity: 1; }
 .is-dim { opacity: 0.18; }
 .hx-canvas.is-tracing .hx-lane:not(.is-traced), .hx-canvas.is-tracing .hx-link:not(.is-traced) { opacity: 0.15; }
