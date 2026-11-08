@@ -879,8 +879,10 @@ function axisSvg(top) {
 }
 
 function renderChart(keepScroll) {
+  if (window.matchMedia('(max-width: 700px)').matches) { renderVertical(); return; }
   const canvas = document.getElementById('hxCanvas');
   const scroller = document.getElementById('hxScroll');
+  canvas.classList.remove('is-vertical');
   const prevRight = scroller.scrollWidth - scroller.scrollLeft;
   canvas.textContent = '';
   scale = makeScale();
@@ -1102,6 +1104,63 @@ function familyBlock(fam) {
 /* headline band layout: each deal's name goes centred over its mark, or ending or starting at it, in the
    first row where it fits; deals bunched in a few years stack into as many rows as they need */
 const BAND_ROW = 18;
+
+/* Phones: each family as a vertical story, oldest first, on a spine in its colour: its miniature tree, then its
+   events, with the headline deals bold and the small events folded away until asked for. Same filters, same panel. */
+function renderVertical() {
+  const canvas = document.getElementById('hxCanvas');
+  canvas.textContent = '';
+  canvas.style.width = '';
+  canvas.classList.add('is-vertical');
+  const filtering = !!state.q || state.type !== 'all';
+  let shown = 0;
+  for (const fam of MODEL.families) {
+    if (!state.families.has(fam.key)) continue;
+    const famHasMatch = fam.events.some(eventMatches) || (state.q && fam.lanes.some(laneMatches));
+    if (!famHasMatch && filtering) continue;
+    shown++;
+    const sec = el('section', { class: 'hx-family hx-vt-family', 'aria-labelledby': 'hxf-' + cssId(fam.key), id: 'fam-' + cssId(fam.key) });
+    sec.style.setProperty('--fam', 'var(' + fam.color + ')');
+    const top = el('div', { class: 'hx-family-top' });
+    const head = el('h2', { class: 'hx-family-head', id: 'hxf-' + cssId(fam.key) });
+    head.append(el('span', { class: 'hx-swatch', 'aria-hidden': 'true' }), el('span', { class: 'hx-family-name' }, fam.name));
+    head.append(el('span', { class: 'hx-family-meta' }, fam.lanes.length + (fam.lanes.length === 1 ? ' company' : ' companies')));
+    top.append(head, el('p', { class: 'hx-family-story' }, fam.text), miniTree(fam));
+    sec.append(top);
+    const all = fam.events.filter(e => !filtering || eventMatches(e));
+    const full = filtering || state.expanded.has(fam.key);
+    const smallOnes = all.filter(e => (isMinor(e) || e.type === 'founded') && !LANDMARK_IDS.has(e.id));
+    const list = full ? all : all.filter(e => !smallOnes.includes(e));
+    const ol = el('ol', { class: 'hx-vt' });
+    for (const e of list) {
+      const big = fam.landmarks.some(c => c.e === e);
+      const li = el('li', { class: 'hx-vt-item' + (big ? ' is-landmark' : '') + (isMinor(e) && !big ? ' is-minor' : '') + (e.pending ? ' is-pending' : '') });
+      const b = el('button', { type: 'button', class: 'hx-vt-btn', 'data-ev': e.id }); // its visible text is its name
+      const node = svg('svg', { width: 18, height: 18, viewBox: '0 0 18 18', class: 'hx-vt-node', 'aria-hidden': 'true', focusable: 'false' });
+      node.append(glyph(e.type, 9, 9, big ? 6 : (isMinor(e) ? 3 : 4.5)));
+      const body = el('span', { class: 'hx-vt-body' });
+      body.append(el('span', { class: 'hx-vt-title' }, e.title),
+        el('span', { class: 'hx-vt-meta' }, (TYPES[e.type] || {}).label + ' · ' + formatDate(e.date) + (e.pending ? ' · pending' : '') + (big && e.value ? ' · ' + e.value : '')));
+      b.append(el('span', { class: 'hx-vt-year' }, e._x === null ? '—' : String(Math.floor(e._x))), node, body);
+      b.addEventListener('click', () => openPanel(e, b));
+      li.append(b); ol.append(li);
+    }
+    sec.append(ol);
+    if (!filtering && smallOnes.length) {
+      const btn = el('button', { type: 'button', class: 'hx-more hx-vt-more', 'aria-expanded': String(full) },
+        full ? 'Hide the ' + smallOnes.length + ' smaller events' : 'Show ' + smallOnes.length + ' more events (foundings, renames, small deals)');
+      btn.addEventListener('click', () => {
+        if (full) state.expanded.delete(fam.key); else state.expanded.add(fam.key);
+        update();
+        const again = document.getElementById('fam-' + cssId(fam.key));
+        if (again) { const m = again.querySelector('.hx-vt-more'); if (m) m.focus(); if (full) again.scrollIntoView({ block: 'nearest' }); }
+      });
+      sec.append(btn);
+    }
+    canvas.append(sec);
+  }
+  document.getElementById('hxEmpty').hidden = shown > 0;
+}
 function planBand(fam) {
   const rows = [], items = [];
   for (const c of fam.landmarks) {
@@ -1323,7 +1382,6 @@ function initTheme() {
 /* ---------- start ---------- */
 function init() {
   readHash();
-  if (!location.hash && window.matchMedia('(max-width: 700px)').matches) state.view = 'list';
   initTheme();
   renderStats();
   renderConsolidation();
