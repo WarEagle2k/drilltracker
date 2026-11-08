@@ -83,11 +83,24 @@ The list is built by `scripts/build-changes.js`, which compares `rigs.js` with t
 
 ## Header
 
-The filters button shows how many filters are on, so they aren't forgotten while the sidebar is closed. **Changes** opens the change list above. **CSV** exports the rigs shown, with every contract, source and note; it is disabled when nothing matches. The **?** button replays the intro tour (on a phone, it's a link in the footer).
+The filters button shows how many filters are on, so they aren't forgotten while the sidebar is closed. **History** opens the driller family tree (below). **Changes** opens the change list above. **CSV** exports the rigs shown, with every contract, source and note; it is disabled when nothing matches. The **?** button replays the intro tour (on a phone, it's a link in the footer).
 
 ## Intro tour
 
 On a first visit, a short tour opens: a pointer moves to each part of the page (the headline numbers, filters, map, map key, views, Changes, CSV) while a spotlight dims the rest, and a card explains it. Back, Next, Skip and Escape work as you'd expect, and "Don't show this again" (ticked by default) is remembered in the browser. It doesn't open on a link to a particular rig. Replaying it switches to the map for the duration, then returns to the view and rig you had open. The steps live in `tour.js`; raise `TOUR_VERSION` there to show the tour again to everyone after a material change to the page.
+
+## Driller history
+
+`history.html` is a family tree of the drillers on the map: how each came to be through mergers, acquisitions, spin-offs, renames, restructurings and major fleet deals, as far back as the sources go (1915 for the earliest drilling company).
+
+- **One lane per company**, grouped by the present-day driller it ended up in, in that driller's map colour. Lanes join where a company merged into or was bought by another, branch where a business was spun out, and carry a tick where a company was renamed. A company whose founding date is unknown starts, faded, a few years before its first recorded event.
+- **Companies outside the tree** (parents such as Schlumberger or Loews, oil companies, and outside buyers such as Shelf Drilling) are not drawn as lanes; they appear as text where they touch a lane ("from Loews", "→ Hercules Offshore").
+- **Pending deals** are dashed: Transocean–Valaris (expected to close about Dec 1, 2026) and Saipem–Subsea7 (agreed, not completed).
+- **Time is weighted by activity**: busier years are drawn wider, so the deal-heavy recent decades are readable without hiding the early history; the axis shows where each decade falls.
+- **Select any point** for the deal: dates (completed and announced), value as stated, the companies on each side, and its sources, each marked Primary (company or official), Press or Reference (encyclopedias, Wikipedia, company-history books). Where sources disagree, the details give both.
+- **Filters** (drillers, search, event type, start year) apply to the timeline and to the **List** view, which shows every event in date order. The URL hash keeps them, plus an open event (`#ev=…`).
+
+The data is in `history-data.js` and is checked by `scripts/validate-history.js` (ids resolve, dates are valid and in order, every event has a source, every present-day driller is a contractor in `rigs.js`). About three quarters of the events have a primary source; the rest, mostly before the 1990s, rest on press or reference works and are labelled as such.
 
 ## Sharing a view
 
@@ -115,6 +128,8 @@ A filter lists the values shown, comma-separated; a filter that isn't in the lin
 | `basemap.js` | World outline from Natural Earth (public domain), built by `scripts/build-basemap.js`. |
 | `icons/` | Rig-type silhouettes for the zoomed-in map: alpha masks built by `scripts/build-icons.py` from `icons/src/` (generated with GPT Image via Higgsfield). |
 | `vendor/` | Leaflet 1.9.4 and Leaflet.markercluster 1.5.3, served from the site rather than a CDN, with their licences. The version is in the path, so a new version is a new folder. |
+| `history.html`, `history.js`, `history.css` | The driller family tree page: markup, layout and styles. |
+| `history-data.js` | The family tree data: companies and the events that link them. Checked by `scripts/validate-history.js`. |
 | `og-image.png` | The 1200×630 card shown when the link is shared. It includes a screenshot, so its figures are a snapshot. |
 
 There is no build step. Serve the folder with any static server, or open `index.html` directly.

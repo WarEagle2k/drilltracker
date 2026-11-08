@@ -32,7 +32,7 @@ function stamp(file, pattern) {
 }
 
 stamp('styles.css', /(url\()(icons\/[a-z-]+\.png)(?:\?v=[0-9a-f]+)?(\))/g);
-stamp('index.html', /((?:src|href)=")([a-z-]+\.(?:js|css))(?:\?v=[0-9a-f]+)?(")/g);
+for (const page of ['index.html', 'history.html']) stamp(page, /((?:src|href)=")([a-z-]+\.(?:js|css))(?:\?v=[0-9a-f]+)?(")/g);
 
 if (check && stale.length) {
   console.error('Asset versions are out of date in ' + stale.join(', ') + '. Run: node scripts/stamp-assets.js');
