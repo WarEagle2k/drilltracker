@@ -109,7 +109,8 @@ function buildModel() {
   }
   for (const lane of lanes) {
     const first = lane.segs[0], last = lane.segs[lane.segs.length - 1];
-    lane.start = parseDate(first.start);
+    // the same mid-point as event marks (a year-only date sits mid-year), so a line starts exactly at its founding mark
+    lane.start = parseDate(first.start, true);
     lane.startUnknown = lane.start === null;
     if (lane.startUnknown) {
       // founding date unknown: start a faded stretch a few years before the first recorded event, not at the axis edge
