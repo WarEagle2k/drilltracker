@@ -155,7 +155,7 @@ Use `null` for anything missing. The validator rejects placeholder strings such 
    node scripts/test-filters.js
    node scripts/test-insights.js
    ```
-   Before a pull request that changes the page, also run the accessibility check (it needs Chrome and, once, `npm install --no-save axe-core@4.13.0`):
+   Before a pull request that changes the page, also run the accessibility check (it needs Chrome and, once, `npm install --no-save axe-core@4.14.0`):
    ```
    node scripts/test-a11y.js
    ```

@@ -1413,7 +1413,8 @@ function updateChangesButton() {
   const n = filteredRigs.filter(r => CHANGES.rigs[r.id]).length;
   document.getElementById('changesBadge').textContent = n;
   document.getElementById('changesBadge').hidden = !n;
-  btn.setAttribute('aria-label', 'Changes since ' + CHANGES.sinceLabel + ': ' + n + (n === 1 ? ' rig' : ' rigs'));
+  /* Starts with the visible "Changes" and count, in that order, so voice control can say what it sees */
+  btn.setAttribute('aria-label', 'Changes ' + n + (n === 1 ? ' rig' : ' rigs') + ' since ' + CHANGES.sinceLabel);
   btn.title = 'What changed since the ' + CHANGES.sinceLabel + ' refresh';
 }
 
