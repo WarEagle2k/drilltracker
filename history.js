@@ -460,6 +460,47 @@ function isMinor(e) {
   if (e.type === 'restructuring') return !(e.from.length > 1 || MAJOR_RESTRUCTURING.test(e.title + ' ' + (e.detail || '')));
   return false;
 }
+/* Who bought whom. The data's from/to lists describe the lanes (which company carries on), not always the buyer,
+   so the roles come from what happened: a company whose independence ended at this deal was bought; otherwise
+   (a stake purchase) the title's order decides ('X buys Y', but 'X sells ... to Y'). Null when it can't be told. */
+function dealRoles(e) {
+  const ids = [...new Set(e.from.concat(e.to))].filter(id => CO[id]);
+  if (ids.length < 2) return null;
+  if (ids.length === 2 && (CO[ids[0]].successor === ids[1] || CO[ids[1]].successor === ids[0])) return null; // one company, before and after a rename
+  const t = e.title.toLowerCase();
+  // where a company is named in the title: its full short name, or its first distinctive word ('SapuraKencana')
+  const STOP = /^(the|a\/s|china|new|international|offshore|drilling)$/;
+  const at = id => {
+    const names = [CO[id].name].concat(CO[id].aka || []).map(n => shortName(n).toLowerCase()).filter(Boolean);
+    const words = names.map(n => n.split(/\s+/)[0]).filter(w => w.length >= 4 && !STOP.test(w));
+    const hits = names.concat(words).map(n => t.indexOf(n)).filter(i => i >= 0);
+    return hits.length ? Math.min(...hits) : -1;
+  };
+  const named = ids.filter(id => at(id) >= 0).sort((a, b) => at(a) - at(b));
+  // 'X sells (part of itself) to Y': X is the seller, Y the buyer, and what changed hands is whatever ended here
+  const selling = /\bsells?\b|\bsold\b|\bdivests?\b/.test(t);
+  const seller = selling && named.length >= 2 ? named[0] : null;
+  const laneOfId = id => MODEL.laneOf[id] || null;
+  let ended = ids.filter(id => {
+    if (id === seller) return false;
+    const l = laneOfId(id), c = CO[id];
+    if (c.endType === 'renamed' && ids.includes(c.successor)) return false; // renamed in the deal, not bought
+    if (l && l.terminal && l.terminal.e === e && l.segs[l.segs.length - 1].id === id) return true;
+    return c.end && /acquired|merged/.test(c.endType || '') && Math.abs(parseDate(c.end, true) - e._x) < 0.5;
+  });
+  let buyer = ids.filter(id => !ended.includes(id) && id !== seller);
+  // a buyer renamed in the same deal shares a lane with its old name: that old name was not bought
+  ended = ended.filter(id => !buyer.some(b => laneOfId(b) && laneOfId(b) === laneOfId(id)));
+  // a company and its own new name are one company: list it once, under its earlier name
+  const once = list => list.filter(id => !list.some(o => o !== id && CO[o].successor === id));
+  if (seller) {
+    const b = named[named.length - 1];
+    return { seller: [seller], buyer: [b], bought: once(ended.filter(id => id !== b)) };
+  }
+  if (ended.length && buyer.length) return { buyer: once(buyer).filter(id => !ended.some(x => CO[id].successor === x)), bought: once(ended) };
+  if (named.length < 2) return null;
+  return { buyer: [named[0]], bought: once(ids.filter(id => id !== named[0] && !(laneOfId(id) && laneOfId(id) === laneOfId(named[0])))) };
+}
 function eventLabel(e) { return formatDate(e.date) + ': ' + e.title + (e.pending ? ' (pending)' : ''); }
 
 /* ---------- header bits: stats, families, controls, legend ---------- */
@@ -839,7 +880,7 @@ function renderLegend() {
     item.append(s, document.createTextNode(label));
     box.append(item);
   }
-  const lane = el('span', { class: 'hx-legend-item' });
+  const lane = el('span', { class: 'hx-legend-item is-chart-only' });
   const ls = svg('svg', { width: 28, height: 16, viewBox: '0 0 28 16', 'aria-hidden': 'true', focusable: 'false' });
   ls.append(svg('rect', { x: 1, y: 5, width: 26, height: BAR_H, rx: 3, class: 'hx-legend-lane' }));
   lane.append(ls, document.createTextNode('Company lifetime'));
@@ -849,9 +890,9 @@ function renderLegend() {
   const sg = svg('g', { class: 'hx-ev is-minor' }); sg.append(glyph('fleet', 8, 8, 2.6)); ss.append(sg);
   small.append(ss, document.createTextNode('Small marks: renames, listings, smaller fleet deals'));
   box.append(small);
-  box.append(el('span', { class: 'hx-legend-item hx-legend-note' }, 'Busier years are drawn wider'));
+  box.append(el('span', { class: 'hx-legend-item hx-legend-note is-chart-only' }, 'Busier years are drawn wider'));
   if (EVENTS.some(e => e.pending)) {
-    const p = el('span', { class: 'hx-legend-item' });
+    const p = el('span', { class: 'hx-legend-item is-chart-only' });
     const ps = svg('svg', { width: 28, height: 16, viewBox: '0 0 28 16', 'aria-hidden': 'true', focusable: 'false' });
     ps.append(svg('path', { d: 'M1 8H27', class: 'hx-legend-pending' }));
     p.append(ps, document.createTextNode('Pending'));
@@ -915,7 +956,7 @@ function axisSvg(top) {
 }
 
 function renderChart(keepScroll) {
-  if (window.matchMedia('(max-width: 700px)').matches) { renderVertical(); return; }
+  if (window.matchMedia('(max-width: 700px)').matches) { document.getElementById('hxAxisSticky').hidden = true; renderVertical(); return; }
   const canvas = document.getElementById('hxCanvas');
   const scroller = document.getElementById('hxScroll');
   canvas.classList.remove('is-vertical');
@@ -923,7 +964,12 @@ function renderChart(keepScroll) {
   canvas.textContent = '';
   scale = makeScale();
   canvas.style.width = scale.width + 'px';
-  canvas.append(axisSvg(true));
+  // the top axis lives outside the scroller so it can stick to the top of the window while the families scroll past
+  const track = document.getElementById('hxAxisTrack');
+  track.textContent = '';
+  track.append(axisSvg(true));
+  track.style.width = scale.width + 'px';
+  document.getElementById('hxAxisSticky').hidden = false;
   let shown = 0;
   for (const fam of MODEL.families) {
     if (!state.families.has(fam.key)) continue;
@@ -937,6 +983,7 @@ function renderChart(keepScroll) {
   // keep today in view: open scrolled to the right, and hold the right edge across re-renders
   if (!keepScroll) scroller.scrollLeft = scroller.scrollWidth;
   else scroller.scrollLeft = Math.max(0, scroller.scrollWidth - prevRight);
+  document.getElementById('hxAxisTrack').style.transform = 'translateX(' + (-scroller.scrollLeft) + 'px)';
 }
 
 const COMPACT_MAX = 6;   // families with more lanes than this open compact
@@ -1317,6 +1364,12 @@ function openPanel(e, from) {
   else if (e.type === 'founded' || e.type === 'listing' || e.type === 'restructuring') addCos('Company', e.to.length ? e.to : e.from);
   else if (e.type === 'fleet' || e.type === 'divestment') { addCos('Seller', e.from); addCos('Buyer', e.to); }
   else if (e.type === 'spin-off' || e.type === 'jv') { addCos(e.type === 'jv' ? 'Partners' : 'Parent', e.from); addCos(e.type === 'jv' ? 'Joint venture' : 'Spun off', e.to); }
+  else if (e.type === 'acquisition') {
+    const r = dealRoles(e);
+    if (r) { if (r.seller) addCos('Seller', r.seller); addCos('Buyer', r.buyer); if (r.bought.length) addCos('Bought', r.bought); }
+    else addCos('Companies', [...new Set(e.from.concat(e.to))]);
+  }
+  else if (e.type === 'merger') { addCos('Merging', e.from); addCos('Combined company', e.to); }
   else { addCos('Going in', e.from); addCos('Coming out', e.to); }
   body.append(who);
   if (e.conflict) body.append(el('p', { class: 'hx-note' }, 'Sources disagree on part of this; the details above give both.'));
@@ -1445,6 +1498,8 @@ function init() {
   document.getElementById('hxPanelClose').addEventListener('click', closePanel);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
   let rt;
+  const scroller = document.getElementById('hxScroll'), track = document.getElementById('hxAxisTrack');
+  scroller.addEventListener('scroll', () => { track.style.transform = 'translateX(' + (-scroller.scrollLeft) + 'px)'; }, { passive: true });
   let lastW = window.innerWidth;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
     if (window.innerWidth !== lastW) { lastW = window.innerWidth; renderConsolidation(); }
