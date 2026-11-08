@@ -266,7 +266,7 @@ function familyStory(fam) {
       if (!lanes.length || lanes.includes(head)) continue;
       target = MODEL.laneOf[e.from.find(id => MODEL.laneOf[id] && inFam.has(MODEL.laneOf[id]))] || lanes[0]; // judged by its parent
       score = subtreeSize(lanes[0]) * 2e8;
-      label = shortName(lanes[0].segs[lanes[0].segs.length - 1].name) + ' spin-off';
+      label = shortName(lanes[0].segs[lanes[0].segs.length - 1].name) + (e.type === 'jv' ? ' joint venture' : ' spin-off');
     } else if (e.type === 'fleet') {
       target = MODEL.laneOf[e.to[0]];
       const v = usd(e.value);
@@ -278,13 +278,16 @@ function familyStory(fam) {
     } else continue;
     const depth = target && trunk.has(target) ? trunk.get(target) : 99;
     score *= [3, 2][depth] || 1;
-    cands.push({ e, score, label, lane: target, lanes, main: depth <= 1 });
+    cands.push({ e, score, label, lane: target, lanes, depth, main: depth <= 1 });
   }
-  // steps that built today's company directly come first; deep side branches only fill a short list
-  const main = cands.filter(c => c.main);
-  const pool = main.length >= 2 ? main : cands;
-  pool.sort((a, b) => (b.score - a.score) || (b.e._x - a.e._x));
-  const landmarks = pool.slice(0, 3).sort((a, b) => a.e._x - b.e._x);
+  // steps that built today's company directly come first; the next tier back fills a short list.
+  // Joint ventures are side ventures, not steps, unless a family has nothing else to show.
+  const byScore = (a, b) => (b.score - a.score) || (b.e._x - a.e._x);
+  const core = cands.filter(c => c.e.type !== 'jv');
+  const main = core.filter(c => c.main).sort(byScore);
+  let picks = main.length >= 2 ? main.slice(0, 3) : cands.slice().sort(byScore).slice(0, 3);
+  if (main.length >= 2 && picks.length < 3) picks = picks.concat(core.filter(c => c.depth === 2).sort(byScore).slice(0, 3 - picks.length));
+  const landmarks = picks.sort((a, b) => a.e._x - b.e._x);
   const starts = fam.lanes.filter(l => !l.startUnknown && l.start !== null).map(l => l.start);
   const since = starts.length ? Math.floor(Math.min(...starts)) : null;
   // companies the driller spun off or set up (and their own offshoots) are offshoots, not companies it brought together
@@ -293,7 +296,7 @@ function familyStory(fam) {
     for (let cur = l, guard = 0; cur && cur !== head && guard++ < 40; ) {
       const v = cur._via;
       if (!v) break;
-      if (v.kind === 'branch' && v.from === head) { offshoots.add(l); break; }
+      if (v.kind === 'branch' && trunk.has(v.from)) { offshoots.add(l); break; } // set up by today's company or a company on its main line
       cur = v.kind === 'branch' ? v.from : v.to;
     }
   }
@@ -311,7 +314,7 @@ function familyStory(fam) {
     }
   }
   // don't repeat an offshoot the steps above already name
-  const named = new Set(landmarks.map(c => c.label.replace(/ spin-off$/, '')));
+  const named = new Set(landmarks.map(c => c.label.replace(/ (spin-off|joint venture)$/, '')));
   const offRest = offNames.filter(n => !named.has(n));
   const offText2 = offRest.length ? ' It also spun off or set up ' + (offRest.length <= 2 ? offRest.join(' and ') : offRest.length + ' companies') + '.' : '';
   if (others) text += offText2;
@@ -418,6 +421,56 @@ function renderStats() {
   }
 }
 
+/* a card's miniature family tree: every company in the family as a hairline on one shared time scale
+   (recent decades drawn wider, as on the main chart), today's company bold, joins curving into the lane they
+   joined, and the card's headline deals as dots. Decorative: the card's text says the same in words. */
+const MINI = { w: 240, pad: 4, y0: 1910 };
+function miniX(y) {
+  const t = Math.max(0, Math.min(1, (y - MINI.y0) / (NOW - MINI.y0)));
+  return MINI.pad + (MINI.w - 2 * MINI.pad) * Math.pow(t, 1.8);
+}
+function miniTree(fam) {
+  const lanes = fam.lanes, n = lanes.length;
+  const gap = n > 1 ? Math.max(2.4, Math.min(7, 44 / (n - 1))) : 0;
+  const h = Math.round(10 + gap * (n - 1) + 14);
+  const rowY = new Map(lanes.map((l, i) => [l, 6 + i * gap]));
+  const box = el('span', { class: 'hx-mini', 'aria-hidden': 'true' });
+  const s = svg('svg', { viewBox: '0 0 ' + MINI.w + ' ' + h, preserveAspectRatio: 'none', width: '100%', height: h, focusable: 'false' });
+  const grid = svg('g', { class: 'hx-mini-grid' });
+  for (const y of [1950, 2000]) grid.append(svg('path', { d: `M${miniX(y)} 0V${h - 12}` }));
+  grid.append(svg('path', { d: `M${miniX(NOW)} 0V${h - 12}`, class: 'is-now' }));
+  s.append(grid);
+  const g = svg('g', { class: 'hx-mini-lanes' });
+  // side lanes first, so today's company draws on top
+  for (const lane of lanes.slice().reverse()) {
+    const y = rowY.get(lane);
+    const x0 = miniX(lane.start === null ? MINI.y0 : lane.start);
+    const join = lane.terminal && rowY.has(lane.terminal.to) ? lane.terminal : null;
+    const x1 = miniX(join ? join.e._x : (lane.end === null ? NOW : lane.end));
+    let d = `M${x0} ${y}H${Math.max(x0, x1 - 3)}`;
+    if (join) { const ty = rowY.get(join.to); d += `C${x1} ${y} ${x1 - 1} ${ty} ${x1 + 1.5} ${ty}`; }
+    const branch = lane.inbound.find(l => l.kind === 'branch' && rowY.has(l.from));
+    if (branch) { const py = rowY.get(branch.from), bx = miniX(branch.e._x); d = `M${bx} ${py}C${bx + 2} ${py} ${x0 - 1} ${y} ${x0 + 2} ${y}` + d.replace(/^M[^H]+/, ''); }
+    g.append(svg('path', { d, class: lane === fam.head ? 'is-head' : (lane.startUnknown ? 'is-faint' : null) }));
+  }
+  s.append(g);
+  const hy = rowY.get(fam.head);
+  const dots = svg('g', { class: 'hx-mini-dots' });
+  const dot = (x, cls) => { const d = `M${x} ${hy}h0`; dots.append(svg('path', { d, class: 'is-ring' }), svg('path', { d, class: cls || null })); };
+  for (const c of fam.landmarks) dot(miniX(c.e._x));
+  if (fam.head.current) dot(miniX(NOW), 'is-end');
+  s.append(dots);
+  box.append(s);
+  const axis = el('span', { class: 'hx-mini-axis' });
+  for (const [y, label] of [[1950, '1950'], [2000, '2000'], [NOW, 'today']]) {
+    const t = el('span', null, label);
+    t.style.left = (miniX(y) / MINI.w * 100) + '%';
+    axis.append(t);
+  }
+  box.append(axis);
+  return box;
+}
+
 /* at a glance: one card per driller, its size and headline deals; each opens its family on the timeline */
 function renderGlance() {
   const box = document.getElementById('hxGlance');
@@ -427,9 +480,12 @@ function renderGlance() {
     const a = el('a', { href: '#fam-' + cssId(fam.key), class: 'hx-card' });
     a.style.setProperty('--fam', 'var(' + fam.color + ')');
     const top = el('span', { class: 'hx-card-head' });
-    top.append(el('span', { class: 'hx-swatch', 'aria-hidden': 'true' }), el('span', { class: 'hx-card-name' }, fam.name));
+    const count = el('span', { class: 'hx-card-count' });
+    count.append(el('span', { class: 'hx-card-num' }, String(fam.lanes.length)), el('span', { class: 'hx-card-unit' }, fam.lanes.length === 1 ? 'company' : 'companies'));
+    top.append(el('span', { class: 'hx-swatch', 'aria-hidden': 'true' }), el('span', { class: 'hx-card-name' }, fam.name), count);
     a.append(top);
-    a.append(el('span', { class: 'hx-card-meta' }, fam.lanes.length + (fam.lanes.length === 1 ? ' company' : ' companies') + (fam.since ? ' · since ' + fam.since : '')));
+    a.append(el('span', { class: 'hx-card-meta' }, fam.since ? 'Roots in ' + fam.since : 'Founding date unknown'));
+    a.append(miniTree(fam));
     const ul = el('span', { class: 'hx-card-deals' });
     if (fam.landmarks.length) {
       for (const c of fam.landmarks) {
@@ -570,7 +626,8 @@ function makeScale() {
   const w = counts.map((c, i) => {
     let sm = 0;
     for (let k = -2; k <= 2; k++) sm += (counts[i + k] || 0) * (k === 0 ? 1 : (Math.abs(k) === 1 ? 0.6 : 0.3));
-    return 0.35 + 1.65 * Math.min(1, sm / 3);
+    // quiet years shrink; busy years widen, and the busiest (a deal every month or so) widen further
+    return 0.35 + 1.65 * Math.min(1, sm / 3) + 1.4 * Math.min(1, Math.max(0, sm - 4) / 12);
   });
   const cum = [0];
   for (let i = 0; i < n; i++) cum.push(cum[i] + w[i]);
@@ -626,7 +683,6 @@ function renderChart(keepScroll) {
   else scroller.scrollLeft = Math.max(0, scroller.scrollWidth - prevRight);
 }
 
-const BAND_H = 44;        // the headline band above a family's lanes
 const COMPACT_MAX = 6;   // families with more lanes than this open compact
 
 /* the lanes a compact family shows: today's company, its main line, and every company behind a headline deal,
@@ -678,7 +734,8 @@ function familyBlock(fam) {
 
   const famSet = new Set(fam.lanes), visSet = new Set(vis);
   const rowOf = new Map(vis.map((l, i) => [l, i]));
-  const band = fam.landmarks.length ? BAND_H : 6;
+  const bandPlan = planBand(fam);
+  const band = fam.landmarks.length ? 8 + bandPlan.rows * BAND_ROW + 4 : 6;
   const h = band + vis.length * ROW_H + 14;
   const s = svg('svg', { width: scale.width, height: h, class: 'hx-family-svg', role: 'group', id: 'hxs-' + cssId(fam.key), 'aria-label': fam.name + ' family timeline' });
   const yOf = lane => band + 8 + rowOf.get(lane) * ROW_H + ROW_H - 9;
@@ -694,6 +751,8 @@ function familyBlock(fam) {
   const marks = svg('g', { class: 'hx-events' });
   const bandG = svg('g', { class: 'hx-band', 'aria-hidden': 'true' });
 
+  const boxes = [];   // every label drawn so far: notes may not cross any of them
+  const deferred = []; // notes, placed once all the lane names are down
   for (const lane of vis) {
     const y = yOf(lane);
     const x0 = lane.start === null ? scale.x(scale.minY) : scale.x(lane.start);
@@ -713,6 +772,7 @@ function familyBlock(fam) {
       const lastSeg = k === lane.segs.length - 1;
       if (lastSeg && lane.current && lane.end === null) {
         g.append(svg('text', { x: x1 + 10, y: y + 4, class: 'hx-lane-label is-end' + (lane.trackerName ? ' is-current' : '') }, c.name));
+        boxes.push({ a: x1 + 10, b: x1 + 10 + c.name.length * 7.2, top: y - 7, bot: y + 7 });
         return;
       }
       const sx = Math.max(segX[k], labelEnd + 8);
@@ -723,6 +783,7 @@ function familyBlock(fam) {
         if (k === 0 && lane.startUnknown) t.append(svg('tspan', { class: 'hx-unknown' }, ' · founding date unknown'));
         g.append(t);
         labelEnd = sx + 2 + est + (k === 0 && lane.startUnknown ? 160 : 0);
+        boxes.push({ a: sx + 2, b: labelEnd, top: y - 19, bot: y - 5 });
       }
     });
     // notes for links to other families and outside companies: drawn under the lane, skipped where they would overlap
@@ -746,13 +807,7 @@ function familyBlock(fam) {
       else if (n.x > w + 12) { n.b = n.x - 6; n.a = n.b - w; n.anchor = 'end'; }
       else { n.a = 4; n.b = 4 + w; n.anchor = 'start'; }
     }
-    notes.sort((p, q) => (q.pending ? 1 : 0) - (p.pending ? 1 : 0) || p.a - q.a);
-    const taken = [];
-    for (const n of notes) {
-      if (taken.some(t => n.a < t.b + 8 && t.a < n.b + 8)) continue;
-      taken.push(n);
-      g.append(svg('text', { x: n.anchor === 'end' ? n.b : n.a, y: y + 15, 'text-anchor': n.anchor, class: 'hx-xref' + (n.pending ? ' is-pending' : '') }, n.text));
-    }
+    for (const n of notes) deferred.push(Object.assign(n, { g, y, w: n.text.length * 5.9 }));
     g.addEventListener('pointerenter', () => highlightLineage(lane));
     g.addEventListener('pointerleave', clearHighlight);
     lanesG.append(g);
@@ -766,6 +821,20 @@ function familyBlock(fam) {
       const py = yOf(b.from), sx = scale.x(b.e._x);
       links.append(svg('path', { d: `M${sx} ${py}C${sx + 10} ${py} ${sx + 6} ${y} ${sx + JOIN} ${y}`, class: 'hx-link' + (b.pending ? ' is-pending' : ''), 'data-lane': lane.i }));
     }
+  }
+
+  // notes: under their lane, on the side they belong to or else the other side; dropped if neither is clear
+  // of every label (the event keeps its mark and its panel either way)
+  const clear = (a, b, top, bot) => !boxes.some(t => a < t.b + 6 && t.a < b + 6 && top < t.bot && t.top < bot);
+  deferred.sort((p, q) => (q.pending ? 1 : 0) - (p.pending ? 1 : 0) || p.a - q.a);
+  for (const n of deferred) {
+    const top = n.y + 6, bot = n.y + 18;
+    const after = { a: n.x + 8, b: n.x + 8 + n.w, anchor: 'start' };
+    const before = n.x > n.w + 12 ? { a: n.x - 6 - n.w, b: n.x - 6, anchor: 'end' } : { a: 4, b: 4 + n.w, anchor: 'start' };
+    const spot = (n.side === 'after' ? [after, before] : [before, after]).find(o => clear(o.a, o.b, top, bot));
+    if (!spot) continue;
+    boxes.push({ a: spot.a, b: spot.b, top, bot });
+    n.g.append(svg('text', { x: spot.anchor === 'end' ? spot.b : spot.a, y: n.y + 15, 'text-anchor': spot.anchor, class: 'hx-xref' + (n.pending ? ' is-pending' : '') }, n.text));
   }
 
   // event markers: on the lane the event happened to; headline deals are larger
@@ -793,23 +862,40 @@ function familyBlock(fam) {
     if (big) marks.append(g); else marks.insertBefore(g, marks.firstChild);
   }
 
-  // headline band: each big deal named above the lanes, with a hairline down to its mark (two rows so names don't collide)
-  const ends = [-1e9, -1e9];
-  for (const c of fam.landmarks) {
-    const p = pos[c.e.id];
+  // headline band: each big deal named above the lanes, with a hairline down to its mark
+  for (const b of bandPlan.items) {
+    const p = pos[b.c.e.id];
     if (!p) continue;
-    const text = c.label + ', ' + String(c.e.date).slice(0, 4);
-    const w = text.length * 6.6;
-    const cx = Math.min(scale.width - w / 2 - 6, Math.max(PAD_L + w / 2, p.x));
-    let row = ends[0] < cx - w / 2 - 10 ? 0 : (ends[1] < cx - w / 2 - 10 ? 1 : (ends[0] <= ends[1] ? 0 : 1));
-    ends[row] = cx + w / 2;
-    const ty = row === 0 ? 15 : 33;
+    const ty = 8 + (b.row + 1) * BAND_ROW - 5;
     bandG.append(svg('path', { d: `M${p.x} ${ty + 4}V${p.y - 9}`, class: 'hx-leader' }));
-    bandG.append(svg('text', { x: cx, y: ty, 'text-anchor': 'middle', class: 'hx-band-label' }, text));
+    bandG.append(svg('text', { x: b.tx, y: ty, 'text-anchor': b.anchor, class: 'hx-band-label' }, b.text));
   }
   s.append(bandG, links, lanesG, marks);
   sec.append(s);
   return sec;
+}
+
+/* headline band layout: each deal's name goes centred over its mark, or ending or starting at it, in the
+   first row where it fits; deals bunched in a few years stack into as many rows as they need */
+const BAND_ROW = 18;
+function planBand(fam) {
+  const rows = [], items = [];
+  for (const c of fam.landmarks) {
+    const x = scale.x(c.e._x);
+    const text = c.label + ', ' + String(c.e.date).slice(0, 4);
+    const w = text.length * 6.6;
+    const fit = a => Math.min(scale.width - w - 6, Math.max(PAD_L, a));
+    const opts = [fit(x - w / 2), fit(x - w + 12), fit(x - 12)];
+    let row = -1, a = opts[0];
+    for (let r = 0; r <= rows.length && row < 0; r++) {
+      const taken = rows[r] || [];
+      const o = opts.find(o => !taken.some(t => o < t.b + 12 && t.a < o + w + 12));
+      if (o !== undefined) { row = r; a = o; }
+    }
+    (rows[row] = rows[row] || []).push({ a, b: a + w });
+    items.push({ c, row, text, tx: a, anchor: 'start' });
+  }
+  return { rows: Math.max(1, rows.length), items };
 }
 
 function markerLane(e, inFam) {
