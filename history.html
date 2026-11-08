@@ -22,7 +22,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css?v=fe792de9">
-<link rel="stylesheet" href="history.css?v=a7c2193f">
+<link rel="stylesheet" href="history.css?v=d76af600">
 </head>
 <body>
 
@@ -83,6 +83,30 @@
     <div class="hx-glance-grid" id="hxGlance"></div>
   </section>
 
+  <section class="hx-howto" aria-labelledby="hxHowtoTitle">
+    <svg class="hx-howto-art" width="236" height="92" viewBox="0 0 236 92" aria-hidden="true" focusable="false">
+      <text x="8" y="16" class="hx-howto-label">Company A</text>
+      <rect x="8" y="23" width="196" height="6" rx="3" class="hx-howto-bar is-main"/>
+      <circle cx="204" cy="26" r="5" class="hx-howto-end"/>
+      <text x="8" y="58" class="hx-howto-label">Company B</text>
+      <rect x="8" y="65" width="96" height="6" rx="3" class="hx-howto-bar"/>
+      <path d="M104 68C118 68 110 26 124 26" class="hx-howto-link"/>
+      <circle cx="124" cy="26" r="6.5" class="hx-howto-mark"/>
+      <text x="138" y="50" class="hx-howto-note">A buys B</text>
+      <text x="204" y="50" text-anchor="middle" class="hx-howto-note">today</text>
+    </svg>
+    <div>
+      <h2 id="hxHowtoTitle" class="hx-section-title">How to read the timeline</h2>
+      <p class="hx-howto-phone">Each family reads top to bottom, oldest first. Bold entries are its biggest deals, and smaller events are folded away under each family. Tap any entry for the date, the value and the sources.</p>
+      <ul class="hx-howto-list">
+        <li>Each line is a company, from its founding to today or to the deal that ended its independence (it may live on as a subsidiary).</li>
+        <li>Lines <strong>join</strong> where one company bought or merged with another, and <strong>branch off</strong> where a business was spun out. What a driller spun off, set up or bought rigs from sits <strong>above</strong> its line; what it brought together sits <strong>below</strong>.</li>
+        <li><strong>Large labelled dots</strong> are each driller's biggest deals; small marks are renames, listings and smaller deals. Select any mark for the date, the value and the sources.</li>
+        <li>Point at a line to light up its whole family. Busier years are drawn wider (the shaded bands are decades), so check the dates along the top.</li>
+      </ul>
+    </div>
+  </section>
+
   <div class="hx-toolbar" role="group" aria-label="Filter the history">
     <div class="hx-families" id="hxFamilies" role="group" aria-label="Show drillers"></div>
     <div class="hx-controls">
@@ -102,32 +126,10 @@
     </div>
   </div>
 
-  <section class="hx-howto" aria-labelledby="hxHowtoTitle">
-    <svg class="hx-howto-art" width="236" height="92" viewBox="0 0 236 92" aria-hidden="true" focusable="false">
-      <text x="8" y="16" class="hx-howto-label">Company A</text>
-      <rect x="8" y="23" width="196" height="6" rx="3" class="hx-howto-bar is-main"/>
-      <circle cx="204" cy="26" r="5" class="hx-howto-end"/>
-      <text x="8" y="58" class="hx-howto-label">Company B</text>
-      <rect x="8" y="65" width="96" height="6" rx="3" class="hx-howto-bar"/>
-      <path d="M104 68C118 68 110 26 124 26" class="hx-howto-link"/>
-      <circle cx="124" cy="26" r="6.5" class="hx-howto-mark"/>
-      <text x="138" y="50" class="hx-howto-note">A buys B</text>
-      <text x="204" y="50" text-anchor="middle" class="hx-howto-note">today</text>
-    </svg>
-    <div>
-      <h2 id="hxHowtoTitle" class="hx-section-title">How to read the timeline</h2>
-      <ul class="hx-howto-list">
-        <li>Each line is a company, from its founding to today or to the deal that ended its independence (it may live on as a subsidiary).</li>
-        <li>Lines <strong>join</strong> where one company bought or merged with another, and <strong>branch off</strong> where a business was spun out. What a driller spun off, set up or bought rigs from sits <strong>above</strong> its line; what it brought together sits <strong>below</strong>.</li>
-        <li><strong>Large labelled dots</strong> are each driller's biggest deals; small marks are renames, listings and smaller deals. Select any mark for the date, the value and the sources.</li>
-        <li>Point at a line to light up its whole family. Busier years are drawn wider (the shaded bands are decades), so check the dates along the top.</li>
-      </ul>
-    </div>
-  </section>
-
   <div class="hx-legend" id="hxLegend" aria-label="Key"></div>
 
   <section class="hx-chart" id="hxChart" aria-label="Timeline of driller families">
+    <div class="hx-axis-sticky" id="hxAxisSticky" aria-hidden="true"><div class="hx-axis-track" id="hxAxisTrack"></div></div>
     <div class="hx-scroll" id="hxScroll" tabindex="0" role="region" aria-label="Timeline, scrolls sideways">
       <div class="hx-canvas" id="hxCanvas"></div>
     </div>
@@ -158,6 +160,6 @@
 </footer>
 
 <script src="history-data.js?v=547d0239"></script>
-<script src="history.js?v=ae5d7eb3"></script>
+<script src="history.js?v=c59c4430"></script>
 </body>
 </html>

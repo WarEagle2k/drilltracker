@@ -839,7 +839,7 @@ function renderLegend() {
     item.append(s, document.createTextNode(label));
     box.append(item);
   }
-  const lane = el('span', { class: 'hx-legend-item' });
+  const lane = el('span', { class: 'hx-legend-item is-chart-only' });
   const ls = svg('svg', { width: 28, height: 16, viewBox: '0 0 28 16', 'aria-hidden': 'true', focusable: 'false' });
   ls.append(svg('rect', { x: 1, y: 5, width: 26, height: BAR_H, rx: 3, class: 'hx-legend-lane' }));
   lane.append(ls, document.createTextNode('Company lifetime'));
@@ -849,9 +849,9 @@ function renderLegend() {
   const sg = svg('g', { class: 'hx-ev is-minor' }); sg.append(glyph('fleet', 8, 8, 2.6)); ss.append(sg);
   small.append(ss, document.createTextNode('Small marks: renames, listings, smaller fleet deals'));
   box.append(small);
-  box.append(el('span', { class: 'hx-legend-item hx-legend-note' }, 'Busier years are drawn wider'));
+  box.append(el('span', { class: 'hx-legend-item hx-legend-note is-chart-only' }, 'Busier years are drawn wider'));
   if (EVENTS.some(e => e.pending)) {
-    const p = el('span', { class: 'hx-legend-item' });
+    const p = el('span', { class: 'hx-legend-item is-chart-only' });
     const ps = svg('svg', { width: 28, height: 16, viewBox: '0 0 28 16', 'aria-hidden': 'true', focusable: 'false' });
     ps.append(svg('path', { d: 'M1 8H27', class: 'hx-legend-pending' }));
     p.append(ps, document.createTextNode('Pending'));
@@ -915,7 +915,7 @@ function axisSvg(top) {
 }
 
 function renderChart(keepScroll) {
-  if (window.matchMedia('(max-width: 700px)').matches) { renderVertical(); return; }
+  if (window.matchMedia('(max-width: 700px)').matches) { document.getElementById('hxAxisSticky').hidden = true; renderVertical(); return; }
   const canvas = document.getElementById('hxCanvas');
   const scroller = document.getElementById('hxScroll');
   canvas.classList.remove('is-vertical');
@@ -923,7 +923,12 @@ function renderChart(keepScroll) {
   canvas.textContent = '';
   scale = makeScale();
   canvas.style.width = scale.width + 'px';
-  canvas.append(axisSvg(true));
+  // the top axis lives outside the scroller so it can stick to the top of the window while the families scroll past
+  const track = document.getElementById('hxAxisTrack');
+  track.textContent = '';
+  track.append(axisSvg(true));
+  track.style.width = scale.width + 'px';
+  document.getElementById('hxAxisSticky').hidden = false;
   let shown = 0;
   for (const fam of MODEL.families) {
     if (!state.families.has(fam.key)) continue;
@@ -937,6 +942,7 @@ function renderChart(keepScroll) {
   // keep today in view: open scrolled to the right, and hold the right edge across re-renders
   if (!keepScroll) scroller.scrollLeft = scroller.scrollWidth;
   else scroller.scrollLeft = Math.max(0, scroller.scrollWidth - prevRight);
+  document.getElementById('hxAxisTrack').style.transform = 'translateX(' + (-scroller.scrollLeft) + 'px)';
 }
 
 const COMPACT_MAX = 6;   // families with more lanes than this open compact
@@ -1317,6 +1323,8 @@ function openPanel(e, from) {
   else if (e.type === 'founded' || e.type === 'listing' || e.type === 'restructuring') addCos('Company', e.to.length ? e.to : e.from);
   else if (e.type === 'fleet' || e.type === 'divestment') { addCos('Seller', e.from); addCos('Buyer', e.to); }
   else if (e.type === 'spin-off' || e.type === 'jv') { addCos(e.type === 'jv' ? 'Partners' : 'Parent', e.from); addCos(e.type === 'jv' ? 'Joint venture' : 'Spun off', e.to); }
+  else if (e.type === 'acquisition') { addCos('Buyer', e.to); addCos('Bought', e.from.filter(id => !e.to.includes(id))); }
+  else if (e.type === 'merger') { addCos('Merging', e.from.concat(e.to.filter(id => !e.from.includes(id)))); addCos('Combined company', e.to); }
   else { addCos('Going in', e.from); addCos('Coming out', e.to); }
   body.append(who);
   if (e.conflict) body.append(el('p', { class: 'hx-note' }, 'Sources disagree on part of this; the details above give both.'));
@@ -1445,6 +1453,8 @@ function init() {
   document.getElementById('hxPanelClose').addEventListener('click', closePanel);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
   let rt;
+  const scroller = document.getElementById('hxScroll'), track = document.getElementById('hxAxisTrack');
+  scroller.addEventListener('scroll', () => { track.style.transform = 'translateX(' + (-scroller.scrollLeft) + 'px)'; }, { passive: true });
   let lastW = window.innerWidth;
   window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
     if (window.innerWidth !== lastW) { lastW = window.innerWidth; renderConsolidation(); }
