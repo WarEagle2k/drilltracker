@@ -3419,31 +3419,6 @@ const RIG_DATA = [
     note: "Owned since Aug 2025 by TEVA Ship Charter (TotalEnergies 75%, Eldorado/Vantage 25%) and run by Eldorado (which bought Vantage in Jun 2026) under a 10-year management contract to Q3 2035 (5-year option). After TotalEnergies work in the Republic of the Congo and Angola that Eldorado's Oct 2026 fleet status chart shows running to the end of Q3 2026, it moved to Namibia for a TotalEnergies contract of two firm wells plus a one-well option, due to start Oct 2026; the chart shows the firm wells to about mid-2027 and the option to about Aug 2027 (dates estimated). A licence partner (Sintana) reportedly said on Oct 15, 2026 that the rig was en route to the Mopane Extension well on PEL 83 (Orange Basin); that post was not read directly and the spud is unconfirmed. Plotted in the PEL 83 area (approximate); equipped for 11,000 ft (designed for 12,000 ft), day rate undisclosed."
   },
   {
-    id: "rig-132",
-    name: "VALARIS MS-1",
-    contractor: "Valaris",
-    owner: null,
-    type: "Semisubmersible",
-    generation: "6th Gen",
-    jackupClass: null,
-    environment: null,
-    waterDepth_ft: 8200,
-    hookload_tons: 1000,
-    buildYear: 2011,
-    region: "Asia Pacific",
-    country: "Malaysia",
-    lat: 5.05,
-    lng: 115.3,
-    position: "area",
-    statusOverride: null,
-    source: "Valaris fleet status report, Nov 2, 2026; release Oct 7, 2026",
-    asOf: "2026-11-02",
-    contracts: [
-      { customer: "Santos", start: "Jan 2024", end: "Oct 2025", dayRate: null, firmness: "firm", note: "Australia (Valaris FSR, Oct 23, 2025)" }
-    ],
-    note: "Moored F&G ExD Millennium semi, sold for recycling in Sep 2026 (Valaris release Oct 7, 2026; listed as Sold in the Nov 2, 2026 FSR) after being warm-stacked in Malaysia with no contract. It finished the Santos work offshore Australia in Q4 2025; its sister DPS-1 was sold for recycling in Apr 2026, leaving Valaris with no semisubmersibles. Plotted near Labuan, its last reported AIS destination (Nov 2025)."
-  },
-  {
     id: "rig-133",
     name: "Etesco Takatsugu J",
     contractor: "Etesco",

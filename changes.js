@@ -66,6 +66,7 @@ const CHANGES = {
     "rig-126": {"group":"less","lines":[{"kind":"less","text":"Booked to: Jan 2030 (was no published end)"},{"kind":"less","text":"Petrobras contract now ends Q4 2026 (was undisclosed)"},{"kind":"more","text":"Petrobras contract extended to Jan 2030 (was Dec 2029)"}]},
     "rig-128": {"group":"less","lines":[{"kind":"less","text":"Booked to: Open now (was Oct 2026)"}]},
     "rig-130": {"group":"more","lines":[{"kind":"other","text":"Booked to: Q3 2029 (was Jul 2029)"},{"kind":"more","text":"ONGC contract extended to Q3 2029 (was Jul 2029)"},{"kind":"more","text":"ONGC contract extended to Q3 2030 (was Jul 2030)"}]},
-    "rig-131": {"group":"more","lines":[{"kind":"more","text":"Booked to: Jun 2027 (was not confirmed)"},{"kind":"less","text":"TotalEnergies contract now ends Sep 2026 (was Nov 2026)"},{"kind":"more","text":"Option exercised: TotalEnergies, Jul 2026 – Sep 2026"},{"kind":"more","text":"New contract: TotalEnergies, Oct 2026 – Jun 2027"},{"kind":"more","text":"New contract: TotalEnergies, Jun 2027 – Aug 2027 (option)"},{"kind":"other","text":"Now in Namibia (was Angola)"}]}
+    "rig-131": {"group":"more","lines":[{"kind":"more","text":"Booked to: Jun 2027 (was not confirmed)"},{"kind":"less","text":"TotalEnergies contract now ends Sep 2026 (was Nov 2026)"},{"kind":"more","text":"Option exercised: TotalEnergies, Jul 2026 – Sep 2026"},{"kind":"more","text":"New contract: TotalEnergies, Oct 2026 – Jun 2027"},{"kind":"more","text":"New contract: TotalEnergies, Jun 2027 – Aug 2027 (option)"},{"kind":"other","text":"Now in Namibia (was Angola)"}]},
+    "rig-132": {"group":"removed","name":"VALARIS MS-1","lines":[{"kind":"less","text":"No longer tracked"}]}
   }
 };
