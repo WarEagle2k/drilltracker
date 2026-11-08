@@ -507,6 +507,172 @@ function miniTree(fam) {
   return box;
 }
 
+/* ---------- consolidation: how many separate companies today's drillers were, year by year ----------
+   Counts every company in the tree whose line of mergers leads into a driller on the rig map, from its founding
+   (or, where that is unknown, its first recorded event) until the deal that ended its independence. Spin-offs,
+   fleet sellers and companies that went elsewhere are left out, so today's count is the rig map's drillers. */
+const CONSOL = (function () {
+  const heads = new Set(MODEL.lanes.filter(l => l.current && l.trackerName));
+  const leadsToHead = l => { for (let c = l, g = 0; c && g < 40; g++) { if (heads.has(c)) return true; c = c.terminal ? c.terminal.to : null; } return false; };
+  const firstEvent = l => {
+    const ids = new Set(l.segs.map(c => c.id));
+    const xs = EVENTS.filter(e => e._x !== null && e.from.concat(e.to).some(id => ids.has(id))).map(e => e._x);
+    return xs.length ? Math.min(...xs) : null;
+  };
+  const lanes = MODEL.lanes.filter(leadsToHead).map(l => ({
+    lane: l,
+    s: l.startUnknown ? firstEvent(l) : l.start,
+    e: !heads.has(l) && l.terminal ? l.terminal.e._x : (l.end === null ? NOW + 1 : l.end)
+  })).filter(x => x.s !== null);
+  const at = y => lanes.filter(x => x.s <= y && x.e > y).length;
+  const y0 = 1950, y1 = Math.floor(NOW);
+  const series = [];
+  for (let y = y0; y <= y1; y++) series.push({ y, n: at(y + 0.5), deals: [] });
+  for (const x of lanes) {
+    if (heads.has(x.lane) || !x.lane.terminal) continue;
+    const row = series.find(r => r.y === Math.floor(x.e));
+    if (row && !row.deals.includes(x.lane.terminal.e)) row.deals.push(x.lane.terminal.e);
+  }
+  const today = at(NOW);
+  const pending = EVENTS.filter(e => e.pending && e.from.filter(id => { const l = MODEL.laneOf[id]; return l && heads.has(l); }).length > 1);
+  return { series, today, pending, y0, y1 };
+})();
+
+function renderConsolidation() {
+  const box = document.getElementById('hxConsol');
+  if (!box) return;
+  box.textContent = '';
+  const S = CONSOL.series, phone = window.matchMedia('(max-width: 700px)').matches;
+  const peak = S.reduce((a, r) => r.n > a.n ? r : a, S[0]);
+  const after = S.filter(r => r.y > peak.y && r.y <= peak.y + 15);
+  const trough = after.reduce((a, r) => r.n < a.n ? r : a, after[0] || peak);
+  const later = S.filter(r => r.y > trough.y && r.y < CONSOL.y1 - 4);
+  const peak2 = later.reduce((a, r) => r.n > a.n ? r : a, later[0] || trough);
+  const last = S[S.length - 1];
+  const dek = document.getElementById('hxConsolDek');
+  dek.textContent = 'The companies that became today\'s ' + CONSOL.today + ' drillers on the rig map were ' + peak.n + ' separate firms at the peak, in ' + peak.y +
+    '. Mergers in the 1990s cut that to ' + trough.n + ' by ' + trough.y + '; a wave of new drillers took it back to ' + peak2.n + ' by ' + peak2.y +
+    ', and the deals that followed the 2014–16 oil-price crash brought it down to ' + CONSOL.today + ' today.';
+
+  const W = Math.max(300, box.clientWidth), H = phone ? 210 : 250;
+  const m = { l: 30, r: phone ? 70 : 150, t: phone ? 30 : 48, b: 30 };
+  const xmin = phone ? 1960 : CONSOL.y0, xmax = CONSOL.y1 + 1;
+  const ymax = Math.ceil((peak.n + 4) / 10) * 10;
+  const X = y => m.l + (W - m.l - m.r) * (y - xmin) / (xmax - xmin);
+  const Y = n => H - m.b - (H - m.t - m.b) * n / ymax;
+  const s = svg('svg', { width: W, height: H, class: 'hx-consol-svg', role: 'img',
+    'aria-label': dek.textContent + ' The numbers are in the table below the chart.' });
+  // grid and axes
+  const g = svg('g', { class: 'hx-consol-grid', 'aria-hidden': 'true' });
+  for (let n = 0; n <= ymax; n += 10) {
+    g.append(svg('line', { x1: m.l, x2: W - m.r, y1: Y(n), y2: Y(n) }));
+    g.append(svg('text', { x: m.l - 6, y: Y(n) + 4, 'text-anchor': 'end', class: 'hx-consol-tick' }, String(n)));
+  }
+  const step = phone ? 20 : 10;
+  for (let y = Math.ceil(xmin / step) * step; y <= xmax; y += step) {
+    g.append(svg('text', { x: X(y), y: H - m.b + 18, 'text-anchor': 'middle', class: 'hx-consol-tick' }, String(y)));
+    g.append(svg('line', { x1: X(y), x2: X(y), y1: H - m.b, y2: H - m.b + 4, class: 'is-tick' }));
+  }
+  s.append(g);
+  // deal rug: one tick per merger or takeover that ended a company's independence
+  const rug = svg('g', { class: 'hx-consol-rug', 'aria-hidden': 'true' });
+  for (const r of S) if (r.y >= xmin) r.deals.forEach((e, k) => rug.append(svg('line', { x1: X(e._x), x2: X(e._x), y1: H - m.b - 1 - k * 0, y2: H - m.b - 7 })));
+  s.append(rug);
+  // the line: a step each year (a company count changes at a deal, not gradually), with a light wash under it
+  const pts = S.filter(r => r.y >= xmin);
+  let d = '';
+  pts.forEach((r, i) => { d += (i ? `H${X(r.y)}V${Y(r.n)}` : `M${X(r.y)} ${Y(r.n)}`); });
+  d += `H${X(xmax)}`;
+  s.append(svg('path', { d: d + `V${Y(0)}H${X(pts[0].y)}Z`, class: 'hx-consol-area', 'aria-hidden': 'true' }));
+  s.append(svg('path', { d, class: 'hx-consol-line', 'aria-hidden': 'true' }));
+  // a pending merger between two of today's drillers: a dashed step down past today
+  if (CONSOL.pending.length) {
+    const nx = CONSOL.today - CONSOL.pending.length;
+    s.append(svg('path', { d: `M${X(xmax) - 1} ${Y(CONSOL.today)}h6V${Y(nx)}h${phone ? 6 : 10}`, class: 'hx-consol-pending', 'aria-hidden': 'true' }));
+  }
+  // annotations
+  const ann = svg('g', { class: 'hx-consol-ann', 'aria-hidden': 'true' });
+  // labels sit clear of the line: above ones in the band over the plot, below ones under the lowest point near them,
+  // each with a hairline down (or up) to its dot
+  const note = (r, text, above, anchor) => {
+    const x = X(r.y + 0.5), y = Y(r.n);
+    const lines = text.split('\n');
+    const near = pts.filter(p => Math.abs(p.y - r.y) <= 4).map(p => Y(p.n));
+    const ty = above ? m.t - 8 - (lines.length - 1) * 13 : Math.max(...near) + 22;
+    ann.append(svg('line', { x1: x, x2: x, y1: above ? m.t - 3 + 0 : y + 6, y2: above ? y - 6 : ty - 12, class: 'hx-consol-leader' }));
+    ann.append(svg('circle', { cx: x, cy: y, r: 4.5, class: 'hx-consol-dot' }));
+    const tx = anchor === 'end' ? x + 4 : anchor === 'start' ? x - 4 : x;
+    const t = svg('text', { x: tx, y: ty, 'text-anchor': anchor || 'middle', class: 'hx-consol-label' });
+    lines.forEach((line, i) => t.append(svg('tspan', { x: tx, dy: i ? 13 : 0, class: i ? 'is-sub' : null }, line)));
+    ann.append(t);
+  };
+  if (!phone) {
+    note(peak, peak.n + ' companies in ' + peak.y + '\nthe peak', true, 'end');
+    note(trough, trough.n + ' by ' + trough.y + '\nafter the 1990s mergers', false);
+    note(peak2, peak2.n + ' by ' + peak2.y + '\nafter a wave of new drillers', true, 'start');
+  } else {
+    note(peak, peak.n + ' in ' + peak.y, true);
+  }
+  const ex = X(xmax) + 8, ey = Y(CONSOL.today);
+  ann.append(svg('circle', { cx: X(xmax), cy: ey, r: 4.5, class: 'hx-consol-dot' }));
+  const end = svg('text', { x: ex + (CONSOL.pending.length ? 14 : 0), y: ey - 6, class: 'hx-consol-label is-end' });
+  end.append(svg('tspan', { x: ex + (CONSOL.pending.length ? 14 : 0), dy: 0 }, CONSOL.today + ' today'));
+  if (CONSOL.pending.length && !phone) {
+    const who = CONSOL.pending[0].from.map(id => shortName(CO[id].name));
+    const more = CONSOL.today - CONSOL.pending.length;
+    end.append(svg('tspan', { x: ex + 14, dy: 15, class: 'is-sub' }, more + ' if ' + who[0]));
+    end.append(svg('tspan', { x: ex + 14, dy: 13, class: 'is-sub' }, 'and ' + who.slice(1).join(', ') + (CONSOL.pending.length > 1 ? ' and others' : '') + ' combine'));
+  }
+  ann.append(end);
+  s.append(ann);
+  // hover and keyboard: a crosshair that snaps to the year, with that year's deals
+  const cross = svg('g', { class: 'hx-consol-cross', 'aria-hidden': 'true' });
+  const cl = svg('line', { y1: m.t - 10, y2: H - m.b }), cd = svg('circle', { r: 4.5, class: 'hx-consol-dot' });
+  cross.append(cl, cd); cross.style.display = 'none';
+  s.append(cross);
+  const hit = svg('rect', { x: m.l, y: m.t - 10, width: W - m.l - m.r, height: H - m.t - m.b + 10, class: 'hx-consol-hit' });
+  s.append(hit);
+  const show = (r, clientX, clientY) => {
+    cross.style.display = '';
+    const x = X(r.y + 0.5);
+    cl.setAttribute('x1', x); cl.setAttribute('x2', x); cd.setAttribute('cx', x); cd.setAttribute('cy', Y(r.n));
+    tip.textContent = '';
+    tip.append(el('strong', null, r.n + (r.n === 1 ? ' separate company' : ' separate companies')), el('span', null, String(r.y)));
+    const names = r.deals.map(e => e.title);
+    for (const n of names.slice(0, 3)) tip.append(el('span', { class: 'hx-tip-deal' }, n));
+    if (names.length > 3) tip.append(el('span', { class: 'hx-tip-deal' }, '+' + (names.length - 3) + ' more'));
+    tip.hidden = false;
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    tip.style.left = Math.min(window.innerWidth - tw - 8, Math.max(8, clientX + 14)) + 'px';
+    tip.style.top = Math.max(8, clientY - th - 12) + 'px';
+  };
+  const yearAt = clientX => {
+    const r = s.getBoundingClientRect();
+    const y = Math.floor(xmin + (clientX - r.left - m.l) / (W - m.l - m.r) * (xmax - xmin));
+    return pts.find(p => p.y === Math.max(xmin, Math.min(CONSOL.y1, y)));
+  };
+  for (const t of ['pointermove', 'pointerdown']) hit.addEventListener(t, ev => { const r = yearAt(ev.clientX); if (r) show(r, ev.clientX, ev.clientY); });
+  hit.addEventListener('pointerleave', () => { cross.style.display = 'none'; hideTip(); });
+  box.append(s);
+
+  // the table twin
+  const tb = document.getElementById('hxConsolTable');
+  tb.textContent = '';
+  const table = el('table', { class: 'hx-consol-tbl' });
+  const thead = el('thead'), hr = el('tr');
+  for (const h of ['Year', 'Separate companies', 'Deals that ended a company\'s independence']) hr.append(el('th', { scope: 'col' }, h));
+  thead.append(hr); table.append(thead);
+  const tbody = el('tbody');
+  for (const r of S) {
+    if (r.y < 2010 && r.y % 5 !== 0) continue;
+    const tr = el('tr');
+    tr.append(el('th', { scope: 'row' }, String(r.y)), el('td', null, String(r.n)), el('td', null, r.deals.length ? r.deals.map(e => e.title).join('; ') : '—'));
+    tbody.append(tr);
+  }
+  table.append(tbody);
+  tb.append(el('p', { class: 'hx-consol-note' }, 'Every five years to 2005, then every year. Counts each company that later became part of a driller on the rig map, from its founding (or first recorded event, where the founding date is unknown) until the deal that ended its independence. Spin-offs and companies that went elsewhere are not counted.'), table);
+}
+
 /* at a glance: one card per driller, its size and headline deals; each opens its family on the timeline */
 function renderGlance() {
   const box = document.getElementById('hxGlance');
@@ -1143,6 +1309,7 @@ function init() {
   if (!location.hash && window.matchMedia('(max-width: 700px)').matches) state.view = 'list';
   initTheme();
   renderStats();
+  renderConsolidation();
   renderGlance();
   initControls();
   renderLegend();
@@ -1150,7 +1317,11 @@ function init() {
   document.getElementById('hxPanelClose').addEventListener('click', closePanel);
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
   let rt;
-  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (state.view === 'chart') renderChart(true); }, 150); });
+  let lastW = window.innerWidth;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => {
+    if (window.innerWidth !== lastW) { lastW = window.innerWidth; renderConsolidation(); }
+    if (state.view === 'chart') renderChart(true);
+  }, 150); });
   const canvas = document.getElementById('hxCanvas');
   canvas.classList.add('is-intro');
   setTimeout(() => canvas.classList.remove('is-intro'), 1200);
