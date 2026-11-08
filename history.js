@@ -468,13 +468,13 @@ function renderStats() {
   const drillers = DATA.companies.filter(c => !c.outside);
   const current = drillers.filter(c => c.current && c.trackerName).length;
   const deals = EVENTS.filter(e => !['founded', 'listing', 'rename'].includes(e.type)).length;
-  const years = drillers.map(c => parseDate(c.start)).filter(Boolean);
-  const first = years.length ? Math.floor(Math.min(...years)) : null;
+  const oldest = drillers.filter(c => parseDate(c.start)).sort((a, b) => parseDate(a.start) - parseDate(b.start))[0];
+  // one strip of figures: the number leads, a sentence-case label sits under it, so the numbers line up however the labels wrap
   const stats = [
-    [String(drillers.length), 'drilling companies'],
-    [String(deals), 'deals and restructurings'],
-    [String(current), 'drillers on the rig map'],
-    [first ? String(first) : '—', 'earliest founding']
+    [String(drillers.length), 'Companies in the tree'],
+    [String(deals), 'Deals and restructurings'],
+    [String(current), 'Drillers on the rig map today'],
+    [oldest ? String(Math.floor(parseDate(oldest.start))) : '—', oldest ? 'Earliest founding (' + shortName(oldest.name) + ')' : 'Earliest founding']
   ];
   for (const [v, k] of stats) {
     const d = el('div', { class: 'hx-stat' });
@@ -484,7 +484,15 @@ function renderStats() {
   const pending = EVENTS.filter(e => e.pending);
   if (pending.length) {
     const d = el('div', { class: 'hx-stat hx-stat-pending' });
-    d.append(el('dt', null, 'Pending'), el('dd', null, pending.map(e => e.title).join('; ')));
+    const dd = el('dd');
+    for (const e of pending) {
+      const item = el('span', { class: 'hx-pending-item' });
+      const key = svg('svg', { width: 18, height: 8, viewBox: '0 0 18 8', 'aria-hidden': 'true', focusable: 'false' });
+      key.append(svg('path', { d: 'M1 4H17', class: 'hx-legend-pending' }));
+      item.append(key, document.createTextNode(e.title.replace(/ \(pending\)$/, '') + ' (' + (e.announced ? 'announced ' + formatDate(e.announced) : 'agreed ' + formatDate(e.date)) + ')'));
+      dd.append(item);
+    }
+    d.append(el('dt', null, 'Pending deals'), dd);
     dl.append(d);
   }
 }
