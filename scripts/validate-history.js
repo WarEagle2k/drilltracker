@@ -34,11 +34,12 @@ for (const c of H.companies) {
   if (!c.name) err(c.id + ': no name');
   if (c.start && !DATE.test(c.start)) err(c.id + ': bad start ' + c.start);
   if (c.end && !DATE.test(c.end)) err(c.id + ': bad end ' + c.end);
-  if (!c.start) warn(c.id + ': founding date unknown');
+  if (!c.start && !c.outside) warn(c.id + ': founding date unknown'); // outside companies are text references, never drawn
   if (c.start && c.end && num(c.end) < num(c.start)) err(c.id + ': ends before it starts');
   if (c.current && c.end) err(c.id + ': current but has an end date');
+  if (c.active && (c.end || c.current || c.outside)) err(c.id + ': active (still in business, not on the rig map) cannot also be current, outside or ended');
   if (c.outside && c.trackerName) err(c.id + ': outside companies are not tracker drillers');
-  if (!c.current && !c.end && !c.outside) warn(c.id + ': not current and no end date');
+  if (!c.current && !c.active && !c.end && !c.outside) warn(c.id + ': not current and no end date');
   if (c.trackerName && !contractors.has(c.trackerName)) err(c.id + ': trackerName "' + c.trackerName + '" is not a contractor in rigs.js');
 }
 for (const c of H.companies) if (c.successor && !co[c.successor]) err(c.id + ': successor ' + c.successor + ' not found');
