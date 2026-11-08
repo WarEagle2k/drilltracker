@@ -216,13 +216,33 @@ function buildModel() {
    as few other lanes as possible: first by when each one ends (the earliest nearest its parent, so a later
    join's curve passes only lanes that are already over), then a short search that moves a sibling wherever
    that removes a crossing. Today's company stays on top. */
+const OFFSHOOTS = new Map(); // today's lane -> how many rows of offshoots sit above it
 function orderRows(roots, members) {
   const endOf = l => l.end === null ? NOW : l.end;
   const linkX = l => (l._via && l._via.e && l._via.e._x) || l.start || 0;
   const cmp = (a, b) => ((b.current && b.trackerName) ? 1 : 0) - ((a.current && a.trackerName) ? 1 : 0) || (endOf(a) - endOf(b)) || (linkX(a) - linkX(b));
   const kids = new Map(members.map(l => [l, l.children.slice().sort(cmp)]));
   const top = roots.slice().sort(cmp);
-  const flatten = () => { const rows = []; (function walk(list) { for (const l of list) { rows.push(l); walk(kids.get(l)); } })(top); return rows; };
+  // Companies that never flowed into today's company (spin-offs, joint ventures, rig sellers) go above it, so their
+  // curves don't cut through the lineage below; each group sits with its root next to today's company.
+  const head = members.find(l => l.current && l.trackerName);
+  const inFam = new Set(members);
+  const leads = l => { for (let c = l, g = 0; c && g < 40; g++) { if (c === head) return true; c = c.terminal && inFam.has(c.terminal.to) ? c.terminal.to : null; } return false; };
+  const parentOf = l => { const v = l._via; const p = v ? (v.kind === 'branch' ? v.from : v.to) : null; return p && inFam.has(p) ? p : null; };
+  const flatten = () => {
+    const rows = []; (function walk(list) { for (const l of list) { rows.push(l); walk(kids.get(l)); } })(top);
+    if (!head) return rows;
+    // only offshoots of today's company itself move up; an older company's offshoots stay beside their parent
+    const rootOf = l => { let c = l; while (parentOf(c) && !leads(parentOf(c))) c = parentOf(c); return c; };
+    const up = l => !leads(l) && (parentOf(rootOf(l)) === head || !parentOf(rootOf(l)));
+    const off = rows.filter(up), core = rows.filter(l => !up(l));
+    if (!off.length) return rows;
+    const blocks = new Map();
+    for (const l of off) { const r = rootOf(l); if (!blocks.has(r)) blocks.set(r, []); blocks.get(r).push(l); }
+    const ordered = [...blocks.entries()].sort((a, b) => (a[0].start || 0) - (b[0].start || 0)).flatMap(([, ls]) => ls.reverse());
+    OFFSHOOTS.set(head, ordered.length);
+    return ordered.concat(core);
+  };
   const crossings = rows => {
     const at = new Map(rows.map((l, i) => [l, i]));
     let n = 0;
@@ -261,6 +281,7 @@ PAD_R = Math.min(240, Math.max(PAD_R, ...MODEL.lanes.filter(l => l.current && l.
    by how much of the family's history a deal brought in. These get large labelled marks, lead the
    at-a-glance cards and name the steps in each family's one-line story. */
 const SUFFIX = /[,]?\s+(Inc\.?|Corporation|Corp\.?|Company|Co\.|Ltd\.?|Limited|plc|PLC|ASA|AS|A\/S|S\.A\.|SE|LLC|N\.V\.|Holding|Holdings|S\.p\.A\.)$/;
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1); // a deal label shown on its own ('Rigs from Noble')
 function shortName(name) {
   let n = String(name || '').replace(/\s*\(.*?\)\s*/g, ' ').trim();
   for (let i = 0; i < 3; i++) n = n.replace(SUFFIX, '').trim();
@@ -703,7 +724,7 @@ function renderGlance() {
     if (fam.landmarks.length) {
       for (const c of fam.landmarks) {
         const li = el('span', { class: 'hx-card-deal' });
-        li.append(el('span', { class: 'hx-card-year' }, String(c.e.date).slice(0, 4)), el('span', null, c.label));
+        li.append(el('span', { class: 'hx-card-year' }, String(c.e.date).slice(0, 4)), el('span', null, cap(c.label)));
         ul.append(li);
       }
     } else ul.append(el('span', { class: 'hx-card-deal is-none' }, fam.lanes.length > 1 ? 'No major deals recorded' : 'No recorded mergers or spin-offs'));
@@ -962,6 +983,8 @@ function familyBlock(fam) {
 
   // decade grid and today line, below the headline band
   const grid = svg('g', { class: 'hx-grid', 'aria-hidden': 'true' });
+  // every other decade shaded, so the stretched busy years read as wider bands
+  for (let y = Math.ceil(scale.minY / 20) * 20; y < scale.maxY; y += 20) grid.append(svg('rect', { x: scale.x(y), y: band - 4, width: Math.max(0, scale.x(Math.min(y + 10, scale.maxY)) - scale.x(y)), height: h - band + 4, class: 'hx-decade-band' }));
   for (let y = Math.ceil(scale.minY / 10) * 10; y <= scale.maxY; y += 10) grid.append(svg('line', { x1: scale.x(y), x2: scale.x(y), y1: band - 4, y2: h }));
   grid.append(svg('line', { x1: scale.x(NOW), x2: scale.x(NOW), y1: band - 4, y2: h, class: 'hx-now' }));
   s.append(grid);
@@ -1165,7 +1188,7 @@ function planBand(fam) {
   const rows = [], items = [];
   for (const c of fam.landmarks) {
     const x = scale.x(c.e._x);
-    const text = c.label + ', ' + String(c.e.date).slice(0, 4);
+    const text = cap(c.label) + ', ' + String(c.e.date).slice(0, 4);
     const w = text.length * 6.6;
     const fit = a => Math.min(scale.width - w - 6, Math.max(PAD_L, a));
     const opts = [fit(x - w / 2), fit(x - w + 12), fit(x - 12)];

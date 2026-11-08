@@ -76,6 +76,7 @@ html.hx-page body { min-height: 100dvh; display: flex; flex-direction: column; }
 .hx-family-svg { display: block; overflow: visible; }
 
 .hx-grid line { stroke: var(--viz-grid); stroke-width: 1; }
+.hx-decade-band { fill: var(--color-text); opacity: 0.025; }
 .hx-grid .hx-now { stroke: var(--color-text-faint); }
 .hx-bar { fill: var(--fam); opacity: 0.55; }
 .hx-lane.is-current .hx-bar { opacity: 1; }
