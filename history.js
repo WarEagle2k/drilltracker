@@ -200,12 +200,7 @@ function buildModel() {
       const parentLane = l._via ? (l._via.kind === 'branch' ? l._via.from : l._via.to) : null; // join, fleet and parent point at .to
       if (parentLane && inFam.has(parentLane)) parentLane.children.push(l); else roots.push(l);
     }
-    const linkDate = l => (l._via && l._via.e && l._via.e._x) || l.start || 0;
-    const rows = [];
-    (function walk(list) {
-      list.sort((a, b) => (b.current - a.current) || (linkDate(b) - linkDate(a)));
-      for (const l of list) { rows.push(l); walk(l.children); }
-    })(roots);
+    const rows = orderRows(roots, members);
     rows.forEach((l, r) => { l.row = r; });
     const events = EVENTS.filter(e => e.from.concat(e.to).some(id => laneOf[id] && inFam.has(laneOf[id])));
     const head = rows.find(l => l.current && l.trackerName);
@@ -216,6 +211,45 @@ function buildModel() {
       color: key === GONE_FAMILY ? '--contractor-other' : (FAMILY_COLORS[key] || '--contractor-other') });
   }
   return { lanes, laneOf, families: result };
+}
+/* Row order inside a family. Each lane sits under the lane it fed; siblings are ordered so the curves cross
+   as few other lanes as possible: first by when each one ends (the earliest nearest its parent, so a later
+   join's curve passes only lanes that are already over), then a short search that moves a sibling wherever
+   that removes a crossing. Today's company stays on top. */
+function orderRows(roots, members) {
+  const endOf = l => l.end === null ? NOW : l.end;
+  const linkX = l => (l._via && l._via.e && l._via.e._x) || l.start || 0;
+  const cmp = (a, b) => ((b.current && b.trackerName) ? 1 : 0) - ((a.current && a.trackerName) ? 1 : 0) || (endOf(a) - endOf(b)) || (linkX(a) - linkX(b));
+  const kids = new Map(members.map(l => [l, l.children.slice().sort(cmp)]));
+  const top = roots.slice().sort(cmp);
+  const flatten = () => { const rows = []; (function walk(list) { for (const l of list) { rows.push(l); walk(kids.get(l)); } })(top); return rows; };
+  const crossings = rows => {
+    const at = new Map(rows.map((l, i) => [l, i]));
+    let n = 0;
+    for (const l of rows) {
+      const links = [];
+      if (l.terminal && at.has(l.terminal.to)) links.push([at.get(l), at.get(l.terminal.to), l.terminal.e._x]);
+      for (const b of l.inbound) if (b.kind === 'branch' && at.has(b.from)) links.push([at.get(b.from), at.get(l), b.e._x]);
+      for (const [a, b, x] of links) for (let r = Math.min(a, b) + 1; r < Math.max(a, b); r++) { const m = rows[r]; if (m.start < x - 0.05 && endOf(m) > x + 0.05) n++; }
+    }
+    return n;
+  };
+  let best = crossings(flatten());
+  for (let pass = 0, better = true; better && best > 0 && pass < 12; pass++) {
+    better = false;
+    for (const p of members) {
+      const n = kids.get(p).length;
+      for (let i = 0; i < n; i++) for (let j = 0; j < n; j++) {
+        if (i === j) continue;
+        const was = kids.get(p), next = was.slice();
+        next.splice(j, 0, next.splice(i, 1)[0]);
+        kids.set(p, next);
+        const c = crossings(flatten());
+        if (c < best) { best = c; better = true; } else kids.set(p, was);
+      }
+    }
+  }
+  return flatten();
 }
 function famRank(k) { const i = FAMILY_ORDER.indexOf(k); return k === GONE_FAMILY ? 999 : (i < 0 ? 500 : i); }
 
@@ -282,9 +316,10 @@ function familyStory(fam) {
     cands.push({ e, score, label, lane: target, lanes, depth, main: depth <= 1 });
   }
   // steps that built today's company directly come first; the next tier back fills a short list.
-  // Joint ventures are side ventures, not steps, unless a family has nothing else to show.
+  // Spin-offs and joint ventures send business out rather than build the company, so they are steps only
+  // when a family has nothing else to show (the story names them separately).
   const byScore = (a, b) => (b.score - a.score) || (b.e._x - a.e._x);
-  const core = cands.filter(c => c.e.type !== 'jv');
+  const core = cands.filter(c => c.e.type !== 'jv' && c.e.type !== 'spin-off');
   const main = core.filter(c => c.main).sort(byScore);
   let picks = main.length >= 2 ? main.slice(0, 3) : cands.slice().sort(byScore).slice(0, 3);
   if (main.length >= 2 && picks.length < 3) picks = picks.concat(core.filter(c => c.depth === 2).sort(byScore).slice(0, 3 - picks.length));
