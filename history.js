@@ -46,7 +46,7 @@ const ERAS = [
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 /* layout constants (px) */
-const ROW_H = 30;        // one lane
+const ROW_H = 34;        // one lane
 const BAR_H = 6;         // thin lane bar
 const PAD_L = 16;
 const PAD_R = 175;       // room for the present-day names beside the end dots
@@ -221,8 +221,92 @@ function famRank(k) { const i = FAMILY_ORDER.indexOf(k); return k === GONE_FAMIL
 
 const MODEL = buildModel();
 
+/* ---------- landmarks and stories ----------
+   Each family's headline deals: the biggest by stated US-dollar value, or, where no value is given,
+   by how much of the family's history a deal brought in. These get large labelled marks, lead the
+   at-a-glance cards and name the steps in each family's one-line story. */
+const SUFFIX = /[,]?\s+(Inc\.?|Corporation|Corp\.?|Company|Co\.|Ltd\.?|Limited|plc|PLC|ASA|AS|A\/S|S\.A\.|SE|LLC|N\.V\.|Holding|Holdings|S\.p\.A\.)$/;
+function shortName(name) {
+  let n = String(name || '').replace(/\s*\(.*?\)\s*/g, ' ').trim();
+  for (let i = 0; i < 3; i++) n = n.replace(SUFFIX, '').trim();
+  return n;
+}
+function usd(v) {
+  const m = /US\$\s?([\d.,]+)\s*(billion|million|bn|m)\b/i.exec(v || '');
+  if (!m) return null;
+  const n = parseFloat(m[1].replace(/,/g, ''));
+  return /^b/i.test(m[2]) ? n * 1e9 : n * 1e6;
+}
+function subtreeSize(lane) { return 1 + lane.children.reduce((a, c) => a + subtreeSize(c), 0); }
+function familyStory(fam) {
+  const inFam = new Set(fam.lanes);
+  const head = fam.lanes.find(l => l.current && l.trackerName) || fam.lanes[0];
+  // the trunk: the present-day lane and, going back, the biggest company that fed each step of it
+  const trunk = new Map(); // lane -> steps back from today's company
+  for (let l = head, d = 0; l && !trunk.has(l); d++) {
+    trunk.set(l, d);
+    const feeders = l.inbound.filter(k => k.kind === 'join' && !k.stake && !k.pending && inFam.has(k.from)).map(k => k.from);
+    l = feeders.sort((a, b) => subtreeSize(b) - subtreeSize(a))[0];
+  }
+  const cands = [];
+  for (const e of fam.events) {
+    if (e.pending) continue;
+    let lanes = [], target = null, score = 0, label = '';
+    if (e.type === 'merger' || e.type === 'acquisition') {
+      lanes = fam.lanes.filter(l => l.outbound.some(k => k.e === e && k.kind === 'join' && !k.stake));
+      target = MODEL.laneOf[e.to[0]];
+      if (!lanes.length) continue;
+      score = Math.max(usd(e.value) || 0, lanes.reduce((a, l) => a + subtreeSize(l), 0) * 4e8) * (e.type === 'merger' ? 1.5 : 1);
+      lanes.sort((a, b) => subtreeSize(b) - subtreeSize(a));
+      const formed = e.type === 'merger' && target && target.start !== null && Math.abs(target.start - e._x) < 0.6;
+      const names = lanes.map(l => shortName(l.segs[l.segs.length - 1].name));
+      label = formed ? shortName(target.segs[0].name) + ' formed' : (names.length > 1 && names.slice(0, 2).join('–').length <= 30 ? names.slice(0, 2).join('–') : names[0]);
+    } else if (e.type === 'spin-off' || e.type === 'jv') {
+      lanes = fam.lanes.filter(l => l.inbound.some(k => k.e === e && k.kind === 'branch'));
+      if (!lanes.length || lanes.includes(head)) continue;
+      target = MODEL.laneOf[e.from.find(id => MODEL.laneOf[id] && inFam.has(MODEL.laneOf[id]))] || lanes[0]; // judged by its parent
+      score = subtreeSize(lanes[0]) * 2e8;
+      label = shortName(lanes[0].segs[lanes[0].segs.length - 1].name) + ' spin-off';
+    } else if (e.type === 'fleet') {
+      target = MODEL.laneOf[e.to[0]];
+      const v = usd(e.value);
+      if (!target || !inFam.has(target) || !v || v < 2e8) continue;
+      const seller = e.from.map(id => CO[id]).find(Boolean);
+      if (!seller) continue; // new rigs from a shipyard
+      lanes = e.from.map(id => MODEL.laneOf[id]).filter(l => l && inFam.has(l));
+      score = v; label = 'rigs from ' + shortName(seller.name);
+    } else continue;
+    const depth = target && trunk.has(target) ? trunk.get(target) : 99;
+    score *= [3, 2][depth] || 1;
+    cands.push({ e, score, label, lane: target, lanes, main: depth <= 1 });
+  }
+  // steps that built today's company directly come first; deep side branches only fill a short list
+  const main = cands.filter(c => c.main);
+  const pool = main.length >= 2 ? main : cands;
+  pool.sort((a, b) => (b.score - a.score) || (b.e._x - a.e._x));
+  const landmarks = pool.slice(0, 3).sort((a, b) => a.e._x - b.e._x);
+  const starts = fam.lanes.filter(l => !l.startUnknown && l.start !== null).map(l => l.start);
+  const since = starts.length ? Math.floor(Math.min(...starts)) : null;
+  const others = fam.lanes.length - 1;
+  const who = shortName(head.name);
+  let text;
+  if (!others) text = who + (since ? ' dates from ' + since : '') + ' and has no recorded mergers or spin-offs.';
+  else {
+    text = who + ' brings together ' + others + ' other ' + (others === 1 ? 'company' : 'companies') + (since ? ', going back to ' + since : '') + '.';
+    if (landmarks.length) {
+      const parts = landmarks.map(c => c.label + ' (' + String(c.e.date).slice(0, 4) + ')');
+      text += ' The biggest steps: ' + (parts.length > 1 ? parts.slice(0, -1).join(', ') + ' and ' + parts[parts.length - 1] : parts[0]) + '.';
+    }
+  }
+  const pending = EVENTS.filter(e => e.pending && e.from.concat(e.to).some(id => { const l = MODEL.laneOf[id]; return l && inFam.has(l); }));
+  if (pending.length) text += ' Pending: ' + pending.map(e => e.title.replace(/ \(pending\)$/, '')).join('; ') + '.';
+  return { text, landmarks, since, head, trunk };
+}
+for (const fam of MODEL.families) Object.assign(fam, familyStory(fam));
+const LANDMARK_IDS = new Set(MODEL.families.flatMap(f => f.landmarks.map(c => c.e.id)));
+
 /* ---------- state ---------- */
-const state = { families: new Set(MODEL.families.map(f => f.key)), type: 'all', era: 'all', q: '', view: 'chart', ev: null };
+const state = { families: new Set(MODEL.families.map(f => f.key)), type: 'all', era: 'all', q: '', view: 'chart', ev: null, expanded: new Set() };
 
 function readHash() {
   const p = new URLSearchParams(location.hash.slice(1));
@@ -314,6 +398,51 @@ function renderStats() {
     const d = el('div', { class: 'hx-stat hx-stat-pending' });
     d.append(el('dt', null, 'Pending'), el('dd', null, pending.map(e => e.title).join('; ')));
     dl.append(d);
+  }
+}
+
+/* at a glance: one card per driller, its size and headline deals; each opens its family on the timeline */
+function renderGlance() {
+  const box = document.getElementById('hxGlance');
+  box.textContent = '';
+  for (const fam of MODEL.families) {
+    if (fam.key === GONE_FAMILY) continue;
+    const a = el('a', { href: '#fam-' + cssId(fam.key), class: 'hx-card' });
+    a.style.setProperty('--fam', 'var(' + fam.color + ')');
+    const top = el('span', { class: 'hx-card-head' });
+    top.append(el('span', { class: 'hx-swatch', 'aria-hidden': 'true' }), el('span', { class: 'hx-card-name' }, fam.name));
+    a.append(top);
+    a.append(el('span', { class: 'hx-card-meta' }, fam.lanes.length + (fam.lanes.length === 1 ? ' company' : ' companies') + (fam.since ? ' · since ' + fam.since : '')));
+    const ul = el('span', { class: 'hx-card-deals' });
+    if (fam.landmarks.length) {
+      for (const c of fam.landmarks) {
+        const li = el('span', { class: 'hx-card-deal' });
+        li.append(el('span', { class: 'hx-card-year' }, String(c.e.date).slice(0, 4)), el('span', null, c.label));
+        ul.append(li);
+      }
+    } else ul.append(el('span', { class: 'hx-card-deal is-none' }, fam.lanes.length > 1 ? 'No major deals recorded' : 'No recorded mergers or spin-offs'));
+    a.append(ul);
+    if (fam.text.includes('Pending:')) a.append(el('span', { class: 'hx-card-pending' }, 'Deal pending'));
+    a.addEventListener('click', ev => {
+      ev.preventDefault();
+      state.families.add(fam.key);
+      state.view = 'chart';
+      // a search or event filter that would hide this family is cleared, so the card always lands on it
+      const shown = fam.events.some(eventMatches) || (state.q && fam.lanes.some(laneMatches));
+      if ((state.q || state.type !== 'all') && !shown) {
+        state.q = ''; state.type = 'all';
+        document.getElementById('hxSearch').value = '';
+        document.getElementById('hxType').value = 'all';
+      }
+      update();
+      const sec = document.getElementById('fam-' + cssId(fam.key));
+      if (sec) {
+        sec.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+        const h = sec.querySelector('.hx-family-head');
+        if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+      }
+    });
+    box.append(a);
   }
 }
 
@@ -474,43 +603,85 @@ function renderChart(keepScroll) {
   else scroller.scrollLeft = Math.max(0, scroller.scrollWidth - prevRight);
 }
 
+const BAND_H = 44;        // the headline band above a family's lanes
+const COMPACT_MAX = 6;   // families with more lanes than this open compact
+
+/* the lanes a compact family shows: today's company, its main line, and every company behind a headline deal,
+   with the lanes that connect them */
+function keyLanes(fam) {
+  const keep = new Set([fam.head]);
+  for (const [l, d] of fam.trunk) if (d <= 1) keep.add(l);
+  for (const c of fam.landmarks) for (const l of [c.lane].concat(c.lanes || [])) if (l) keep.add(l);
+  const famSet = new Set(fam.lanes);
+  for (const l of [...keep]) {
+    for (let cur = l, guard = 0; cur && guard++ < 40; ) {
+      keep.add(cur);
+      const v = cur._via;
+      const next = v ? (v.kind === 'branch' ? v.from : v.to) : null;
+      cur = next && famSet.has(next) ? next : null;
+    }
+  }
+  return keep;
+}
+
 function familyBlock(fam) {
-  const sec = el('section', { class: 'hx-family', 'aria-labelledby': 'hxf-' + cssId(fam.key) });
+  const sec = el('section', { class: 'hx-family', 'aria-labelledby': 'hxf-' + cssId(fam.key), id: 'fam-' + cssId(fam.key) });
   sec.style.setProperty('--fam', 'var(' + fam.color + ')');
+  const headWrap = el('div', { class: 'hx-family-top' });
   const head = el('h2', { class: 'hx-family-head', id: 'hxf-' + cssId(fam.key) });
-  const sw = el('span', { class: 'hx-swatch', 'aria-hidden': 'true' });
-  head.append(sw, el('span', { class: 'hx-family-name' }, fam.name));
+  head.append(el('span', { class: 'hx-swatch', 'aria-hidden': 'true' }), el('span', { class: 'hx-family-name' }, fam.name));
   const deals = fam.events.filter(e => !['founded', 'listing'].includes(e.type)).length;
   head.append(el('span', { class: 'hx-family-meta' }, fam.lanes.length + (fam.lanes.length === 1 ? ' company' : ' companies') + ' · ' + deals + (deals === 1 ? ' event' : ' events')));
-  sec.append(head);
+  headWrap.append(head, el('p', { class: 'hx-family-story' }, fam.text));
 
-  const h = fam.lanes.length * ROW_H + 14;
-  const s = svg('svg', { width: scale.width, height: h, class: 'hx-family-svg', role: 'group', 'aria-label': fam.name + ' family timeline' });
-  const yOf = lane => 8 + lane.row * ROW_H + ROW_H - 9;
-  const inFam = new Set(fam.lanes);
+  // compact by default: big families show their key lanes until opened
+  const filtering = !!state.q || state.type !== 'all';
+  const canCompact = !filtering && fam.lanes.length > COMPACT_MAX;
+  const full = !canCompact || state.expanded.has(fam.key);
+  const keep = full ? null : keyLanes(fam);
+  const vis = full ? fam.lanes : fam.lanes.filter(l => keep.has(l));
+  if (canCompact) {
+    const btn = el('button', { type: 'button', class: 'hx-more', 'aria-expanded': String(full), 'aria-controls': 'hxs-' + cssId(fam.key) },
+      full ? 'Show fewer companies' : 'Show all ' + fam.lanes.length + ' companies (' + (fam.lanes.length - vis.length) + ' more)');
+    btn.addEventListener('click', () => {
+      if (full) state.expanded.delete(fam.key); else state.expanded.add(fam.key);
+      update();
+      const again = document.getElementById('fam-' + cssId(fam.key));
+      if (again) { again.querySelector('.hx-more').focus(); if (full) again.scrollIntoView({ block: 'nearest' }); }
+    });
+    headWrap.append(btn);
+  }
+  sec.append(headWrap);
 
-  // decade grid and today line
+  const famSet = new Set(fam.lanes), visSet = new Set(vis);
+  const rowOf = new Map(vis.map((l, i) => [l, i]));
+  const band = fam.landmarks.length ? BAND_H : 6;
+  const h = band + vis.length * ROW_H + 14;
+  const s = svg('svg', { width: scale.width, height: h, class: 'hx-family-svg', role: 'group', id: 'hxs-' + cssId(fam.key), 'aria-label': fam.name + ' family timeline' });
+  const yOf = lane => band + 8 + rowOf.get(lane) * ROW_H + ROW_H - 9;
+
+  // decade grid and today line, below the headline band
   const grid = svg('g', { class: 'hx-grid', 'aria-hidden': 'true' });
-  for (let y = Math.ceil(scale.minY / 10) * 10; y <= scale.maxY; y += 10) grid.append(svg('line', { x1: scale.x(y), x2: scale.x(y), y1: 0, y2: h }));
-  grid.append(svg('line', { x1: scale.x(NOW), x2: scale.x(NOW), y1: 0, y2: h, class: 'hx-now' }));
+  for (let y = Math.ceil(scale.minY / 10) * 10; y <= scale.maxY; y += 10) grid.append(svg('line', { x1: scale.x(y), x2: scale.x(y), y1: band - 4, y2: h }));
+  grid.append(svg('line', { x1: scale.x(NOW), x2: scale.x(NOW), y1: band - 4, y2: h, class: 'hx-now' }));
   s.append(grid);
 
   const links = svg('g', { class: 'hx-links', 'aria-hidden': 'true' });
   const lanesG = svg('g', { class: 'hx-lanes' });
   const marks = svg('g', { class: 'hx-events' });
+  const bandG = svg('g', { class: 'hx-band', 'aria-hidden': 'true' });
 
-  for (const lane of fam.lanes) {
+  for (const lane of vis) {
     const y = yOf(lane);
     const x0 = lane.start === null ? scale.x(scale.minY) : scale.x(lane.start);
     const x1 = scale.x(lane.end === null ? NOW : lane.end);
     const g = svg('g', { class: 'hx-lane' + (lane.current ? ' is-current' : '') + (laneMatches(lane) ? '' : ' is-dim'), 'data-lane': lane.i });
     // bar, leaving room for the curve into the lane it joined
-    const joinOut = lane.terminal && inFam.has(lane.terminal.to) ? lane.terminal : null;
-    const branchIn = lane.inbound.find(l => l.kind === 'branch' && inFam.has(l.from));
+    const joinOut = lane.terminal && visSet.has(lane.terminal.to) ? lane.terminal : null;
+    const branchIn = lane.inbound.find(l => l.kind === 'branch' && visSet.has(l.from));
     const bx0 = branchIn ? Math.min(x1, x0 + JOIN) : x0;
     const bx1 = joinOut ? Math.max(bx0, x1 - JOIN) : x1;
-    const bar = svg('rect', { x: bx0, y: y - BAR_H / 2, width: Math.max(2, bx1 - bx0), height: BAR_H, rx: BAR_H / 2, class: 'hx-bar' + (lane.startUnknown ? ' is-fade' : '') });
-    g.append(bar);
+    g.append(svg('rect', { x: bx0, y: y - BAR_H / 2, width: Math.max(2, bx1 - bx0), height: BAR_H, rx: BAR_H / 2, class: 'hx-bar' + (lane.startUnknown ? ' is-fade' : '') }));
     if (lane.current && lane.end === null) g.append(svg('circle', { cx: x1, cy: y, r: 5, class: 'hx-end' }));
     // names: the present-day name sits beside its end dot; earlier names label their own stretch where they fit
     const segX = lane.segs.map((c, k) => k === 0 ? bx0 : scale.x(parseDate(lane.renames[k - 1].date, true)));
@@ -523,34 +694,41 @@ function familyBlock(fam) {
       }
       const sx = Math.max(segX[k], labelEnd + 8);
       const nx = lastSeg ? (lane.current ? x1 - 6 : x1 + PAD_R - 8) : segX[k + 1];
-      const est = c.name.length * 6.1;
+      const est = c.name.length * 6.7;
       if (k === 0 || sx + est <= Math.max(nx, sx + 1) + (lastSeg ? 60 : 0)) {
         const t = svg('text', { x: sx + 2, y: y - 8, class: 'hx-lane-label' }, c.name);
         if (k === 0 && lane.startUnknown) t.append(svg('tspan', { class: 'hx-unknown' }, ' · founding date unknown'));
         g.append(t);
-        labelEnd = sx + 2 + est + (k === 0 && lane.startUnknown ? 150 : 0);
+        labelEnd = sx + 2 + est + (k === 0 && lane.startUnknown ? 160 : 0);
       }
     });
-    // links to other families
+    // notes for links to other families and outside companies: drawn under the lane, skipped where they would overlap
+    // (every one of these events still has its mark and its panel)
+    const notes = [];
     for (const l of lane.inbound) {
-      if (inFam.has(l.from) || l.stake) continue;
-      const lx = scale.x(l.e._x);
-      g.append(svg('text', { x: Math.max(4, lx - 6), y: y + 16, 'text-anchor': lx > 120 ? 'end' : 'start', class: 'hx-xref' }, (l.kind === 'branch' ? 'from ' : '') + l.from.name + (l.pending ? ' (pending)' : '') + (l.kind === 'join' ? ' →' : '')));
+      if (famSet.has(l.from) || l.stake) continue;
+      notes.push({ x: scale.x(l.e._x), side: 'before', text: (l.kind === 'branch' ? 'from ' : '') + l.from.name + (l.pending ? ' (pending)' : '') + (l.kind === 'join' ? ' →' : '') });
     }
     for (const l of lane.outbound) {
-      if ((inFam.has(l.to) && !l.pending) || l.stake) continue;
+      if ((famSet.has(l.to) && !l.pending) || l.stake) continue;
       const lx = scale.x(l.e._x);
-      const t = (l.kind === 'join' ? '→ into ' : '→ spun off ') + l.to.name + (l.pending ? ' (pending)' : '');
-      g.append(svg('text', { x: lx + 8, y: y + 16, class: 'hx-xref' + (l.pending ? ' is-pending' : '') }, t));
+      notes.push({ x: lx, side: 'after', pending: l.pending, text: (l.kind === 'join' ? '→ into ' : '→ spun off ') + l.to.name + (l.pending ? ' (pending)' : '') });
       if (l.pending) g.append(svg('path', { d: `M${x1} ${y}H${lx + 4}`, class: 'hx-pending' }));
     }
-    for (const o of lane.outsideIn) {
-      const lx = scale.x(o.e._x);
-      g.append(svg('text', { x: Math.max(4, lx - 6), y: y + 16, 'text-anchor': lx > 120 ? 'end' : 'start', class: 'hx-xref' }, 'from ' + o.name));
+    for (const o of lane.outsideIn) notes.push({ x: scale.x(o.e._x), side: 'before', text: 'from ' + o.name });
+    for (const o of lane.outsideOut) notes.push({ x: scale.x(o.e._x), side: 'after', text: '→ ' + o.name });
+    for (const n of notes) {
+      const w = n.text.length * 5.9;
+      if (n.side === 'after') { n.a = n.x + 8; n.b = n.a + w; n.anchor = 'start'; }
+      else if (n.x > w + 12) { n.b = n.x - 6; n.a = n.b - w; n.anchor = 'end'; }
+      else { n.a = 4; n.b = 4 + w; n.anchor = 'start'; }
     }
-    for (const o of lane.outsideOut) {
-      const lx = scale.x(o.e._x);
-      g.append(svg('text', { x: lx + 8, y: y + 16, class: 'hx-xref' }, '→ ' + o.name));
+    notes.sort((p, q) => (q.pending ? 1 : 0) - (p.pending ? 1 : 0) || p.a - q.a);
+    const taken = [];
+    for (const n of notes) {
+      if (taken.some(t => n.a < t.b + 8 && t.a < n.b + 8)) continue;
+      taken.push(n);
+      g.append(svg('text', { x: n.anchor === 'end' ? n.b : n.a, y: y + 15, 'text-anchor': n.anchor, class: 'hx-xref' + (n.pending ? ' is-pending' : '') }, n.text));
     }
     g.addEventListener('pointerenter', () => highlightLineage(lane));
     g.addEventListener('pointerleave', clearHighlight);
@@ -561,36 +739,52 @@ function familyBlock(fam) {
       const ty = yOf(joinOut.to), ex = scale.x(joinOut.e._x);
       links.append(svg('path', { d: `M${ex - JOIN} ${y}C${ex - 6} ${y} ${ex - 10} ${ty} ${ex} ${ty}`, class: 'hx-link', 'data-lane': lane.i }));
     }
-    for (const b of lane.inbound.filter(l => l.kind === 'branch' && inFam.has(l.from))) {
+    for (const b of lane.inbound.filter(l => l.kind === 'branch' && visSet.has(l.from))) {
       const py = yOf(b.from), sx = scale.x(b.e._x);
       links.append(svg('path', { d: `M${sx} ${py}C${sx + 10} ${py} ${sx + 6} ${y} ${sx + JOIN} ${y}`, class: 'hx-link' + (b.pending ? ' is-pending' : ''), 'data-lane': lane.i }));
     }
   }
 
-  // event markers: on the lane the event happened to
-  const placed = {};
+  // event markers: on the lane the event happened to; headline deals are larger
+  const placed = {}, pos = {};
   for (const e of fam.events) {
-    const lane = markerLane(e, inFam);
+    const lane = markerLane(e, visSet);
     if (!lane || e._x === null) continue;
     let x = scale.x(e._x);
     const y = yOf(lane);
-    // nudge markers that would sit on top of one another
+    const big = LANDMARK_IDS.has(e.id) && fam.landmarks.some(c => c.e === e);
     const key = lane.i + ':' + Math.round(x / 9);
     placed[key] = (placed[key] || 0) + 1;
-    if (placed[key] > 1) x += (placed[key] - 1) * 9;
-    const g = svg('g', { class: 'hx-ev hx-ev-' + e.type + (e.pending ? ' is-pending' : '') + (eventMatches(e) ? '' : ' is-dim'),
+    if (placed[key] > 1 && !big) x += (placed[key] - 1) * 9; // nudge markers that would sit on one another
+    pos[e.id] = { x, y };
+    const g = svg('g', { class: 'hx-ev hx-ev-' + e.type + (big ? ' is-landmark' : '') + (e.pending ? ' is-pending' : '') + (eventMatches(e) ? '' : ' is-dim'),
       tabindex: '0', role: 'button', 'aria-label': eventLabel(e), 'data-ev': e.id });
-    g.append(svg('circle', { cx: x, cy: y, r: 12, class: 'hx-hit' }));
-    g.append(glyph(e.type, x, y, 4.5));
+    g.append(svg('circle', { cx: x, cy: y, r: big ? 14 : 12, class: 'hx-hit' }));
+    g.append(glyph(e.type, x, y, big ? 7 : 4.5));
     g.addEventListener('click', () => openPanel(e, g));
     g.addEventListener('keydown', ev => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); openPanel(e, g); } });
     g.addEventListener('pointerenter', ev => showTip(e, ev));
     g.addEventListener('pointerleave', hideTip);
     g.addEventListener('focus', () => showTipAt(e, g));
     g.addEventListener('blur', hideTip);
-    marks.append(g);
+    if (big) marks.append(g); else marks.insertBefore(g, marks.firstChild);
   }
-  s.append(links, lanesG, marks);
+
+  // headline band: each big deal named above the lanes, with a hairline down to its mark (two rows so names don't collide)
+  const ends = [-1e9, -1e9];
+  for (const c of fam.landmarks) {
+    const p = pos[c.e.id];
+    if (!p) continue;
+    const text = c.label + ', ' + String(c.e.date).slice(0, 4);
+    const w = text.length * 6.6;
+    const cx = Math.min(scale.width - w / 2 - 6, Math.max(PAD_L + w / 2, p.x));
+    let row = ends[0] < cx - w / 2 - 10 ? 0 : (ends[1] < cx - w / 2 - 10 ? 1 : (ends[0] <= ends[1] ? 0 : 1));
+    ends[row] = cx + w / 2;
+    const ty = row === 0 ? 15 : 33;
+    bandG.append(svg('path', { d: `M${p.x} ${ty + 4}V${p.y - 9}`, class: 'hx-leader' }));
+    bandG.append(svg('text', { x: cx, y: ty, 'text-anchor': 'middle', class: 'hx-band-label' }, text));
+  }
+  s.append(bandG, links, lanesG, marks);
   sec.append(s);
   return sec;
 }
@@ -797,6 +991,7 @@ function init() {
   if (!location.hash && window.matchMedia('(max-width: 700px)').matches) state.view = 'list';
   initTheme();
   renderStats();
+  renderGlance();
   initControls();
   renderLegend();
   document.getElementById('hxAsOf').textContent = DATA.asOf ? 'History as of ' + formatDate(DATA.asOf) : '';

@@ -54,6 +54,7 @@ const STATES = [
   { name: 'history: timeline, dark', page: 'history.html', hash: '', theme: 'dark' },
   { name: 'history: event open', page: 'history.html', hash: '', run: "document.querySelector('.hx-ev').dispatchEvent(new MouseEvent('click', { bubbles: true }))" },
   { name: 'history: list, dark', page: 'history.html', hash: '#view=list', theme: 'dark' },
+  { name: 'history: family opened, dark', page: 'history.html', hash: '', theme: 'dark', run: "document.querySelector('.hx-more').click()" },
   { name: 'history: no matches', page: 'history.html', hash: '#q=zzzz' },
   { name: 'phone: history', page: 'history.html', hash: '', phone: true },
   { name: 'phone: history event, dark', page: 'history.html', hash: '#view=list', phone: true, theme: 'dark', run: "document.querySelector('.hx-row').click()" }
