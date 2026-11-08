@@ -317,7 +317,7 @@ function familyStory(fam) {
   if (others) text += offText2;
   const pending = EVENTS.filter(e => e.pending && e.from.concat(e.to).some(id => { const l = MODEL.laneOf[id]; return l && inFam.has(l); }));
   if (pending.length) text += ' Pending: ' + pending.map(e => e.title.replace(/ \(pending\)$/, '')).join('; ') + '.';
-  return { text, landmarks, since, head, trunk };
+  return { text, landmarks, since, head, trunk, pending };
 }
 for (const fam of MODEL.families) Object.assign(fam, familyStory(fam));
 const LANDMARK_IDS = new Set(MODEL.families.flatMap(f => f.landmarks.map(c => c.e.id)));
@@ -438,8 +438,14 @@ function renderGlance() {
         ul.append(li);
       }
     } else ul.append(el('span', { class: 'hx-card-deal is-none' }, fam.lanes.length > 1 ? 'No major deals recorded' : 'No recorded mergers or spin-offs'));
+    // a pending deal is a plain row naming the other side, not a badge
+    for (const e of fam.pending) {
+      const other = e.from.concat(e.to).map(id => CO[id]).find(c => c && !fam.lanes.some(l => l.segs.some(s => s.id === c.id)));
+      const li = el('span', { class: 'hx-card-deal is-pending' });
+      li.append(el('span', { class: 'hx-card-year' }, String(e.date).slice(0, 4)), el('span', null, (other ? shortName(other.name) + ' ' : '') + e.type + ', pending'));
+      ul.append(li);
+    }
     a.append(ul);
-    if (fam.text.includes('Pending:')) a.append(el('span', { class: 'hx-card-pending' }, 'Deal pending'));
     a.addEventListener('click', ev => {
       ev.preventDefault();
       state.families.add(fam.key);
