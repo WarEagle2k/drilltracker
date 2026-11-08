@@ -1133,11 +1133,12 @@ function renderVertical() {
   canvas.style.width = '';
   canvas.classList.add('is-vertical');
   const filtering = !!state.q || state.type !== 'all';
+  const narrowing = filtering || state.era !== 'all'; // the year control narrows the list too, without unfolding small events
   let shown = 0;
   for (const fam of MODEL.families) {
     if (!state.families.has(fam.key)) continue;
     const famHasMatch = fam.events.some(eventMatches) || (state.q && fam.lanes.some(laneMatches));
-    if (!famHasMatch && filtering) continue;
+    if (!famHasMatch && narrowing) continue;
     shown++;
     const sec = el('section', { class: 'hx-family hx-vt-family', 'aria-labelledby': 'hxf-' + cssId(fam.key), id: 'fam-' + cssId(fam.key) });
     sec.style.setProperty('--fam', 'var(' + fam.color + ')');
@@ -1147,7 +1148,7 @@ function renderVertical() {
     head.append(el('span', { class: 'hx-family-meta' }, fam.lanes.length + (fam.lanes.length === 1 ? ' company' : ' companies')));
     top.append(head, el('p', { class: 'hx-family-story' }, fam.text), miniTree(fam));
     sec.append(top);
-    const all = fam.events.filter(e => !filtering || eventMatches(e));
+    const all = fam.events.filter(eventMatches);
     const full = filtering || state.expanded.has(fam.key);
     const smallOnes = all.filter(e => (isMinor(e) || e.type === 'founded') && !LANDMARK_IDS.has(e.id));
     const list = full ? all : all.filter(e => !smallOnes.includes(e));
