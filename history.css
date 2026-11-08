@@ -52,7 +52,7 @@ html.hx-page body { min-height: 100dvh; display: flex; flex-direction: column; }
 .hx-legend-pending { stroke: var(--color-text-muted); stroke-width: 2; stroke-dasharray: 4 3; fill: none; }
 
 /* timeline */
-.hx-chart { background: var(--color-surface); border: 1px solid var(--color-divider); border-radius: var(--radius-lg); overflow: hidden; }
+.hx-chart { background: var(--color-bg); border: 1px solid var(--color-divider); border-radius: var(--radius-lg); overflow: hidden; }
 .hx-scroll { overflow-x: auto; overflow-y: hidden; }
 .hx-scroll:focus-visible { outline-offset: -2px; }
 .hx-canvas { position: relative; padding-bottom: var(--space-2); }
@@ -62,9 +62,16 @@ html.hx-page body { min-height: 100dvh; display: flex; flex-direction: column; }
 .hx-tick-label.is-minor { font-size: 10px; opacity: 0.8; }
 .hx-now-label { fill: var(--color-text-muted); font: 600 11px var(--font-body); }
 
-.hx-family { border-top: 1px solid var(--color-divider); }
-.hx-family-head { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-base); font-weight: 700; flex-wrap: wrap; }
-.hx-family-head .hx-swatch { width: 12px; height: 12px; }
+.hx-family { --panel: var(--color-surface); background: var(--panel); border-block: 1px solid var(--color-divider); margin-top: var(--space-3); }
+.hx-family + .hx-axis { margin-top: var(--space-2); }
+/* each family sits on its own panel, washed very lightly in its colour, with page background between panels */
+@supports (background: color-mix(in srgb, red 5%, white)) {
+  .hx-family { --panel: color-mix(in srgb, var(--fam) 5%, var(--color-surface)); }
+  [data-theme="dark"] .hx-family { --panel: color-mix(in srgb, var(--fam) 6%, var(--color-surface)); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .hx-family { --panel: color-mix(in srgb, var(--fam) 6%, var(--color-surface)); } }
+}
+.hx-family-head { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-lg); font-weight: 700; flex-wrap: wrap; }
+.hx-family-head .hx-swatch { width: 14px; height: 14px; border-radius: 4px; }
 .hx-family-meta { font-weight: 400; font-size: var(--text-xs); color: var(--color-text-muted); }
 .hx-family-svg { display: block; overflow: visible; }
 
@@ -73,7 +80,7 @@ html.hx-page body { min-height: 100dvh; display: flex; flex-direction: column; }
 .hx-bar { fill: var(--fam); opacity: 0.55; }
 .hx-lane.is-current .hx-bar { opacity: 1; }
 .hx-bar.is-fade { opacity: 0.3; }
-.hx-end { fill: var(--fam); stroke: var(--color-surface); stroke-width: 2; }
+.hx-end { fill: var(--fam); stroke: var(--panel, var(--color-surface)); stroke-width: 2; }
 .hx-link { fill: none; stroke: var(--fam); stroke-width: 2; stroke-linecap: round; opacity: 0.55; }
 .hx-link.is-pending, .hx-pending { fill: none; stroke: var(--fam); stroke-width: 2; stroke-dasharray: 4 3; opacity: 0.8; }
 .hx-lane-label { fill: var(--color-text-muted); font: 500 11px var(--font-body); }
@@ -83,14 +90,14 @@ html.hx-page body { min-height: 100dvh; display: flex; flex-direction: column; }
 .hx-xref.is-pending { fill: var(--color-text-muted); font-style: normal; font-weight: 600; }
 
 /* event marks: family colour with a surface ring; the hit area is bigger than the mark */
-.hx-mark { fill: var(--fam); stroke: var(--color-surface); stroke-width: 2; }
-.hx-mark-ring { fill: var(--color-surface); stroke: var(--fam); stroke-width: 2; }
+.hx-mark { fill: var(--fam); stroke: var(--panel, var(--color-surface)); stroke-width: 2; }
+.hx-mark-ring { fill: var(--panel, var(--color-surface)); stroke: var(--fam); stroke-width: 2; }
 .hx-mark-tick { stroke-width: 1.5; }
 .hx-hit { fill: transparent; }
 .hx-ev { cursor: pointer; outline: none; }
 .hx-ev:hover .hx-mark, .hx-ev:focus-visible .hx-mark, .hx-ev.is-open .hx-mark { stroke: var(--color-text); }
 .hx-ev:focus-visible .hx-hit, .hx-ev.is-open .hx-hit { stroke: var(--color-primary); stroke-width: 2; }
-.hx-ev.is-pending .hx-mark { stroke-dasharray: 2 2; stroke: var(--fam); fill: var(--color-surface); }
+.hx-ev.is-pending .hx-mark { stroke-dasharray: 2 2; stroke: var(--fam); fill: var(--panel, var(--color-surface)); }
 .is-dim { opacity: 0.18; }
 .hx-canvas.is-tracing .hx-lane:not(.is-traced), .hx-canvas.is-tracing .hx-link:not(.is-traced) { opacity: 0.15; }
 
