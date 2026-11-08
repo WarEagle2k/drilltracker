@@ -427,6 +427,13 @@ function renderGlance() {
       ev.preventDefault();
       state.families.add(fam.key);
       state.view = 'chart';
+      // a search or event filter that would hide this family is cleared, so the card always lands on it
+      const shown = fam.events.some(eventMatches) || (state.q && fam.lanes.some(laneMatches));
+      if ((state.q || state.type !== 'all') && !shown) {
+        state.q = ''; state.type = 'all';
+        document.getElementById('hxSearch').value = '';
+        document.getElementById('hxType').value = 'all';
+      }
       update();
       const sec = document.getElementById('fam-' + cssId(fam.key));
       if (sec) {
