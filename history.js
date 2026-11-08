@@ -49,7 +49,7 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const ROW_H = 34;        // one lane
 const BAR_H = 6;         // thin lane bar
 const PAD_L = 16;
-const PAD_R = 175;       // room for the present-day names beside the end dots
+let PAD_R = 175;         // room for the present-day names beside the end dots (widened below to fit the longest)
 const AXIS_H = 26;
 const JOIN = 18;         // horizontal run of a join or branch curve
 
@@ -220,6 +220,7 @@ function buildModel() {
 function famRank(k) { const i = FAMILY_ORDER.indexOf(k); return k === GONE_FAMILY ? 999 : (i < 0 ? 500 : i); }
 
 const MODEL = buildModel();
+PAD_R = Math.min(240, Math.max(PAD_R, ...MODEL.lanes.filter(l => l.current && l.end === null).map(l => Math.ceil(l.name.length * 7.2) + 24)));
 
 /* ---------- landmarks and stories ----------
    Each family's headline deals: the biggest by stated US-dollar value, or, where no value is given,
@@ -771,8 +772,13 @@ function familyBlock(fam) {
     lane.segs.forEach((c, k) => {
       const lastSeg = k === lane.segs.length - 1;
       if (lastSeg && lane.current && lane.end === null) {
-        g.append(svg('text', { x: x1 + 10, y: y + 4, class: 'hx-lane-label is-end' + (lane.trackerName ? ' is-current' : '') }, c.name));
-        boxes.push({ a: x1 + 10, b: x1 + 10 + c.name.length * 7.2, top: y - 7, bot: y + 7 });
+        // a name too long for the right margin drops its legal suffix (the full name is in the tooltip and panel)
+        const room = (PAD_R - 18) / 7.2;
+        const shown = c.name.length <= room ? c.name : shortName(c.name);
+        const t = svg('text', { x: x1 + 10, y: y + 4, class: 'hx-lane-label is-end' + (lane.trackerName ? ' is-current' : '') }, shown);
+        if (shown !== c.name) t.append(svg('title', null, c.name));
+        g.append(t);
+        boxes.push({ a: x1 + 10, b: x1 + 10 + shown.length * 7.2, top: y - 7, bot: y + 7 });
         return;
       }
       const sx = Math.max(segX[k], labelEnd + 8);
