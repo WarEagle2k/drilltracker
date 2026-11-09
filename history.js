@@ -986,6 +986,13 @@ function renderChart(keepScroll) {
   document.getElementById('hxAxisTrack').style.transform = 'translateX(' + (-scroller.scrollLeft) + 'px)';
 }
 
+/* A link from a family to its rigs on the map (the map's contractor filter lives in its hash). */
+function mapLink(fam) {
+  if (fam.key === GONE_FAMILY) return null;
+  const a = el('a', { class: 'hx-maplink', href: 'index.html#' + new URLSearchParams({ contractor: fam.key }), 'aria-label': 'Rigs on the map: ' + fam.key }, 'Rigs on the map');
+  a.append(el('span', { 'aria-hidden': 'true' }, ' \u2192'));
+  return a;
+}
 const COMPACT_MAX = 6;   // families with more lanes than this open compact
 
 /* the lanes a compact family shows: today's company, its main line, and every company behind a headline deal,
@@ -1015,6 +1022,8 @@ function familyBlock(fam) {
   const deals = fam.events.filter(e => !['founded', 'listing'].includes(e.type)).length;
   head.append(el('span', { class: 'hx-family-meta' }, fam.lanes.length + (fam.lanes.length === 1 ? ' company' : ' companies') + ' · ' + deals + (deals === 1 ? ' event' : ' events')));
   headWrap.append(head, el('p', { class: 'hx-family-story' }, fam.text));
+  const acts = el('div', { class: 'hx-family-acts' });
+  headWrap.append(acts);
 
   // compact by default: big families show their key lanes until opened
   const filtering = !!state.q || state.type !== 'all';
@@ -1031,8 +1040,9 @@ function familyBlock(fam) {
       const again = document.getElementById('fam-' + cssId(fam.key));
       if (again) { again.querySelector('.hx-more').focus(); if (full) again.scrollIntoView({ block: 'nearest' }); }
     });
-    headWrap.append(btn);
+    acts.append(btn);
   }
+  const ml = mapLink(fam); if (ml) acts.append(ml);
   sec.append(headWrap);
 
   const famSet = new Set(fam.lanes), visSet = new Set(vis);
@@ -1225,7 +1235,9 @@ function renderVertical() {
     const head = el('h2', { class: 'hx-family-head', id: 'hxf-' + cssId(fam.key) });
     head.append(el('span', { class: 'hx-swatch', 'aria-hidden': 'true' }), el('span', { class: 'hx-family-name' }, fam.name));
     head.append(el('span', { class: 'hx-family-meta' }, fam.lanes.length + (fam.lanes.length === 1 ? ' company' : ' companies')));
-    top.append(head, el('p', { class: 'hx-family-story' }, fam.text), miniTree(fam));
+    top.append(head, el('p', { class: 'hx-family-story' }, fam.text));
+    const ml = mapLink(fam); if (ml) { const acts = el('div', { class: 'hx-family-acts' }); acts.append(ml); top.append(acts); }
+    top.append(miniTree(fam));
     sec.append(top);
     const all = fam.events.filter(eventMatches);
     const full = filtering || state.expanded.has(fam.key);
@@ -1362,7 +1374,7 @@ function openPanel(e, from) {
   };
   if (e.type === 'rename') { addCos('Old name', e.from); addCos('New name', e.to); }
   else if (e.type === 'founded' || e.type === 'listing' || e.type === 'restructuring') addCos('Company', e.to.length ? e.to : e.from);
-  else if (e.type === 'fleet' || e.type === 'divestment') { addCos('Seller', e.from); addCos('Buyer', e.to); }
+  else if (e.type === 'fleet' || e.type === 'divestment') { addCos('Seller', e.from.filter(id => !e.to.includes(id))); addCos('Buyer', e.to); } // a buyer the record also lists going in is not a seller
   else if (e.type === 'spin-off' || e.type === 'jv') { addCos(e.type === 'jv' ? 'Partners' : 'Parent', e.from); addCos(e.type === 'jv' ? 'Joint venture' : 'Spun off', e.to); }
   else if (e.type === 'acquisition') {
     const r = dealRoles(e);
@@ -1509,6 +1521,18 @@ function init() {
   canvas.classList.add('is-intro');
   setTimeout(() => canvas.classList.remove('is-intro'), 1200);
   update(true);
+  const smooth = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+  document.getElementById('hxJump').addEventListener('click', ev => {
+    ev.preventDefault(); // the hash holds the page's state, so scroll by hand
+    const bar = document.getElementById('hxToolbar');
+    bar.scrollIntoView({ behavior: smooth(), block: 'start' });
+    bar.focus({ preventScroll: true });
+  });
+  // arriving with one driller picked (the rig map's History link): land on its timeline
+  if (state.families.size === 1 && !state.ev) {
+    const sec = document.getElementById('fam-' + cssId([...state.families][0]));
+    if (sec) requestAnimationFrame(() => document.getElementById('hxToolbar').scrollIntoView({ block: 'start' }));
+  }
   if (state.ev) { const e = EVENTS.find(x => x.id === state.ev); if (e) openPanel(e, null); }
 }
 init();

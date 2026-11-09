@@ -21,8 +21,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="styles.css?v=fe792de9">
-<link rel="stylesheet" href="history.css?v=d76af600">
+<link rel="stylesheet" href="styles.css?v=79b6902d">
+<link rel="stylesheet" href="history.css?v=48d1fb3a">
 </head>
 <body>
 
@@ -62,6 +62,7 @@
     <div class="hx-intro-text">
       <h1 id="hxTitle">The driller family tree</h1>
       <p>Today's offshore drillers are the result of decades of mergers, takeovers and spin-offs. Transocean alone brings together more than twenty companies. This page shows where each driller on the rig map came from: pick one below, or scroll the timeline.</p>
+      <p><a class="hx-jump" id="hxJump" href="#hxToolbar">Jump to the timeline <span aria-hidden="true">&darr;</span></a></p>
     </div>
     <dl class="hx-stats" id="hxStats"></dl>
   </section>
@@ -107,7 +108,7 @@
     </div>
   </section>
 
-  <div class="hx-toolbar" role="group" aria-label="Filter the history">
+  <div class="hx-toolbar" id="hxToolbar" tabindex="-1" role="group" aria-label="Filter the history">
     <div class="hx-families" id="hxFamilies" role="group" aria-label="Show drillers"></div>
     <div class="hx-controls">
       <label class="hx-field"><span>Search</span>
@@ -160,6 +161,6 @@
 </footer>
 
 <script src="history-data.js?v=547d0239"></script>
-<script src="history.js?v=abb1b557"></script>
+<script src="history.js?v=82565261"></script>
 </body>
 </html>
