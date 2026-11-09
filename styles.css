@@ -903,6 +903,7 @@ a:hover { color: var(--color-primary-hover); }
 .detail-rig-name { font-size: var(--text-lg); font-weight: 700; line-height: 1.2; margin-bottom: var(--space-1); }
 .detail-aka { display: block; font-size: var(--text-xs); font-weight: 400; color: var(--color-text-faint); margin-top: 2px; }
 .detail-contractor { font-size: var(--text-sm); color: var(--color-text-muted); }
+.detail-history { text-decoration: underline; text-underline-offset: 2px; }
 
 .detail-body {
   flex: 1;

@@ -1572,7 +1572,15 @@ function openDetail(rig, opener, opts) {
   const nameEl = document.getElementById('detailName'), aka = rig.name.match(/^(.*?) \((ex .+)\)$/);
   nameEl.textContent = aka ? aka[1] : rig.name;
   if (aka) nameEl.insertAdjacentHTML('beforeend', ' <span class="detail-aka">' + escapeHtml(aka[2]) + '</span>');
-  document.getElementById('detailContractor').textContent = rig.contractor + (rig.owner ? ' · owned by ' + rig.owner : '');
+  const conEl = document.getElementById('detailContractor');
+  conEl.textContent = rig.contractor + (rig.owner ? ' · owned by ' + rig.owner : '') + ' · ';
+  // how this driller came to be: its family on the history page
+  const hist = document.createElement('a');
+  hist.className = 'detail-history';
+  hist.href = 'history.html#' + new URLSearchParams({ family: rig.contractor });
+  hist.textContent = 'History';
+  hist.setAttribute('aria-label', 'History of ' + rig.contractor);
+  conEl.appendChild(hist);
 
   // with nothing current or ahead, the last contract that ended still says something
   const lastEnded = d.shown ? null : d.contracts.filter(x => x.e && x.e < AS_OF).pop() || null;
