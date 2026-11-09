@@ -83,7 +83,7 @@ The list is built by `scripts/build-changes.js`, which compares `rigs.js` with t
 
 ## Header
 
-The filters button shows how many filters are on, so they aren't forgotten while the sidebar is closed. **History** opens the driller family tree (below). **Changes** opens the change list above. **CSV** exports the rigs shown, with every contract, source and note; it is disabled when nothing matches. The **?** button replays the intro tour (on a phone, it's a link in the footer).
+The filters button shows how many filters are on, so they aren't forgotten while the sidebar is closed. **History** opens the driller family tree (below). **Changes** opens the change list above. **CSV** exports the rigs shown, with every contract, source and note; it is disabled when nothing matches. On a phone the header has no room for it, so it is an **Export CSV** link in the footer. The **?** button replays the intro tour (on a phone, it's a link in the footer).
 
 ## Intro tour
 
