@@ -777,7 +777,7 @@ function fitToRigs(animate) {
   if (!map.getContainer().clientWidth) { fitWhenSized = true; return; }
   const bounds = L.latLngBounds(filteredRigs.map(r => [r.lat, r.lng]));
   if (animate) glideToBounds(bounds, fit => Math.min(fit, 6));
-  else map.fitBounds(bounds, Object.assign(mapPadding(), { maxZoom: 6, animate: false }));
+  else map.fitBounds(bounds, Object.assign(mapPadding(bounds), { maxZoom: 6, animate: false }));
 }
 
 /* Glides: every zoom the app makes (a cluster, "Zoom to the rigs shown", Show on map) flies
@@ -785,7 +785,7 @@ function fitToRigs(animate) {
    motion if the viewer has asked for less. */
 function glideToBounds(bounds, pickZoom, done) {
   if (!map.getSize().x) return; // a hidden map has no size to fit to; it fits when shown
-  const pad = mapPadding();
+  const pad = mapPadding(bounds);
   const fit = map.getBoundsZoom(bounds, false, L.point(pad.paddingTopLeft).add(pad.paddingBottomRight));
   const zoom = Math.min(MAP_MAX_ZOOM, pickZoom(fit));
   // centre the bounds in the part of the map the padding leaves clear
@@ -836,12 +836,31 @@ function startFlightBasemap() {
 
 /* Room to keep markers clear of the zoom controls, the filter pill and the map key (open,
    or folded to its button at the bottom right) */
-function mapPadding() {
+/* Room to leave around a fit. The open map key is only given room when a rig in the fit would
+   otherwise land under it: reserving its width every time made the opening view a quarter
+   narrower, and near the world's edge the map can't slide far enough to use the room anyway. */
+function mapPadding(bounds) {
   const legend = document.getElementById('mapLegend');
   const open = legend && !legend.hidden && !legend.classList.contains('collapsed');
-  const legendW = open && map.getSize().x > 600 ? legend.offsetWidth + 24 : 0;
   const pill = !document.getElementById('filterPill').hidden;
-  return { paddingTopLeft: [64, pill ? 72 : 32], paddingBottomRight: [Math.max(32, legendW), open ? 32 : 60] };
+  const pad = { paddingTopLeft: [64, pill ? 72 : 32], paddingBottomRight: [32, open ? 32 : 60] };
+  if (!open || map.getSize().x <= 600) return pad;
+  if (bounds && !keyCovers(bounds, pad, legend)) return pad;
+  if (legend.offsetLeft < map.getSize().x / 2) pad.paddingTopLeft[0] = Math.max(pad.paddingTopLeft[0], legend.offsetLeft + legend.offsetWidth + 24);
+  else pad.paddingBottomRight[0] = legend.offsetWidth + 24;
+  return pad;
+}
+/* Would a rig inside these bounds sit under the map key, if the map were fitted with this padding? */
+function keyCovers(bounds, pad, legend) {
+  const t = map._getBoundsCenterZoom(bounds, Object.assign({ maxZoom: 6 }, pad));
+  const centre = map._limitCenter(t.center, t.zoom, map.options.maxBounds);
+  const origin = map.project(centre, t.zoom).subtract(map.getSize().divideBy(2));
+  const m = map.getContainer().getBoundingClientRect(), k = legend.getBoundingClientRect(), r = 18; // r: a marker's reach
+  return filteredRigs.some(function (rig) {
+    if (!bounds.contains([rig.lat, rig.lng])) return false;
+    const p = map.project([rig.lat, rig.lng], t.zoom).subtract(origin), x = p.x + m.left, y = p.y + m.top;
+    return x > k.left - r && x < k.right + r && y > k.top - r && y < k.bottom + r;
+  });
 }
 
 const FitControl = window.L ? L.Control.extend({
@@ -1213,6 +1232,7 @@ function updateFilterCount(count) {
   document.getElementById('filterDone').textContent = count ? 'Show ' + plural(count, 'rig') : 'No rigs match';
   const exp = document.getElementById('exportBtn'), what = 'Export the ' + plural(count, 'rig') + ' shown to CSV';
   exp.setAttribute('aria-label', what); exp.title = what; exp.disabled = !count;
+  document.getElementById('exportFooterBtn').disabled = !count;
 }
 
 /* With facets the only way to reach zero is the search, so say so */

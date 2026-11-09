@@ -35,7 +35,7 @@ const TOUR_STEPS = [
       'Select a rig for its details: contracts, a timeline of what it is booked for, specs and sources.'
   },
   {
-    targets: ['#mapLegend'], place: 'left',
+    targets: ['#mapLegend'], get place() { return document.getElementById('mapLegend').offsetLeft < innerWidth / 3 ? 'right' : 'left'; }, // the key is bottom-left on a wide map
     // a folded key would leave nothing to point at, so open it for this stop
     enter: () => { if (document.getElementById('mapLegend').classList.contains('collapsed')) { toggleLegend(); tourOpenedLegend = true; } },
     title: 'Map key',
@@ -55,7 +55,7 @@ const TOUR_STEPS = [
       'each linked to its rig.'
   },
   {
-    targets: ['#exportBtn'], place: 'bottom',
+    targets: ['#exportBtn', '#exportFooterBtn'], place: 'top', // 'top' drops below a target at the top of the page
     title: 'Take the data with you',
     body: () => 'Download the rigs shown, with their contracts, as a CSV file.'
   },

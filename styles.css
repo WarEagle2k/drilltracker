@@ -780,6 +780,9 @@ a:hover { color: var(--color-primary-hover); }
   margin-left: auto; width: 7px; height: 7px; border: solid currentColor; border-width: 0 1.5px 1.5px 0;
   transform: translateY(-2px) rotate(45deg); transition: transform var(--transition-fast);
 }
+/* on a wide map the key sits bottom-left, over the south-east Pacific where no rigs work;
+   bottom-right it covered south-east Asia and Australia, and the open details pane covered it */
+@media (min-width: 769px) and (min-height: 501px) { .map-legend { right: auto; left: var(--space-4); } }
 .map-legend.collapsed .legend-collapsible { display: none; }
 .map-legend.collapsed { width: auto; }
 .map-legend.collapsed .legend-chevron { transform: translateY(1px) rotate(-135deg); }
@@ -1609,11 +1612,14 @@ button.changes-rig-name:hover { text-decoration-color: currentColor; }
   .tour-btn { min-height: 40px; }
   .tour-close { width: 40px; height: 40px; }
 }
-/* on a phone the header has no room for the tour button, so the footer offers it instead */
+/* on a phone the header has no room for the tour and CSV buttons (the last one ran off the screen),
+   so the footer offers them instead */
 .footer-tour { display: none; }
 .footer-tour-btn { font: inherit; color: var(--color-text-muted); text-decoration: underline; padding: 0; }
 .footer-tour-btn:hover { color: var(--color-primary); }
+.footer-tour-btn:disabled { opacity: 0.5; text-decoration: none; cursor: default; }
 @media (max-width: 480px) {
-  #tourBtn { display: none; }
+  #tourBtn, #exportBtn { display: none; }
+  .header-left { gap: var(--space-2); }
   .footer-tour { display: inline; }
 }
